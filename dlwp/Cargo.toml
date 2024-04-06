@@ -1,5 +1,6 @@
 [package]
 name = "dlwp"
+authors = ["Nathan McMillan <nathanmcmillan54@gmail.com>"]
 description = "The DLWP library"
 version = "0.1.0-alpha"
 edition = "2021"
