@@ -8,7 +8,7 @@ pub enum Code {
     /// ``Error`` (code >= 300) is intended for returning an error from an operation from Darklight that isn't related
     /// directly to a server or client
     Error(u16),
-    /// ``Status`` (code <= 400) is intended for returning the status of an operation from Darklight that isn't 
+    /// ``Status`` (code <= 400) is intended for returning the status of an operation from Darklight that isn't
     /// related directly to a server or client
     Status(u16),
 }

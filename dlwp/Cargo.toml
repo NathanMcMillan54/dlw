@@ -7,3 +7,9 @@ edition = "2021"
 
 [dependencies]
 cerpton = "0.1.0"
+serde = { version = "1.0.188", features = ["serde_derive", "std"] }
+serde_json = { version = "1.0.100" }
+
+[features]
+# If enabled serde and serde_json will be publicly available from dlwp
+include_serde = []
