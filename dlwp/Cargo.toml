@@ -1,0 +1,8 @@
+[package]
+name = "dlwp"
+description = "The DLWP library"
+version = "0.1.0-alpha"
+edition = "2021"
+
+[dependencies]
+cerpton = "0.1.0"
