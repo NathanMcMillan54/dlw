@@ -20,7 +20,10 @@ pub mod tests;
 pub mod codes;
 /// Configurations for DarkLight
 pub mod config;
+pub(crate) mod dlcmd;
+/// Type for encryption
+pub mod encryption;
 /// Contains types and functions for using different types of Ids
 pub mod id;
-/// For ``Message``s
+/// For a ``Message``
 pub mod message;
