@@ -27,3 +27,5 @@ pub mod encryption;
 pub mod id;
 /// For a ``Message``
 pub mod message;
+/// Used for creating DarkLight clients and servers
+pub mod stream;
