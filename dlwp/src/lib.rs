@@ -20,11 +20,19 @@ pub mod tests;
 pub mod codes;
 /// Configurations for DarkLight
 pub mod config;
+
+#[cfg(feature = "use_io")]
+pub mod distributor;
+
 pub(crate) mod dlcmd;
 /// Type for encryption
 pub mod encryption;
 /// Contains types and functions for using different types of Ids
 pub mod id;
+
+#[cfg(feature = "use_io")]
+pub mod io;
+
 /// For a ``Message``
 pub mod message;
 /// Used for creating DarkLight clients and servers

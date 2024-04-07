@@ -1,0 +1,15 @@
+[package]
+name = "darklight_driver"
+authors = ["Nathan McMillan"]
+version = "0.1.0-alpha"
+edition = "2021"
+
+[dependencies]
+dlwp = { path = "../dlwp/" }
+
+[build-dependencies]
+chrono = "0.4.31"
+
+[profile.release]
+opt-level = 3
+lto = "fat"

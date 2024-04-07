@@ -1,4 +1,5 @@
 [workspace]
-members = [ "dlwp",
+members = [
+    "darklight_driver/",
     "dlwp/",
 ]

@@ -6,6 +6,13 @@ pub const INFO_SPLIT: &str = "\\|\\";
 const INFO_SPLIT_AREA: &str = " \\|\\ ";
 pub const CONTENTS_LENGTH: usize = 4096;
 
+/// The start of a message being sent
+pub const MSG_INIT: &str = "\\z ";
+/// The start of a message being sent on a serial device
+pub const SN_MSG_INIT: &str = "\\\\z ";
+/// The end of a message being sent
+pub const MSG_END: &str = " \\q";
+
 /// "contents" type, 4096 byte array
 pub type Contents = [u8; CONTENTS_LENGTH];
 

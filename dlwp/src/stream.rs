@@ -1,5 +1,9 @@
 use crate::{
-    codes::{Code, STATUS_OK}, dlcmd::{send_dlcmd, CONNECT}, encryption::EncryptionInfo, id::{DId, LId}, message::Message
+    codes::{Code, STATUS_OK},
+    dlcmd::{send_dlcmd, CONNECT},
+    encryption::EncryptionInfo,
+    id::{DId, LId},
+    message::Message,
 };
 
 #[allow(improper_ctypes_definitions)]
@@ -16,16 +20,16 @@ pub(crate) const EMPTY_ENCRYPTIONIFNO: EncryptionInfo = EncryptionInfo {
 #[derive(Copy, Clone)]
 pub enum StreamType {
     Client {
-        /// The receiving id of a client/server 
+        /// The receiving id of a client/server
         rid: LId,
         /// The client/server's Distributor Id
         rdid: DId,
         /// The port that the client/server is using
-        port: u16
+        port: u16,
     },
     Server {
         /// Port to bind to
-        port: u16
+        port: u16,
     },
 }
 
