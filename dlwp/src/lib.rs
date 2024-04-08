@@ -1,5 +1,8 @@
 pub extern crate cerpton;
 
+#[cfg(feature = "include_chrono")]
+pub extern crate chrono;
+
 #[cfg(not(feature = "include_serde"))]
 #[macro_use]
 extern crate serde;
@@ -8,10 +11,14 @@ extern crate serde;
 extern crate serde_json;
 
 #[cfg(feature = "include_serde")]
+#[macro_use]
 pub extern crate serde;
 
 #[cfg(feature = "include_serde")]
 pub extern crate serde_json;
+
+#[cfg(feature = "use_io")]
+pub extern crate serialport;
 
 #[cfg(test)]
 pub mod tests;

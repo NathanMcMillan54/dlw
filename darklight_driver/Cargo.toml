@@ -5,7 +5,7 @@ version = "0.1.0-alpha"
 edition = "2021"
 
 [dependencies]
-dlwp = { path = "../dlwp/" }
+dlwp = { path = "../dlwp/", features = ["include_chrono", "include_serde", "use_io"] }
 
 [build-dependencies]
 chrono = "0.4.31"

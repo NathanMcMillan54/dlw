@@ -1,15 +1,23 @@
 use std::{
     env,
-    fs::{create_dir, remove_dir},
+    fs::{create_dir, read_to_string, remove_dir, remove_file},
     path::Path,
+    process::exit,
+    thread,
+    time::Duration,
 };
 
+use dlwp::config::DLConfig;
+
+pub(crate) mod cmd;
 pub(crate) mod ids;
+pub(crate) mod streams;
 
 fn files_setup() -> bool {
     if Path::new("/tmp/darklight/").exists() {
-        println!("Removing \"/tmp/darklight/\"");
+        println!("Removing \"/tmp/darklight/\"...");
         remove_dir("/tmp/darklight/").unwrap();
+        println!("Restart darklight_driver");
         return false;
     }
 
@@ -23,7 +31,9 @@ fn files_setup() -> bool {
     } else if Path::new("/etc/dlw/local_id").exists() {
         println!("Verifying local Id....");
         if ids::verify_id() == false {
-            println!("Local Id could not be verified, delete \"/etc/dlw/local_id\"");
+            println!("Local Id could not be verified, deleting \"/etc/dlw/local_id\"");
+            remove_file("/etc/dlw/local_id").unwrap();
+            println!("Restart darklight_driver");
             return false;
         }
         println!("Local Id verified");
@@ -59,5 +69,28 @@ fn main() {
 
     if files_setup() == false {
         exit(-1);
+    } else {
+        println!("File setup finished");
+    }
+
+    let config_contents = read_to_string(&args[1]).expect("Failed to read configuration file");
+    // There should probably be a better way of doing this
+    let config_json: DLConfig =
+        dlwp::serde_json::from_str(Box::leak(config_contents.into_boxed_str()))
+            .expect("Failed to parse configuration file");
+    unsafe {
+        streams::STREAMS_HANDLER.config = config_json;
+    }
+
+    thread::spawn(|| {
+        cmd::cmd_input_thread();
+    });
+
+    thread::spawn(|| {
+        streams::handle_streams();
+    });
+
+    loop {
+        thread::sleep(Duration::from_millis(1500));
     }
 }

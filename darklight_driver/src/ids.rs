@@ -4,7 +4,7 @@ use std::{
 };
 
 pub(crate) fn generate_local_id() -> String {
-    let mut key = env!("DLU_KEY");
+    let key = env!("DLU_KEY");
     let mut id = String::new();
 
     for b in key.as_bytes() {
