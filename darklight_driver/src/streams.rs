@@ -208,7 +208,7 @@ impl StreamsHandler {
                     println!("Successfully wrote to distributor");
                 }
 
-                let id = self.io_method.as_mut().unwrap()._read().0.replace("\0", "");
+                let id = self.io_method.as_mut().unwrap()._read().0.replace("\0", "").replace(" ", "");
 
                 if id.parse::<u64>().is_ok() {
                     if id != distributor_id().unwrap_or(0).to_string() {
