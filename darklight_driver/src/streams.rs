@@ -8,7 +8,7 @@ use dlwp::io::{DLSerialIO, DLIO, DLTCPIO};
 use dlwp::message::Message;
 use dlwp::serialport::posix::TTYPort;
 use std::fmt::{Debug, Formatter};
-use std::fs::File;
+use std::fs::{remove_file, File};
 use std::io::Write;
 use std::net::SocketAddr;
 use std::path::Path;
@@ -27,7 +27,7 @@ pub struct StreamInfo {
     pub(crate) waited: u8,
     pub(crate) last_minute: u8,
     pub received: Vec<Message>,
-    pub pending: Vec<Message>,
+    pub pending: Vec<String>,
     pub info: [i32; 6],
 }
 
@@ -75,6 +75,11 @@ impl StreamsHandler {
             .expect("Failed to open stream file")
             .write_fmt(format_args!("{}", write))
             .expect("Failed to write to stream file");
+    }
+
+    pub fn remove_stream_file(&self, rid: u64, port: u16) {
+        remove_file(&format!("/tmp/darklight/connections/_dl_{}-{}", rid, port))
+            .expect("Failed to remove stream file");
     }
 
     // TODO: For some reason, at the current moment (2024/1/7), the darklight driver does not properly receive the
@@ -262,6 +267,7 @@ impl StreamsHandler {
             let minute = utc.minute() as u8;
 
             for i in 0..self.stream_info.len() {
+                // TODO: Check if stream received 200 within a certain amount of time
                 /*if self.stream_info[i].connected == false {
                     if self.stream_info[i].waited == 5 {
                         println!("Stream: {:?} connection timed out", self.stream_info[i]);
@@ -284,7 +290,6 @@ impl StreamsHandler {
                 }
 
                 if !self.stream_info[i].pending.is_empty() {
-                    println!("not empty");
                     if self.io_method.is_none() {
                         println!("io_method is not set");
                         return;
@@ -293,11 +298,7 @@ impl StreamsHandler {
                         println!("writing to distributor");
                         io_method._write(format!(
                             "\\z {} \\q",
-                            self.stream_info[i]
-                                .pending
-                                .remove(0)
-                                .as_string()
-                                .replace("\0", "")
+                            self.stream_info[i].pending.remove(0).replace("\0", "")
                         ));
                     }
                 }
@@ -306,11 +307,7 @@ impl StreamsHandler {
 
             let io_method = self.io_method.as_mut().unwrap();
             let mut read = io_method._read();
-            read.0 = read
-                .0
-                .replace("\0", "")
-                .replace("\\z ", "")
-                .replace(" \\q", "");
+            read.0 = read.0.replace("\0", "");
 
             if read.1 == READ_SUCCESS {
                 let message = Message::from_string(&read.0);

@@ -1,4 +1,7 @@
-use crate::id::{DId, LId};
+use crate::{
+    encryption::EncryptionInfo,
+    id::{DId, LId},
+};
 use cerpton::utf::utf8_to_string;
 
 /// Divides the ``Message`` when it is represented as a ``String``
@@ -186,6 +189,46 @@ impl Message {
             INFO_SPLIT,
             contents_to_string(self.contents)
         )
+    }
+
+    #[inline]
+    pub fn ri_as_string(&self) -> String {
+        format!(
+            "{} {} {} {}",
+            self.ri.rid, self.ri.rdid, self.ri.instance_id, self.ri.port
+        )
+    }
+
+    #[inline]
+    pub fn ti_as_string(&self) -> String {
+        format!(
+            "{} {} {} {} {} {}",
+            self.ti.tid, self.ti.code, self.ti.tdid, self.day, self.week, self.month
+        )
+    }
+
+    pub fn encode(&self, encryption: EncryptionInfo) -> String {
+        let mut ret = String::new();
+
+        let ri = self.ri_as_string();
+        let ti = self.ti_as_string();
+        let contents = contents_to_string(self.contents);
+
+        ret.push_str(&ri);
+        ret.push_str(INFO_SPLIT_AREA);
+        // Find better way of doing this
+        ret.push_str((encryption.function)(
+            encryption.info,
+            Box::leak(ti.into_boxed_str()),
+        ));
+        ret.push_str(INFO_SPLIT_AREA);
+        // Find better way of doing this
+        ret.push_str((encryption.function)(
+            encryption.info,
+            Box::leak(contents.into_boxed_str()),
+        ));
+
+        ret
     }
 
     /// Converts an unencrypted ``String`` formatted for ``Message``s to a new ``Message``.

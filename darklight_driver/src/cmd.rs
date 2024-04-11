@@ -15,6 +15,10 @@ pub fn cmd_input_thread() {
         for read_line in reader.lines() {
             let read = read_line.unwrap();
 
+            if read.is_empty() {
+                continue;
+            }
+
             let inputs = read.split(" ").collect::<Vec<&str>>();
 
             if inputs[0].is_empty() {
@@ -121,7 +125,7 @@ pub fn cmd_input_thread() {
                             {
                                 STREAMS_HANDLER.stream_info[j]
                                     .pending
-                                    .push(Message::from_string(&message_str));
+                                    .push(message_str.clone());
                             }
                         }
                     }
@@ -129,13 +133,16 @@ pub fn cmd_input_thread() {
                 "DISCONNECT" => {
                     println!("disconnect arguments: {:?}", inputs);
                     let rid = inputs[1].parse::<u64>().unwrap();
+                    let port = inputs[2].parse::<u16>().unwrap();
                     let rdid = inputs[2].parse::<u32>().unwrap();
 
                     unsafe {
                         for i in 0..STREAMS_HANDLER.stream_info.len() {
                             if STREAMS_HANDLER.stream_info[i].rid == rid
-                                && STREAMS_HANDLER.stream_info[i].rdid == rdid
+                                && STREAMS_HANDLER.stream_info[i].port == port
                             {
+                                println!("removing...");
+                                STREAMS_HANDLER.remove_stream_file(rid, port);
                                 STREAMS_HANDLER.stream_info.remove(i);
                             }
                         }
@@ -149,7 +156,8 @@ pub fn cmd_input_thread() {
             //drop(inputs);
 
             File::create("/tmp/darklight/cmd_input").unwrap();
-            sleep(Duration::from_millis(1));
         }
+
+        sleep(Duration::from_millis(1));
     }
 }

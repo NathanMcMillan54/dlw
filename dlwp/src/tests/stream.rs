@@ -1,3 +1,4 @@
+use crate::codes::*;
 use crate::encryption::EncryptionInfo;
 use crate::stream::*;
 
@@ -20,4 +21,6 @@ fn test_stream_setup() {
     stream.add_encryption_info(encryption_info);
 
     assert_ne!(EMPTY_ENCRYPTIONIFNO.info, stream.encryption.info);
+    assert_eq!(STATUS_OK, stream.start());
+    assert_eq!(STATUS_OK, stream.stop());
 }

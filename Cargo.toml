@@ -2,4 +2,5 @@
 members = [
     "darklight_driver/",
     "dlwp/",
+    "test_streams/test_client",
 ]
