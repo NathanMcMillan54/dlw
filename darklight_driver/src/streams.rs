@@ -56,7 +56,7 @@ pub struct StreamsHandler {
 }
 
 impl StreamsHandler {
-    fn create_stream_file(&self, rid: u64, port: u16) {
+    pub(crate) fn create_stream_file(&self, rid: u64, port: u16) {
         println!("created file");
         File::options()
             .read(true)

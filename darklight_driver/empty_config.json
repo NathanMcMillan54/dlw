@@ -1,8 +1,8 @@
 {
-    "tcp": false,
+    "tcp": true,
     "serial":false,
     "serial_path": "/dev/ttyUSB0",
-    "closed": true,
-    "ip_address": "127.0.0.1:5000",
+    "closed": false,
+    "ip_address": "35.184.46.104:5000",
     "public_instance_id": 0
 }

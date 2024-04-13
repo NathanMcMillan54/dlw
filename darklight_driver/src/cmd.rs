@@ -1,4 +1,5 @@
 use crate::streams::{StreamInfo, STREAMS_HANDLER};
+use dlwp::id::local_user_id;
 use dlwp::message::Message;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -136,8 +137,14 @@ pub fn cmd_input_thread() {
                     let port = inputs[2].parse::<u16>().unwrap();
                     let rdid = inputs[2].parse::<u32>().unwrap();
 
+                    sleep(Duration::from_millis(700));
                     unsafe {
                         for i in 0..STREAMS_HANDLER.stream_info.len() {
+                            if STREAMS_HANDLER.stream_info[i].rid == local_user_id().unwrap() && STREAMS_HANDLER.stream_info[i].port == port {
+                                STREAMS_HANDLER.remove_stream_file(local_user_id().unwrap(), port);
+                                STREAMS_HANDLER.create_stream_file(local_user_id().unwrap(), port);
+                            }
+
                             if STREAMS_HANDLER.stream_info[i].rid == rid
                                 && STREAMS_HANDLER.stream_info[i].port == port
                             {

@@ -7,6 +7,7 @@ use std::io::{stdin, stdout, Write};
 
 fn main() {
     let mut stream = Stream::new(
+        // Add the client/server's ID and the Distributor ID
         dlwp::stream::StreamType::Client {
             rid: 0,
             rdid: 0,
