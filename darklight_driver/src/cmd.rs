@@ -140,7 +140,9 @@ pub fn cmd_input_thread() {
                     sleep(Duration::from_millis(700));
                     unsafe {
                         for i in 0..STREAMS_HANDLER.stream_info.len() {
-                            if STREAMS_HANDLER.stream_info[i].rid == local_user_id().unwrap() && STREAMS_HANDLER.stream_info[i].port == port {
+                            if STREAMS_HANDLER.stream_info[i].rid == local_user_id().unwrap()
+                                && STREAMS_HANDLER.stream_info[i].port == port
+                            {
                                 STREAMS_HANDLER.remove_stream_file(local_user_id().unwrap(), port);
                                 STREAMS_HANDLER.create_stream_file(local_user_id().unwrap(), port);
                             }

@@ -134,7 +134,7 @@ impl StreamsHandler {
 
     pub fn run(&mut self) {
         loop {
-            sleep(Duration::from_millis(80));
+            sleep(Duration::from_millis(10));
 
             // Check the I/O method
             if self.io_method.is_none()
@@ -208,7 +208,14 @@ impl StreamsHandler {
                     println!("Successfully wrote to distributor");
                 }
 
-                let id = self.io_method.as_mut().unwrap()._read().0.replace("\0", "").replace(" ", "");
+                let id = self
+                    .io_method
+                    .as_mut()
+                    .unwrap()
+                    ._read()
+                    .0
+                    .replace("\0", "")
+                    .replace(" ", "");
 
                 if id.parse::<u64>().is_ok() {
                     if id != distributor_id().unwrap_or(0).to_string() {

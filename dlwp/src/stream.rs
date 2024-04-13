@@ -1,5 +1,6 @@
 use crate::{
-    codes::{Code, REQUEST_CONNECTION, STATUS_OK, UNKNOWN_STATUS},
+    codes::{Code, REMOVE_CLIENT, REQUEST_CONNECTION, STATUS_OK, UNKNOWN_STATUS},
+    connections::Connections,
     dlcmd::{send_dlcmd, CONNECT, DISCONNECT, SEND},
     encryption::EncryptionInfo,
     id::*,
@@ -95,6 +96,8 @@ pub struct Stream {
     pub encryption: EncryptionInfo,
     /// Store sent and received messages
     pub history: bool,
+    // For servers
+    connections: Connections,
     instance_id: InstanceID,
     received_messages: Vec<Message>,
     sent_messages: Vec<Message>,
@@ -107,11 +110,66 @@ impl Stream {
             stream_type,
             encryption: EMPTY_ENCRYPTIONIFNO,
             history,
+            connections: Connections::empty(),
             instance_id: 0,
             received_messages: vec![],
             sent_messages: vec![],
             running: false,
         };
+    }
+
+    pub fn add_not_allowed_connections(&mut self, not_allowed_connections: Vec<ReceiveInfo>) {
+        if self.stream_type.is_client() {
+            return;
+        }
+
+        if self.connections.not_allowed.is_empty() {
+            self.connections.not_allowed = not_allowed_connections;
+        } else {
+            for i in 0..not_allowed_connections.len() {
+                self.connections
+                    .not_allowed
+                    .push(not_allowed_connections[i]);
+            }
+        }
+    }
+
+    fn check_add_connection(&mut self, message: Message) -> bool {
+        let ri = ReceiveInfo {
+            rid: message.ti.tid,
+            rdid: message.ti.tdid,
+            instance_id: message.ri.instance_id,
+            port: message.ri.port,
+        };
+
+        if self.connections.not_allowed.contains(&ri) {
+            return false;
+        }
+
+        if self.connections.current.contains(&ri) {
+            return true;
+        } else {
+            if message.ti.code == REQUEST_CONNECTION.value() {
+                self.connections.current.push(ri);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    pub fn remove_connection(&mut self, ri: ReceiveInfo) -> Code {
+        if self.stream_type.is_client() {
+            return UNKNOWN_STATUS;
+        }
+
+        let index = self.connections.current.iter().position(|&iri| iri == ri);
+        if index.is_none() {
+            return UNKNOWN_STATUS;
+        } else {
+            self.connections.current.remove(index.unwrap());
+            return STATUS_OK;
+        }
     }
 
     fn stream_file_exists(&self) -> bool {
@@ -160,12 +218,15 @@ impl Stream {
         ret
     }
 
-    pub fn read(&self) -> Vec<Message> {
+    pub fn read(&mut self) -> Vec<Message> {
         let mut ret = vec![];
         let strings = self._read();
 
         for i in 0..strings.len() {
-            ret.push(Message::from_string(&strings[i]));
+            let received_message = Message::from_string(&strings[i]);
+            if self.check_add_connection(received_message) {
+                ret.push(received_message);
+            }
         }
 
         ret
@@ -288,6 +349,8 @@ impl Stream {
     pub fn stop(&mut self) -> Code {
         self.running = false;
 
+        self.write(String::new(), REMOVE_CLIENT);
+
         send_dlcmd(
             DISCONNECT,
             vec![
@@ -298,12 +361,7 @@ impl Stream {
         );
 
         // Wait for darklight_driver
-        sleep(Duration::from_micros(1200));
 
-        if self.stream_file_exists() {
-            UNKNOWN_STATUS
-        } else {
-            STATUS_OK
-        }
+        REMOVE_CLIENT
     }
 }

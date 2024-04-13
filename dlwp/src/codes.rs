@@ -60,6 +60,8 @@ pub const CHUNK_RESPONSE: Code = Code::Response(203);
 /// Response for a file that fits inside a ``Message`` or wether the file can be sent or not. If the file needs to be
 /// sent in chunks respond with the number of chunks that will need to be received
 pub const FILE_RESPONSE: Code = Code::Response(204);
+/// Disconnect server/client
+pub const DISCONNECT: Code = Code::Response(205);
 
 /// Internal error indicating that a Message will be longer than 4096 bytes
 pub const LENGTH_EXCEEDED: Code = Code::Error(300);
@@ -76,5 +78,6 @@ pub const UNKNOWN_STATUS: Code = Code::Status(404);
 pub const STATUS_OK: Code = Code::Status(405);
 pub const WRITE_FAILED: Code = Code::Status(406);
 pub const READ_FAILED: Code = Code::Status(407);
+pub const REMOVE_CLIENT: Code = Code::Status(408);
 /// Do what you want with this
 pub const TEAPOT: Code = Code::Status(418);

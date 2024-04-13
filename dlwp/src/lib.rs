@@ -28,6 +28,9 @@ pub mod codes;
 /// Configurations for DarkLight
 pub mod config;
 
+/// For ``Connections`` struct and handling of client connections (for servers)
+pub mod connections;
+
 #[cfg(feature = "use_io")]
 pub mod distributor;
 
