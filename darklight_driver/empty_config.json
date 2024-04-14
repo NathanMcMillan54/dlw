@@ -3,6 +3,6 @@
     "serial":false,
     "serial_path": "/dev/ttyUSB0",
     "closed": false,
-    "ip_address": "34.121.169.50:5000",
+    "ip_address": "127.0.0.1:5000",
     "public_instance_id": 0
 }
