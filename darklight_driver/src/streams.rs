@@ -317,11 +317,11 @@ impl StreamsHandler {
             read.0 = read.0.replace("\0", "");
 
             if read.1 == READ_SUCCESS {
-                let message = Message::from_string(&read.0);
+                let ri = Message::get_ri_from_encoded(&read.0);
 
-                if message.ri.rid == local_user_id().unwrap() {
+                if ri.rid == local_user_id().unwrap() {
                     for i in 0..self.stream_info.len() {
-                        if self.stream_info[i].port == message.ri.port {
+                        if self.stream_info[i].port == ri.port {
                             let mut waiting = true;
                             let mut waited = 0;
 
@@ -343,29 +343,29 @@ impl StreamsHandler {
                             }
 
                             //self.stream_info[i].received.push(Cell::new(message));
-                            if message.ti.code == 200 {
+                            /*if message.ti.code == 200 {
                                 if self.stream_info[i].connected == false {
                                     self.stream_info[i].connected = true;
                                 }
-                            }
+                            }*/
 
                             if Path::new(&format!(
                                 "/tmp/darklight/connections/_dl_{}-{}",
                                 local_user_id().unwrap(),
-                                *&message.ri.port
+                                ri.port
                             ))
                             .exists()
                             {
                                 self.write_to_stream_file(
-                                    *&message.ri.rid,
-                                    *&message.ri.port,
-                                    &message.as_string(),
+                                    ri.rid,
+                                    ri.port,
+                                    &read.0,
                                 );
                             } else {
                                 self.write_to_stream_file(
-                                    *&message.ti.tid,
-                                    *&message.ri.port,
-                                    &message.as_string(),
+                                    self.stream_info[i].rid,
+                                    self.stream_info[i].port,
+                                    &read.0,
                                 );
                             }
                             break;
