@@ -193,7 +193,15 @@ impl Message {
 
     pub fn get_ri_from_encoded(string: &String) -> ReceiveInfo {
         let split_message = split_from_info(string);
+        if split_message.len() != 3 {
+            return ReceiveInfo::empty();
+        }
+
         let split_ri = split_message[0].split(" ").collect::<Vec<&str>>();
+
+        if split_ri.len() != 4 {
+            return ReceiveInfo::empty();
+        }
 
         ReceiveInfo {
             rid: split_ri[0].parse().unwrap_or(0),
@@ -243,10 +251,18 @@ impl Message {
         ret
     }
 
-    /*pub fn decode(string: &String, encryption: EncryptionInfo) -> Self {
+    pub fn decode(string: &String, encryption: EncryptionInfo) -> Self {
         let split = split_from_info(string);
+        
+        // This is always plain text
+        let ri = split[0];
+        let ti = (encryption.decode_function)(encryption.info, split[1].to_string());
+        let contents = (encryption.decode_function)(encryption.info, split[2].to_string());
 
-    }*/
+        let ret = Message::from_string(&format!("{}{}{}{}{}", ri, INFO_SPLIT_AREA, ti, INFO_SPLIT_AREA, contents));
+
+        ret
+    }
 
     /// Converts an unencrypted ``String`` formatted for ``Message``s to a new ``Message``.
     pub fn from_string(string: &String) -> Self {
