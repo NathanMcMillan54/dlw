@@ -15,12 +15,13 @@ use std::{
 };
 
 #[allow(improper_ctypes_definitions)]
-extern "C" fn empty_encryption_function(_i: [i32; 6], s: &'static str) -> &'static str {
+fn empty_encryption_function(_i: [i32; 6], s: String) -> String {
     s
 }
 
 pub(crate) const EMPTY_ENCRYPTIONIFNO: EncryptionInfo = EncryptionInfo {
-    function: empty_encryption_function,
+    encode_function: empty_encryption_function,
+    decode_function: empty_encryption_function,
     info: [0; 6],
 };
 
@@ -223,7 +224,7 @@ impl Stream {
         let strings = self._read();
 
         for i in 0..strings.len() {
-            let received_message = Message::from_string(&strings[i]);
+            let received_message = Message::from_string(&(self.encryption.decode_function)(self.encryption.info, strings[i].to_owned()).to_string());
             if self.check_add_connection(received_message) {
                 ret.push(received_message);
             }

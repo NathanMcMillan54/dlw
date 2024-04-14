@@ -217,15 +217,15 @@ impl Message {
         ret.push_str(&ri);
         ret.push_str(INFO_SPLIT_AREA);
         // Find better way of doing this
-        ret.push_str((encryption.function)(
+        ret.push_str(&(encryption.encode_function)(
             encryption.info,
-            Box::leak(ti.into_boxed_str()),
+            ti,
         ));
         ret.push_str(INFO_SPLIT_AREA);
         // Find better way of doing this
-        ret.push_str((encryption.function)(
+        ret.push_str(&(encryption.encode_function)(
             encryption.info,
-            Box::leak(contents.into_boxed_str()),
+            contents,
         ));
 
         ret

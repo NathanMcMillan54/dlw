@@ -1,7 +1,5 @@
 use dlwp::{
-    codes::REQUEST_RESPONSE,
-    message::{contents_to_string, Message},
-    stream::Stream,
+    cerpton::{libcerpton_decode, libcerpton_encode}, codes::REQUEST_RESPONSE, encryption::EncryptionInfo, message::{contents_to_string, Message}, stream::Stream
 };
 use std::io::{stdin, stdout, Write};
 
@@ -16,6 +14,11 @@ fn main() {
         false,
     );
 
+    stream.add_encryption_info(EncryptionInfo {
+        encode_function: libcerpton_encode,
+        decode_function: libcerpton_decode,
+        info: [2, 1, 2, 0, 0, 0],
+    });
     stream.start();
 
     while stream.running() {
@@ -24,7 +27,7 @@ fn main() {
         stdout().flush().unwrap();
         stdin()
             .read_line(&mut input)
-            .expect("Did not enter a correct string");
+            .expect("Failed to read string");
         if let Some('\n') = input.chars().next_back() {
             input.pop();
         }

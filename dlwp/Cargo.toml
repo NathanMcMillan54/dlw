@@ -6,7 +6,7 @@ version = "0.1.0-alpha"
 edition = "2021"
 
 [dependencies]
-cerpton = "0.1.0"
+cerpton = "0.1.1"
 chrono = { version = "0.4.31", optional = true }
 serde = { version = "1.0.188", features = ["serde_derive", "std"] }
 serde_json = { version = "1.0.100" }
