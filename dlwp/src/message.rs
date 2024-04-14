@@ -191,6 +191,18 @@ impl Message {
         )
     }
 
+    pub fn get_ri_from_encoded(string: &String) -> ReceiveInfo {
+        let split_message = split_from_info(string);
+        let split_ri = split_message[0].split(" ").collect::<Vec<&str>>();
+
+        ReceiveInfo {
+            rid: split_ri[0].parse().unwrap_or(0),
+            rdid: split_ri[1].parse().unwrap_or(0),
+            instance_id: split_ri[2].parse().unwrap_or(0),
+            port: split_ri[3].parse().unwrap_or(0),
+        }
+    }
+
     #[inline]
     pub fn ri_as_string(&self) -> String {
         format!(
@@ -230,6 +242,11 @@ impl Message {
 
         ret
     }
+
+    /*pub fn decode(string: &String, encryption: EncryptionInfo) -> Self {
+        let split = split_from_info(string);
+
+    }*/
 
     /// Converts an unencrypted ``String`` formatted for ``Message``s to a new ``Message``.
     pub fn from_string(string: &String) -> Self {
