@@ -4,6 +4,6 @@ members = [
     "dlwp/",
     "test_streams/test_client",
     "test_streams/test_server", 
-    "tools/dldns",
+    "tools/dlcns",
     "tools/dlup",
 ]

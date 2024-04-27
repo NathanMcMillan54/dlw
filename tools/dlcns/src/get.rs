@@ -1,6 +1,6 @@
 use dlwp::{codes::{FILE_RESPONSE, REQUEST_CHUNK, REQUEST_FILE, REQUEST_RESPONSE}, id::{DId, LId, Port}, message::contents_to_string, stream::Stream};
 
-use crate::{owner::Owner, DNS_DISTRIBUTOR, DNS_ID, DNS_PORT, OWNERS_LIST};
+use crate::{owner::Owner, CNS_DISTRIBUTOR, CNS_ID, CNS_PORT, OWNERS_LIST};
 
 /// Getting the location of a name
 pub fn format_name_request(name: String) -> String {
@@ -17,24 +17,24 @@ pub fn format_specific_id_request(did: DId, id: LId, port: Port) -> String {
     return format!("GET_NAME {} {} {}", did, id, port);
 }
 
-pub struct DNSGet {
+pub struct CNSGet {
     stream: Stream,
     pub received: Vec<Owner>,
 }
 
-impl DNSGet {
+impl CNSGet {
     pub fn new() -> Self {
         let mut stream = Stream::new(
             dlwp::stream::StreamType::Client {
-                rid: DNS_ID,
-                rdid: DNS_DISTRIBUTOR,
-                port: DNS_PORT,
+                rid: CNS_ID,
+                rdid: CNS_DISTRIBUTOR,
+                port: CNS_PORT,
             },
             false,
         );
         stream.start();
 
-        return DNSGet {
+        return CNSGet {
             stream,
             received: vec![],
         };
