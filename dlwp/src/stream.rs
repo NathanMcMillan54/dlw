@@ -135,7 +135,7 @@ impl Stream {
         }
     }
 
-    fn check_add_connection(&mut self, message: Message) -> bool {
+    pub fn check_add_connection(&mut self, message: Message) -> bool {
         let ri = ReceiveInfo {
             rid: message.ti.tid,
             rdid: message.ti.tdid,
