@@ -356,11 +356,7 @@ impl StreamsHandler {
                             ))
                             .exists()
                             {
-                                self.write_to_stream_file(
-                                    ri.rid,
-                                    ri.port,
-                                    &read.0,
-                                );
+                                self.write_to_stream_file(ri.rid, ri.port, &read.0);
                             } else {
                                 self.write_to_stream_file(
                                     self.stream_info[i].rid,

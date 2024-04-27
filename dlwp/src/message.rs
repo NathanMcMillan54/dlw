@@ -237,29 +237,26 @@ impl Message {
         ret.push_str(&ri);
         ret.push_str(INFO_SPLIT_AREA);
         // Find better way of doing this
-        ret.push_str(&(encryption.encode_function)(
-            encryption.info,
-            ti,
-        ));
+        ret.push_str(&(encryption.encode_function)(encryption.info, ti));
         ret.push_str(INFO_SPLIT_AREA);
         // Find better way of doing this
-        ret.push_str(&(encryption.encode_function)(
-            encryption.info,
-            contents,
-        ));
+        ret.push_str(&(encryption.encode_function)(encryption.info, contents));
 
         ret
     }
 
     pub fn decode(string: &String, encryption: EncryptionInfo) -> Self {
         let split = split_from_info(string);
-        
+
         // This is always plain text
         let ri = split[0];
         let ti = (encryption.decode_function)(encryption.info, split[1].to_string());
         let contents = (encryption.decode_function)(encryption.info, split[2].to_string());
 
-        let ret = Message::from_string(&format!("{}{}{}{}{}", ri, INFO_SPLIT_AREA, ti, INFO_SPLIT_AREA, contents));
+        let ret = Message::from_string(&format!(
+            "{}{}{}{}{}",
+            ri, INFO_SPLIT_AREA, ti, INFO_SPLIT_AREA, contents
+        ));
 
         ret
     }

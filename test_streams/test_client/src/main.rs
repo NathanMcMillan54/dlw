@@ -1,5 +1,9 @@
 use dlwp::{
-    cerpton::{libcerpton_decode, libcerpton_encode}, codes::REQUEST_RESPONSE, encryption::EncryptionInfo, message::{contents_to_string, Message}, stream::Stream
+    cerpton::{libcerpton_decode, libcerpton_encode},
+    codes::REQUEST_RESPONSE,
+    encryption::EncryptionInfo,
+    message::{contents_to_string, Message},
+    stream::Stream,
 };
 use std::io::{stdin, stdout, Write};
 
