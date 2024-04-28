@@ -225,7 +225,8 @@ impl Stream {
 
         for i in 0..strings.len() {
             println!("read: {}", strings[i]);
-            let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
+            //let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
+            let received_message = Message::from_string(&strings[i].to_owned());
             if self.check_add_connection(received_message) {
                 ret.push(received_message);
             }
