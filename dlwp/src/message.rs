@@ -266,6 +266,7 @@ impl Message {
         let valid = valid_message_string(string, false);
 
         if valid == false {
+            println!("invalid: {}", string);
             return Message::empty();
         }
 
@@ -278,6 +279,7 @@ impl Message {
         for i in 0..ri.len() {
             let parse = ri[i].parse::<u64>();
             if parse.is_err() {
+                println!("error");
                 return Message::empty();
             }
 
@@ -293,6 +295,7 @@ impl Message {
         for i in 0..ti.len() {
             let parse = ti[i].parse::<u64>();
             if parse.is_err() {
+                println!("error1");
                 return Message::empty();
             }
 

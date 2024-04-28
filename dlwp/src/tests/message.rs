@@ -1,7 +1,9 @@
-use crate::message::{
+use cerpton::{libcerpton_decode, libcerpton_encode};
+
+use crate::{encryption::EncryptionInfo, message::{
     contents_to_string, string_to_contents, valid_message_string, Message, ReceiveInfo,
     TransmitInfo, CONTENTS_LENGTH,
-};
+}};
 
 #[test]
 fn test_string_contents_conversions() {

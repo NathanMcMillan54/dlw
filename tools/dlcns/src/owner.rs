@@ -1,5 +1,6 @@
 use dlwp::id::{DId, LId, Port};
 
+#[derive(Debug)]
 pub struct Owner {
     pub id: LId,
     pub did: DId,

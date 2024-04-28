@@ -236,10 +236,12 @@ impl Stream {
 
     /// Writes a ``Message`` to the stream
     pub fn write_message(&self, message: Message) {
+        let encoded = message.encode(self.encryption);
+        println!("encoded: {}", encoded);
+
         send_dlcmd(
             SEND,
-            message
-                .encode(self.encryption)
+            encoded
                 .split(" ")
                 .collect::<Vec<&str>>(),
         );

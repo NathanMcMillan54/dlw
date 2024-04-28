@@ -1,9 +1,9 @@
-use dlwp::{codes::{FILE_RESPONSE, REQUEST_CHUNK, REQUEST_FILE, REQUEST_RESPONSE}, id::{DId, LId, Port}, message::contents_to_string, stream::Stream};
+use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::{FILE_RESPONSE, REQUEST_CHUNK, REQUEST_FILE, REQUEST_RESPONSE}, encryption::EncryptionInfo, id::{DId, LId, Port}, message::contents_to_string, stream::Stream};
 
 use crate::{owner::Owner, CNS_DISTRIBUTOR, CNS_ID, CNS_PORT, OWNERS_LIST};
 
 /// Getting the location of a name
-pub fn format_name_request(name: String) -> String {
+pub fn format_name_request(name: &String) -> String {
     return format!("GET_ID {}", name);
 }
 
@@ -32,6 +32,11 @@ impl CNSGet {
             },
             false,
         );
+        stream.add_encryption_info(EncryptionInfo {
+            info: [2, 1, 2, 0, 0, 0],
+            encode_function: libcerpton_encode,
+            decode_function: libcerpton_decode,
+        });
         stream.start();
 
         return CNSGet {
@@ -45,10 +50,9 @@ impl CNSGet {
             return None;
         }
 
-        self.stream.write(String::from(format_name_request(name)), REQUEST_RESPONSE);
-
         let mut read = vec![];
         while read.is_empty() {
+            self.stream.write(String::from(format_name_request(&name)), REQUEST_RESPONSE);
             read = self.stream.read();
         }
 
