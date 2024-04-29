@@ -1,6 +1,6 @@
 use crate::{
     encryption::EncryptionInfo,
-    id::{DId, LId},
+    id::{DId, InstanceID, LId, Port},
 };
 use cerpton::utf::utf8_to_string;
 
@@ -105,7 +105,7 @@ pub fn valid_message_string(string: &String, encrypted: bool) -> bool {
 }
 
 /// Struct containing information about the receiver
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ReceiveInfo {
     pub rid: LId,
     pub rdid: DId,
@@ -139,6 +139,15 @@ impl TransmitInfo {
             tdid: 0,
             code: 0,
         };
+    }
+
+    pub fn into_ri(&self, instance: InstanceID, port: Port) -> ReceiveInfo {
+        ReceiveInfo {
+            rid: self.tid,
+            rdid: self.tdid,
+            instance_id: instance,
+            port,
+        }
     }
 }
 

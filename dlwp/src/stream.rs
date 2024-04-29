@@ -1,5 +1,5 @@
 use crate::{
-    codes::{Code, REMOVE_CLIENT, REQUEST_CONNECTION, STATUS_OK, UNKNOWN_STATUS},
+    codes::{Code, DISCONNECT as DISCONNECT_, REMOVE_CLIENT, REQUEST_CONNECTION, STATUS_OK, UNKNOWN_STATUS},
     connections::Connections,
     dlcmd::{send_dlcmd, CONNECT, DISCONNECT, SEND},
     encryption::EncryptionInfo,
@@ -136,22 +136,22 @@ impl Stream {
     }
 
     pub fn check_add_connection(&mut self, message: Message) -> bool {
-        let ri = ReceiveInfo {
-            rid: message.ti.tid,
-            rdid: message.ti.tdid,
-            instance_id: message.ri.instance_id,
-            port: message.ri.port,
-        };
+        if self.stream_type.is_client() {
+            return false;
+        }
+
+        let ri = message.ti.into_ri(message.ri.instance_id, message.ri.port);
 
         if self.connections.not_allowed.contains(&ri) {
             return false;
         }
 
-        if self.connections.current.contains(&ri) {
+        if self.connections.current.get(&ri).is_some() {
             return true;
         } else {
             if message.ti.code == REQUEST_CONNECTION.value() {
-                self.connections.current.push(ri);
+                self.connections.current.insert(ri, Stream::new(StreamType::Client { rid: ri.rid, rdid: ri.rdid, port: ri.port }, self.history));
+                self.connections.current.get_mut(&ri).unwrap().start();
                 return true;
             } else {
                 return false;
@@ -164,11 +164,11 @@ impl Stream {
             return UNKNOWN_STATUS;
         }
 
-        let index = self.connections.current.iter().position(|&iri| iri == ri);
-        if index.is_none() {
+        let stream = self.connections.current.remove(&ri);
+        if stream.is_none() {
             return UNKNOWN_STATUS;
         } else {
-            self.connections.current.remove(index.unwrap());
+            stream.unwrap().write(String::new(), DISCONNECT_);
             return STATUS_OK;
         }
     }
@@ -238,34 +238,41 @@ impl Stream {
     /// Writes a ``Message`` to the stream
     pub fn write_message(&self, message: Message) {
         let encoded = message.encode(self.encryption);
-        println!("encoded: {}", encoded);
 
-        send_dlcmd(
-            SEND,
-            encoded
-                .split(" ")
-                .collect::<Vec<&str>>(),
-        );
+        send_dlcmd(SEND, encoded.split(" ").collect::<Vec<&str>>());
     }
 
-    pub fn write(&self, write: String, code: Code) {
-        self.write_message(Message {
-            ri: ReceiveInfo {
-                rid: self.stream_type.rid(),
-                rdid: self.stream_type.rdid(),
-                port: self.stream_type.port(),
-                instance_id: self.instance_id,
-            },
-            ti: TransmitInfo {
-                tid: local_user_id().unwrap(),
-                tdid: distributor_id().unwrap(),
-                code: code.value(),
-            },
-            day: self.encryption.info[0],
-            week: self.encryption.info[1],
-            month: self.encryption.info[2],
-            contents: string_to_contents(write),
-        });
+    /// When a server receives a message, it should use the transmit info to respond by calling this function
+    pub fn server_write(&mut self, ti: TransmitInfo, write: String, code: Code) {
+        if self.stream_type.is_client() {
+            return;
+        }
+
+        let ri = ti.into_ri(self.instance_id, self.stream_type.port());
+
+        self.connections.current.get_mut(&ri).unwrap().write(write, code);
+    }
+
+    pub fn write(&self, write: String, code: Code) {        
+        if self.stream_type.is_client() {
+            self.write_message(Message {
+                ri: ReceiveInfo {
+                    rid: self.stream_type.rid(),
+                    rdid: self.stream_type.rdid(),
+                    port: self.stream_type.port(),
+                    instance_id: self.instance_id,
+                },
+                ti: TransmitInfo {
+                    tid: local_user_id().unwrap(),
+                    tdid: distributor_id().unwrap(),
+                    code: code.value(),
+                },
+                day: self.encryption.info[0],
+                week: self.encryption.info[1],
+                month: self.encryption.info[2],
+                contents: string_to_contents(write),
+            });
+        }
     }
 
     fn _server_start(&mut self) -> Code {

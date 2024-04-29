@@ -1,4 +1,11 @@
-use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::{FILE_RESPONSE, REQUEST_CHUNK, REQUEST_FILE, REQUEST_RESPONSE}, encryption::EncryptionInfo, id::{DId, LId, Port}, message::contents_to_string, stream::Stream};
+use dlwp::{
+    cerpton::{libcerpton_decode, libcerpton_encode},
+    codes::{FILE_RESPONSE, REQUEST_CHUNK, REQUEST_FILE, REQUEST_RESPONSE},
+    encryption::EncryptionInfo,
+    id::{DId, LId, Port},
+    message::contents_to_string,
+    stream::Stream,
+};
 
 use crate::{owner::Owner, CNS_DISTRIBUTOR, CNS_ID, CNS_PORT, OWNERS_LIST};
 
@@ -50,12 +57,7 @@ impl CNSGet {
             return None;
         }
 
-        let mut read = vec![];
-        while read.is_empty() {
-            self.stream.write(String::from(format_name_request(&name)), REQUEST_RESPONSE);
-            read = self.stream.read();
-        }
-
+        let mut found = false;
         let mut owner = Owner {
             id: 0,
             did: 0,
@@ -63,9 +65,22 @@ impl CNSGet {
             name: String::new(),
             name_type: 0,
         };
+        let mut read = vec![];
+        self.stream
+            .write(String::from(format_name_request(&name)), REQUEST_RESPONSE);
+        while read.is_empty() {
+            read = self.stream.read();
+        }
+
+        println!("read len: {}", read.len());
 
         let response = contents_to_string(read[0].contents);
         let split_response = response.split(" ").collect::<Vec<&str>>();
+
+        if split_response.len() != 5 {
+            panic!("oh no!");
+        }
+
         let id = split_response[0].parse::<u64>();
         let did = split_response[1].parse::<u32>();
         let port = split_response[2].parse::<u16>();
@@ -112,7 +127,7 @@ impl CNSGet {
         } else if message.ti.code == FILE_RESPONSE.value() {
             return contents;
         } else {
-            return String::new()
+            return String::new();
         }
     }
 }
