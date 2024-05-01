@@ -1,6 +1,6 @@
 use dlwp::{
     cerpton::{libcerpton_decode, libcerpton_encode},
-    codes::{FILE_RESPONSE, REQUEST_CHUNK, REQUEST_FILE, REQUEST_RESPONSE},
+    codes::{FILE_RESPONSE, REGULAR_RESPONSE, REQUEST_CHUNK, REQUEST_CONNECTION, REQUEST_FILE, REQUEST_RESPONSE},
     encryption::EncryptionInfo,
     id::{DId, LId, Port},
     message::contents_to_string,
@@ -66,10 +66,13 @@ impl CNSGet {
             name_type: 0,
         };
         let mut read = vec![];
-        self.stream
-            .write(String::from(format_name_request(&name)), REQUEST_RESPONSE);
         while read.is_empty() {
+            self.stream
+                .write(String::from(format_name_request(&name)), REQUEST_RESPONSE);
             read = self.stream.read();
+            if read[0].ti.code != REGULAR_RESPONSE.value() {
+                read.clear();
+            }
         }
 
         println!("read len: {}", read.len());
@@ -77,7 +80,7 @@ impl CNSGet {
         let response = contents_to_string(read[0].contents);
         let split_response = response.split(" ").collect::<Vec<&str>>();
 
-        if split_response.len() != 5 {
+        if split_response.len() != 3 {
             panic!("oh no!");
         }
 
