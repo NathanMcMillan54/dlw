@@ -151,6 +151,7 @@ impl Stream {
         } else {
             if message.ti.code == REQUEST_CONNECTION.value() {
                 self.connections.current.insert(ri, Stream::new(StreamType::Client { rid: ri.rid, rdid: ri.rdid, port: ri.port }, self.history));
+                self.connections.current.get_mut(&ri).unwrap().add_encryption_info(self.encryption);
                 self.connections.current.get_mut(&ri).unwrap().start();
                 return true;
             } else {
