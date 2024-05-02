@@ -57,7 +57,6 @@ impl CNSGet {
             return None;
         }
 
-        let mut found = false;
         let mut owner = Owner {
             id: 0,
             did: 0,
@@ -70,18 +69,19 @@ impl CNSGet {
             self.stream
                 .write(String::from(format_name_request(&name)), REQUEST_RESPONSE);
             read = self.stream.read();
-            if read[0].ti.code != REGULAR_RESPONSE.value() {
-                read.clear();
+
+            if read.is_empty() == false {
+                if contents_to_string(read[0].contents).replace("\0", "").is_empty() {
+                    read.clear();
+                }
             }
         }
 
-        println!("read len: {}", read.len());
-
-        let response = contents_to_string(read[0].contents);
+        let response = contents_to_string(read[0].contents).replace("\0", "");
         let split_response = response.split(" ").collect::<Vec<&str>>();
 
-        if split_response.len() != 3 {
-            panic!("oh no!");
+        if split_response.len() < 5 {
+            return None;
         }
 
         let id = split_response[0].parse::<u64>();

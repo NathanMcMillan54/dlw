@@ -62,6 +62,8 @@ pub const CHUNK_RESPONSE: Code = Code::Response(203);
 pub const FILE_RESPONSE: Code = Code::Response(204);
 /// Disconnect server/client
 pub const DISCONNECT: Code = Code::Response(205);
+/// When a client requests or responds with something unexpected
+pub const INVALID_RR: Code = Code::Response(206);
 
 /// Internal error indicating that a Message will be longer than 4096 bytes
 pub const LENGTH_EXCEEDED: Code = Code::Error(300);
