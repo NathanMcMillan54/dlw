@@ -26,7 +26,7 @@ pub struct Name {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct NamesList {
-    pub list: Vec<NamesList>,
+    pub list: Vec<Name>,
 }
 
 impl NamesList {
