@@ -20,6 +20,8 @@ pub struct Name {
     pub requests: usize,
     /// Date that the ``Name`` was added
     pub date: [i32; 3],
+    pub current_dlu_key: String,
+    pub og_dlu_key: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
