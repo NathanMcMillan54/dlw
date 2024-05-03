@@ -7,7 +7,7 @@ use dlwp::{
     stream::Stream,
 };
 
-use crate::{owner::Owner, CNS_DISTRIBUTOR, CNS_ID, CNS_PORT, OWNERS_LIST};
+use crate::{name::Owner, CNS_DISTRIBUTOR, CNS_ID, CNS_PORT, OWNERS_LIST};
 
 /// Getting the location of a name
 pub fn format_name_request(name: &String) -> String {
@@ -103,7 +103,8 @@ impl CNSGet {
     }
 
     pub fn get_all(&mut self) -> String {
-        self.stream.write(String::from(OWNERS_LIST), REQUEST_FILE);
+        unimplemented!();
+        /*self.stream.write(String::from(OWNERS_LIST), REQUEST_FILE);
 
         let mut read = vec![];
         while read.is_empty() {
@@ -131,6 +132,10 @@ impl CNSGet {
             return contents;
         } else {
             return String::new();
-        }
+        }*/
+    }
+
+    pub fn get_id(&mut self, id: LId, did: DId, port: Port) -> String {
+        unimplemented!();
     }
 }
