@@ -18,6 +18,8 @@ pub struct Owner {
 pub struct Name {
     pub owner: Owner,
     pub requests: usize,
+    /// Date that the ``Name`` was added
+    pub date: [i32; 3],
 }
 
 #[derive(Debug, Deserialize, Serialize)]
