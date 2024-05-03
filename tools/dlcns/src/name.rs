@@ -26,6 +26,12 @@ pub struct NamesList {
 }
 
 impl NamesList {
+    pub const fn empty() -> Self {
+        return NamesList {
+            list: vec![],
+        };
+    }
+
     pub fn from_file(file: String) -> Option<Self> {
         let read = read_to_string(file);
         if read.is_err() {
