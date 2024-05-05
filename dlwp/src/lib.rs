@@ -43,6 +43,8 @@ pub mod id;
 #[cfg(feature = "use_io")]
 pub mod io;
 
+// UTF language ranges (human readable language)
+pub mod langs;
 /// For a ``Message``
 pub mod message;
 /// Used for creating DarkLight clients and servers
