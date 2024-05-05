@@ -3,7 +3,8 @@ members = [
     "darklight_driver/",
     "dlwp/",
     "test_streams/test_client",
-    "test_streams/test_server", 
+    "test_streams/test_server",
+    "tools/dlcmd", 
     "tools/dlcns",
     "tools/dlup",
 ]
