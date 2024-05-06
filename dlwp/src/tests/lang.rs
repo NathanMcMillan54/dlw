@@ -1,10 +1,13 @@
-use crate::langs::LATIN_UPPER;
+use crate::langs::{is_human_readable_including, is_human_readable};
 
 #[test]
-fn test_latin() {
-    let text = "THISISUPPERCASELATINCHARACTERS";
+fn test_lan() {
+    let regular_text = "this is some text 12345932";
+    let not_really_regular = ".,!?-";
 
-    for c in text.chars() {
-        assert_eq!(true, LATIN_UPPER.contains(&(c as u16)));
-    }
+    assert_eq!(true, is_human_readable_including(regular_text.to_string(), vec![' ']));
+    assert_eq!(false, is_human_readable_including(not_really_regular.to_string(), vec![' ']));
+
+    assert_eq!(false, is_human_readable(regular_text.to_string()));
+    assert_eq!(false, is_human_readable(not_really_regular.to_string()));
 }
