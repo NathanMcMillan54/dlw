@@ -1,6 +1,9 @@
 use dlwp::{
     cerpton::{libcerpton_decode, libcerpton_encode},
-    codes::{FILE_RESPONSE, REGULAR_RESPONSE, REQUEST_CHUNK, REQUEST_CONNECTION, REQUEST_FILE, REQUEST_RESPONSE},
+    codes::{
+        FILE_RESPONSE, REGULAR_RESPONSE, REQUEST_CHUNK, REQUEST_CONNECTION, REQUEST_FILE,
+        REQUEST_RESPONSE,
+    },
     encryption::EncryptionInfo,
     id::{DId, LId, Port},
     message::contents_to_string,
@@ -71,7 +74,10 @@ impl CNSGet {
             read = self.stream.read();
 
             if read.is_empty() == false {
-                if contents_to_string(read[0].contents).replace("\0", "").is_empty() {
+                if contents_to_string(read[0].contents)
+                    .replace("\0", "")
+                    .is_empty()
+                {
                     read.clear();
                 }
             }

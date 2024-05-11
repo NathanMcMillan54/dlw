@@ -1,6 +1,7 @@
 use std::{
     env,
-    fs::{create_dir, read_to_string, remove_dir, remove_file},
+    fs::{create_dir, read_to_string, remove_dir, remove_file, File},
+    io::Write,
     path::Path,
     process::exit,
     thread,
@@ -10,6 +11,7 @@ use std::{
 use dlwp::config::DLConfig;
 
 pub(crate) mod cmd;
+pub(crate) mod cns;
 pub(crate) mod ids;
 pub(crate) mod streams;
 
@@ -37,6 +39,16 @@ fn files_setup() -> bool {
             return false;
         }
         println!("Local Id verified");
+    }
+
+    if !Path::new("/etc/dlw/first_key").exists() {
+        File::options()
+            .create(true)
+            .write(true)
+            .open("/etc/dlw/first_key")
+            .expect("Failed to create \"/etc/dlw/first_key\"")
+            .write_fmt(format_args!("{}", env!("DLU_KEY")))
+            .expect("Failed to write key");
     }
 
     create_dir("/tmp/darklight/").unwrap();

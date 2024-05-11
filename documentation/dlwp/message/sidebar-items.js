@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["CONTENTS_LENGTH","INFO_SPLIT","MSG_END","MSG_INIT","SN_MSG_INIT"],"fn":["contents_to_string","split_from_info","string_to_contents","valid_message_string"],"struct":["Message","ReceiveInfo","TransmitInfo"],"type":["Contents"]};

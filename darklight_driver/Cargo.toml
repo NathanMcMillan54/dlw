@@ -5,7 +5,9 @@ version = "0.1.0-alpha"
 edition = "2021"
 
 [dependencies]
+dlcns = { path = "../tools/dlcns/" }
 dlwp = { path = "../dlwp/", features = ["include_chrono", "include_serde", "use_io"] }
+rand = "0.8.5"
 
 [build-dependencies]
 chrono = "0.4.31"

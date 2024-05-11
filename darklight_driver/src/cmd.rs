@@ -1,3 +1,4 @@
+use crate::cns::cns_add;
 use crate::streams::{StreamInfo, STREAMS_HANDLER};
 use dlwp::id::local_user_id;
 use dlwp::message::Message;
@@ -156,6 +157,23 @@ pub fn cmd_input_thread() {
                             }
                         }
                     }
+                }
+                "REQUEST-ADD-NAME" => {
+                    println!("Requested to add a name");
+                    println!("Shutting down all streams...");
+
+                    unsafe {
+                        for i in 0..STREAMS_HANDLER.stream_info.len() {
+                            STREAMS_HANDLER.remove_stream_file(
+                                STREAMS_HANDLER.stream_info[i].rid,
+                                STREAMS_HANDLER.stream_info[i].port,
+                            );
+                        }
+
+                        STREAMS_HANDLER.stream_info.clear();
+                    }
+
+                    cns_add(inputs);
                 }
                 _ => {
                     println!("Invalid input: {:?}", inputs[0]);

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"externcrate":["cerpton","chrono","serde","serde_json","serialport"],"mod":["codes","config","connections","distributor","encryption","id","io","langs","message","stream"]};

@@ -1,5 +1,8 @@
 use crate::{
-    codes::{Code, DISCONNECT as DISCONNECT_, REMOVE_CLIENT, REQUEST_CONNECTION, STATUS_OK, UNKNOWN_STATUS},
+    codes::{
+        Code, DISCONNECT as DISCONNECT_, REMOVE_CLIENT, REQUEST_CONNECTION, STATUS_OK,
+        UNKNOWN_STATUS,
+    },
     connections::Connections,
     dlcmd::{send_dlcmd, CONNECT, DISCONNECT, SEND},
     encryption::EncryptionInfo,
@@ -150,8 +153,22 @@ impl Stream {
             return true;
         } else {
             if message.ti.code == REQUEST_CONNECTION.value() {
-                self.connections.current.insert(ri, Stream::new(StreamType::Client { rid: ri.rid, rdid: ri.rdid, port: ri.port }, self.history));
-                self.connections.current.get_mut(&ri).unwrap().add_encryption_info(self.encryption);
+                self.connections.current.insert(
+                    ri,
+                    Stream::new(
+                        StreamType::Client {
+                            rid: ri.rid,
+                            rdid: ri.rdid,
+                            port: ri.port,
+                        },
+                        self.history,
+                    ),
+                );
+                self.connections
+                    .current
+                    .get_mut(&ri)
+                    .unwrap()
+                    .add_encryption_info(self.encryption);
                 self.connections.current.get_mut(&ri).unwrap().start();
                 return true;
             } else {
@@ -248,10 +265,14 @@ impl Stream {
 
         let ri = ti.into_ri(self.instance_id, self.stream_type.port());
 
-        self.connections.current.get_mut(&ri).unwrap().write(write, code);
+        self.connections
+            .current
+            .get_mut(&ri)
+            .unwrap()
+            .write(write, code);
     }
 
-    pub fn write(&self, write: String, code: Code) {        
+    pub fn write(&self, write: String, code: Code) {
         if self.stream_type.is_client() {
             self.write_message(Message {
                 ri: ReceiveInfo {

@@ -18,3 +18,4 @@ tests:
 
 docs:
 	@ cargo doc
+	@ mv target/doc/dlwp/ documentation/

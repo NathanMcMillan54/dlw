@@ -1,7 +1,11 @@
 use std::{
-    fs::File,
+    fs::{read_to_string, File},
     io::{Read, Write},
 };
+
+pub(crate) fn first_key() -> String {
+    read_to_string("/etc/dlw/first_key").expect("Failed to open \"/etc/dlw/first_key\'")
+}
 
 pub(crate) fn generate_local_id() -> String {
     let key = env!("DLU_KEY");
