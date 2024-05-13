@@ -4,7 +4,7 @@ use dlwp::id::local_user_id;
 use dlwp::message::Message;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::thread::sleep;
+use std::thread::{sleep, spawn};
 use std::time::Duration;
 
 pub fn cmd_input_thread() {
@@ -21,7 +21,7 @@ pub fn cmd_input_thread() {
                 continue;
             }
 
-            let inputs = read.split(" ").collect::<Vec<&str>>();
+            let mut inputs = read.split(" ").collect::<Vec<&str>>();
 
             if inputs[0].is_empty() {
                 sleep(Duration::from_millis(250));
@@ -173,7 +173,18 @@ pub fn cmd_input_thread() {
                         STREAMS_HANDLER.stream_info.clear();
                     }
 
-                    cns_add(inputs);
+                    if inputs.len() != 3 {
+                        println!("Invalid arguments");
+                        continue;
+                    }
+
+                    let arg1 = Box::leak(inputs[1].to_string().into_boxed_str());
+                    let arg2 = Box::leak(inputs[2].to_string().into_boxed_str());
+                    unsafe {
+                        spawn(move || {
+                            cns_add(vec![arg1, arg2]);
+                        });
+                    }
                 }
                 _ => {
                     println!("Invalid input: {:?}", inputs[0]);

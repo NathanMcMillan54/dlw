@@ -1,8 +1,9 @@
-use std::fmt::format;
+use std::{fmt::format, thread::sleep, time::Duration};
 
 use dlcns::{CNS_DISTRIBUTOR, CNS_ID, CNS_PORT};
 use dlwp::{
-    cerpton::{alphabet::ALPHABET_LEN, libcerpton_encode, Encoder}, chrono::{Timelike, Utc}, codes::{INVALID_RR, REGULAR_RESPONSE, REQUEST_CONNECTION, REQUEST_RESPONSE}, id::local_user_id, langs::is_human_readable_including, message::contents_to_string, stream::Stream
+    cerpton::{alphabet::ALPHABET_LEN, libcerpton_encode, libcerpton_decode, Encoder}, chrono::{Timelike, Utc}, codes::{INVALID_RR, REGULAR_RESPONSE, REQUEST_CONNECTION, REQUEST_RESPONSE}, id::local_user_id, langs::is_human_readable_including, message::contents_to_string, stream::Stream,
+    encryption::EncryptionInfo
 };
 use rand::{thread_rng, Rng};
 
@@ -59,16 +60,14 @@ pub fn setup_cns() -> ([i32; 6], String, String) {
 }
 
 pub fn cns_add(input: Vec<&str>) {
-    let readable = is_human_readable_including(input[1].to_string(), vec!['-', '_']);
-    let parseable = input[2].parse::<u16>().is_ok();
+    let readable = is_human_readable_including(input[0].to_string(), vec!['-', '_']);
+    let parseable = input[1].parse::<u16>().is_ok();
 
     if readable == false {
         println!("Input name: {} is invalid, read (documentation)", input[1]);
     } else if parseable == false {
         println!("Port {} is invalid", input[2]);
     }
-
-    let (setting, current_key, first_key) = setup_cns();
 
     let mut stream = Stream::new(
         dlwp::stream::StreamType::Client {
@@ -79,23 +78,38 @@ pub fn cns_add(input: Vec<&str>) {
         false,
     );
 
+    stream.add_encryption_info(EncryptionInfo {
+        encode_function: libcerpton_encode,
+        decode_function: libcerpton_decode,
+        info: [2, 1, 2, 0, 0, 0],
+    });
+
     stream.start();
+    sleep(Duration::from_millis(100));
+
+    let (setting, current_key, first_key) = setup_cns();
 
     let mut send_first = false;
     let mut send_second = false;
     let mut recv_first = false;
     let mut recv_second = false;
+
     while stream.running() {
         if send_first == false {
+            println!("Sending first...");
             stream.write(format!("REQUEST_ADD0 {} {} {} {} {}", setting[0], setting[1], setting[2], current_key, first_key), REQUEST_RESPONSE);
             send_first = true;
         }
 
         if recv_first == false {
             let read = stream.read();
+            if read.is_empty() {
+                continue;
+            }
             let contents = contents_to_string(read[0].contents).replace("\0", "");
             if read[0].ti.code != REQUEST_CONNECTION.value() && read[0].ti.code == REGULAR_RESPONSE.value() {
                 if contents.contains("ALLOW_ADD0") {
+                    println!("receving first");
                     recv_first = true;
                     println!("Name request is allowed, {} names registered", contents.replace("ALLOW_ADD0 ", ""));
                 }
@@ -107,16 +121,21 @@ pub fn cns_add(input: Vec<&str>) {
 
         if recv_first == true && recv_first == true && send_second == false {
             send_second = true;
-            stream.write(format!("REQUEST_ADD1 {} {} {} {} {} {} {}", setting[0], setting[1], setting[2], current_key, first_key, input[1], input[2]), REQUEST_RESPONSE);
+            println!("sending second");
+            stream.write(format!("REQUEST_ADD1 {} {} {} {} {} {} {}", setting[0], setting[1], setting[2], current_key, first_key, input[0], input[1]), REQUEST_RESPONSE);
         }
 
         if send_second == true && recv_second == false {
             let read = stream.read();
+            if read.is_empty() {
+                continue;
+            }
             let contents = contents_to_string(read[0].contents).replace("\0", "");
             if read[0].ti.code != REQUEST_CONNECTION.value() && read[0].ti.code == REGULAR_RESPONSE.value() {
                 if contents.contains("Added name") {
+                    println!("receving second");
                     recv_second = true;
-                    println!("Name: {} is now asociated with {}-{}", input[1], local_user_id().unwrap(), input[2]);
+                    println!("Name: {} is now asociated with {}-{}", input[0], local_user_id().unwrap(), input[1]);
                 }
             } else if read[0].ti.code == INVALID_RR.value() {
                 println!("An error occured: {}", contents);

@@ -153,6 +153,7 @@ impl Stream {
             return true;
         } else {
             if message.ti.code == REQUEST_CONNECTION.value() {
+                println!("adding");
                 self.connections.current.insert(
                     ri,
                     Stream::new(
@@ -172,6 +173,7 @@ impl Stream {
                 self.connections.current.get_mut(&ri).unwrap().start();
                 return true;
             } else {
+                println!("no: {}", message.ti.code);
                 return false;
             }
         }
@@ -331,6 +333,7 @@ impl Stream {
                 &decode_info[0].to_string(),
                 &decode_info[1].to_string(),
                 &decode_info[2].to_string(),
+                "-",
             ],
         );
 
