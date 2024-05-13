@@ -216,7 +216,7 @@ impl Stream {
         self.sent_messages.clear();
     }
 
-    fn _read(&self) -> Vec<String> {
+    pub fn _read(&self) -> Vec<String> {
         sleep(Duration::from_micros(15));
         let reader = BufReader::new(
             File::options()
@@ -333,7 +333,6 @@ impl Stream {
                 &decode_info[0].to_string(),
                 &decode_info[1].to_string(),
                 &decode_info[2].to_string(),
-                "-",
             ],
         );
 
