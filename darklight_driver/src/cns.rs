@@ -94,6 +94,7 @@ pub fn cns_add(input: Vec<&str>) {
     let mut recv_first = false;
     let mut recv_second = false;
 
+    println!("sending...");
     while stream.running() {
         if send_first == false {
             println!("Sending first...");

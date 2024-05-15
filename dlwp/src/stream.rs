@@ -244,8 +244,8 @@ impl Stream {
         let strings = self._read();
 
         for i in 0..strings.len() {
-            //let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
-            let received_message = Message::from_string(&strings[i].to_owned());
+            let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
+            //let received_message = Message::from_string(&strings[i].to_owned());
             ret.push(received_message);
         }
 
@@ -356,7 +356,7 @@ impl Stream {
                 port: self.stream_type.port(),
                 instance_id: self.instance_id,
             },
-            contents: [0; 4096],
+            contents: [69; 4096],
             day: 0,
             week: 0,
             month: 0,
