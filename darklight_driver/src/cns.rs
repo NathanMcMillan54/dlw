@@ -96,10 +96,12 @@ pub fn cns_add(input: Vec<&str>) {
 
     println!("sending...");
     while stream.running() {
+        sleep(Duration::from_millis(100));
         if send_first == false {
             println!("Sending first...");
             stream.write(format!("REQUEST_ADD0 {} {} {} {} {}", setting[0], setting[1], setting[2], current_key, first_key), REQUEST_RESPONSE);
             send_first = true;
+            continue;
         }
 
         if recv_first == false {
@@ -115,8 +117,10 @@ pub fn cns_add(input: Vec<&str>) {
                     println!("Name request is allowed, {} names registered", contents.replace("ALLOW_ADD0 ", ""));
                 }
             } else if read[0].ti.code == INVALID_RR.value() {
-                println!("An error occured: {}", contents);
-                return;
+                println!("An error occured1: {}", contents);
+                send_first = false;
+                recv_first = false;
+                continue;
             }
         }
 
@@ -139,7 +143,7 @@ pub fn cns_add(input: Vec<&str>) {
                     println!("Name: {} is now asociated with {}-{}", input[0], local_user_id().unwrap(), input[1]);
                 }
             } else if read[0].ti.code == INVALID_RR.value() {
-                println!("An error occured: {}", contents);
+                println!("An error occured2: {}", contents);
                 return;
             }
         }

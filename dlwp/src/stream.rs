@@ -249,6 +249,11 @@ impl Stream {
             ret.push(received_message);
         }
 
+        File::create(format!(
+            "/tmp/darklight/connections/_dl_{}-{}",
+            self.stream_type.rid(),
+            self.stream_type.port())).unwrap();
+
         ret
     }
 
@@ -356,7 +361,7 @@ impl Stream {
                 port: self.stream_type.port(),
                 instance_id: self.instance_id,
             },
-            contents: [69; 4096],
+            contents: [0; 4096],
             day: 0,
             week: 0,
             month: 0,
