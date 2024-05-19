@@ -93,6 +93,7 @@ pub fn cns_add(input: Vec<&str>) {
     let mut send_second = false;
     let mut recv_first = false;
     let mut recv_second = false;
+    let mut attempts = 0;
 
     println!("sending...");
     while stream.running() {
@@ -107,6 +108,12 @@ pub fn cns_add(input: Vec<&str>) {
         if recv_first == false {
             let read = stream.read();
             if read.is_empty() {
+                attempts += 1;
+
+                if attempts > 400 {
+                    send_first = false;
+                }
+
                 continue;
             }
             let contents = contents_to_string(read[0].contents).replace("\0", "");

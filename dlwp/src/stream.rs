@@ -146,10 +146,12 @@ impl Stream {
         let ri = message.ti.into_ri(message.ri.instance_id, message.ri.port);
 
         if self.connections.not_allowed.contains(&ri) {
+            println!("is not allowed");
             return false;
         }
 
         if self.connections.current.get(&ri).is_some() {
+            println!("already exists");
             return true;
         } else {
             if message.ti.code == REQUEST_CONNECTION.value() {
@@ -245,6 +247,7 @@ impl Stream {
 
         for i in 0..strings.len() {
             let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
+            println!("message ti: {:?}", received_message.ti);
             //let received_message = Message::from_string(&strings[i].to_owned());
             ret.push(received_message);
         }
