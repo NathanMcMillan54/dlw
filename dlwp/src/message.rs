@@ -53,11 +53,13 @@ pub fn valid_message_string(string: &String, encrypted: bool) -> bool {
     let split = split_from_info(&string);
 
     if split.len() != 3 {
+        println!("full length is not 3");
         return false;
     }
 
     let receive_info = split[0].split(" ").collect::<Vec<&str>>();
     if receive_info.len() != 4 {
+        println!("ri len not 4");
         return false;
     }
 
@@ -65,6 +67,7 @@ pub fn valid_message_string(string: &String, encrypted: bool) -> bool {
         // If it can't be parsed to an integer, then it is not valid
         let parse = receive_info[i].parse::<u64>();
         if parse.is_err() {
+            println!("cannot parse ri");
             return false;
         } else {
             if i == 0 || i == 1 {
@@ -260,6 +263,7 @@ impl Message {
         // This is always plain text
         let ri = split[0];
         let ti = (encryption.decode_function)(encryption.info, split[1].to_string());
+        println!("og ti: {}, now ti: {}", split[1], ti);
         let contents = (encryption.decode_function)(encryption.info, split[2].to_string());
 
         let ret = Message::from_string(&format!(
