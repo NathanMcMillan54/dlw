@@ -154,7 +154,7 @@ impl Stream {
             println!("already exists");
             return true;
         } else {
-            if message.ti.code == REQUEST_CONNECTION.value() {
+            //if message.ti.code == REQUEST_CONNECTION.value() {
                 println!("adding");
                 self.connections.current.insert(
                     ri,
@@ -174,10 +174,10 @@ impl Stream {
                     .add_encryption_info(self.encryption);
                 self.connections.current.get_mut(&ri).unwrap().start();
                 return true;
-            } else {
+            /*} else {
                 println!("no: {}", message.ti.code);
                 return false;
-            }
+            }*/
         }
     }
 

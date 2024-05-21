@@ -88,6 +88,7 @@ pub fn cns_add(input: Vec<&str>) {
     sleep(Duration::from_millis(100));
 
     let (setting, current_key, first_key) = setup_cns();
+    //let (setting, current_key, first_key) = ([72, 66, 7, 0, 0, 0], String::from("abcdeftg13"), String::from("abcdeftg13"));
 
     let mut send_first = false;
     let mut send_second = false;
@@ -122,6 +123,7 @@ pub fn cns_add(input: Vec<&str>) {
                     println!("receving first");
                     recv_first = true;
                     println!("Name request is allowed, {} names registered", contents.replace("ALLOW_ADD0 ", ""));
+                    sleep(Duration::from_millis(500));
                 }
             } else if read[0].ti.code == INVALID_RR.value() {
                 println!("An error occured1: {}", contents);
@@ -140,6 +142,14 @@ pub fn cns_add(input: Vec<&str>) {
         if send_second == true && recv_second == false {
             let read = stream.read();
             if read.is_empty() {
+
+                attempts += 1;
+
+                if attempts > 400 {
+                    send_second = false;
+                    sleep(Duration::from_millis(50));
+                }
+
                 continue;
             }
             let contents = contents_to_string(read[0].contents).replace("\0", "");
