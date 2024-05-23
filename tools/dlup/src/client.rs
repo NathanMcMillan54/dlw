@@ -10,7 +10,7 @@ fn main() {
     // The DarkLight information servers should always be on id 1000 and distributor 3
     let mut stream = Stream::new(
         StreamType::Client {
-            rid: 1000,
+           // rid: 1000,
             rdid: 3,
             port: 5000,
         },

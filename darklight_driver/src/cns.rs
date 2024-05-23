@@ -26,7 +26,6 @@ pub fn setup_cns() -> ([i32; 6], String, String) {
     println!("{} {}", s1, s2);
 
     while encoder.setting_good() == false {
-        println!("here");
         s1 = rng.gen_range(0..ALPHABET_LEN);
         s2 = rng.gen_range(0..ALPHABET_LEN);
         encoder.change_setting(s1, s2);
@@ -34,7 +33,8 @@ pub fn setup_cns() -> ([i32; 6], String, String) {
         println!("Running");
     }
 
-    s3 = rng.gen_range(0..i32::MAX / 16);
+    // In the future this value can (and should) be increased to i32::MAX
+    s3 = rng.gen_range(1500..60000);
 
     println!("Encoding your keys...\nThis may take a few minutes. Start time: {}:{}:{}", start_hour, start_minute, start_second);
     if s3 > 3500 * 1000 {
@@ -62,6 +62,16 @@ pub fn setup_cns() -> ([i32; 6], String, String) {
 pub fn cns_add(input: Vec<&str>) {
     let readable = is_human_readable_including(input[0].to_string(), vec!['-', '_']);
     let parseable = input[1].parse::<u16>().is_ok();
+    let name = match input[2] {
+        "0" => format!("{}{}{}", "info.", input[3], ".org"),
+        "1" => format!("{}{}{}", "info.", input[3], ".com"),
+        "2" => format!("{}{}{}", "visu.", input[3], ".org"),
+        "3" => format!("{}{}{}", "visu.", input[3], ".com"),
+        _ => {
+            println!("Invalid option: {}, read (documentation)", input[3]);
+            return;
+        }
+    };
 
     if readable == false {
         println!("Input name: {} is invalid, read (documentation)", input[1]);
@@ -88,7 +98,6 @@ pub fn cns_add(input: Vec<&str>) {
     sleep(Duration::from_millis(100));
 
     let (setting, current_key, first_key) = setup_cns();
-    //let (setting, current_key, first_key) = ([72, 66, 7, 0, 0, 0], String::from("abcdeftg13"), String::from("abcdeftg13"));
 
     let mut send_first = false;
     let mut send_second = false;
@@ -120,7 +129,6 @@ pub fn cns_add(input: Vec<&str>) {
             let contents = contents_to_string(read[0].contents).replace("\0", "");
             if read[0].ti.code != REQUEST_CONNECTION.value() && read[0].ti.code == REGULAR_RESPONSE.value() {
                 if contents.contains("ALLOW_ADD0") {
-                    println!("receving first");
                     recv_first = true;
                     println!("Name request is allowed, {} names registered", contents.replace("ALLOW_ADD0 ", ""));
                     sleep(Duration::from_millis(500));
@@ -142,14 +150,6 @@ pub fn cns_add(input: Vec<&str>) {
         if send_second == true && recv_second == false {
             let read = stream.read();
             if read.is_empty() {
-
-                attempts += 1;
-
-                if attempts > 400 {
-                    send_second = false;
-                    sleep(Duration::from_millis(50));
-                }
-
                 continue;
             }
             let contents = contents_to_string(read[0].contents).replace("\0", "");
