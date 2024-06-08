@@ -9,6 +9,7 @@ endif
 
 all: libs
 	@ DLU_KEY=$(DL_KEY) cargo build -p darklight_driver --release
+	@ cargo build -p dlcmd --release
 
 libs:
 	@ cargo build -p dlwp $(RELEASE)
@@ -18,4 +19,3 @@ tests:
 
 docs:
 	@ cargo doc
-	@ mv target/doc/dlwp/ documentation/

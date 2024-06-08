@@ -125,6 +125,23 @@ impl ReceiveInfo {
             port: 0,
         };
     }
+
+    pub fn get_from_message_string(message: String) -> Self {
+        let msg_split = split_from_info(&message);
+        let info_split = msg_split[0].split(' ').collect::<Vec<&str>>();
+
+        let rid = info_split[0].parse().unwrap();
+        let rdid = info_split[0].parse().unwrap();
+        let instance = info_split[0].parse().unwrap();
+        let port = info_split[0].parse().unwrap();
+
+        return ReceiveInfo {
+            rid,
+            rdid,
+            instance_id: instance,
+            port
+        };
+    }
 }
 
 /// Struct containing information about the transmitter

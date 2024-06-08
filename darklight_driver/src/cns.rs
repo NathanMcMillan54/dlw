@@ -67,6 +67,8 @@ pub fn cns_add(input: Vec<&str>) {
         "1" => format!("{}{}{}", "info.", input[3], ".com"),
         "2" => format!("{}{}{}", "visu.", input[3], ".org"),
         "3" => format!("{}{}{}", "visu.", input[3], ".com"),
+        "4" => format!("{}{}{}", "info.", input[3], ".prs"),
+        "5" => format!("{}{}{}", "visu.", input[3], ".prs"),
         _ => {
             println!("Invalid option: {}, read (documentation)", input[3]);
             return;
