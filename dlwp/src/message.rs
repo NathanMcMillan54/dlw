@@ -128,7 +128,16 @@ impl ReceiveInfo {
 
     pub fn get_from_message_string(message: String) -> Self {
         let msg_split = split_from_info(&message);
+
+        if msg_split.len() != 3 && msg_split.len() != 2 {
+            return ReceiveInfo::empty();
+        }
+
         let info_split = msg_split[0].split(' ').collect::<Vec<&str>>();
+
+        if info_split.len() != 4 {
+            return ReceiveInfo::empty();
+        }
 
         let rid = info_split[0].parse::<u64>();
         let rdid = info_split[1].parse::<u32>();
