@@ -7,4 +7,5 @@ members = [
     "tools/dlcmd", 
     "tools/dlcns",
     "tools/dlup",
+    "tools/new_dlukey/",
 ]
