@@ -11,9 +11,9 @@ fn main() {
     let mut stream = Stream::new(
         // Add the client/server's ID and the Distributor ID
         dlwp::stream::StreamType::Client {
-            rid: 999, // Add Id here
+            rid: 97989910010149, // Add Id here
             rdid: 3,
-            port: 5000,
+            port: 4998,
         },
         false,
     );

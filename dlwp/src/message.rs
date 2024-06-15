@@ -130,16 +130,20 @@ impl ReceiveInfo {
         let msg_split = split_from_info(&message);
         let info_split = msg_split[0].split(' ').collect::<Vec<&str>>();
 
-        let rid = info_split[0].parse().unwrap();
-        let rdid = info_split[0].parse().unwrap();
-        let instance = info_split[0].parse().unwrap();
-        let port = info_split[0].parse().unwrap();
+        let rid = info_split[0].parse::<u64>();
+        let rdid = info_split[0].parse::<u32>();
+        let instance = info_split[0].parse::<u32>();
+        let port = info_split[0].parse::<u16>();
+
+        if rid.is_err() || rdid.is_err() || instance.is_err() || port.is_err() {
+            return ReceiveInfo::empty();
+        }
 
         return ReceiveInfo {
-            rid,
-            rdid,
-            instance_id: instance,
-            port
+            rid: rid.unwrap(),
+            rdid: rdid.unwrap(),
+            instance_id: instance.unwrap(),
+            port: port.unwrap(),
         };
     }
 }
