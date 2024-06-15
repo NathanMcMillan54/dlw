@@ -131,9 +131,9 @@ impl ReceiveInfo {
         let info_split = msg_split[0].split(' ').collect::<Vec<&str>>();
 
         let rid = info_split[0].parse::<u64>();
-        let rdid = info_split[0].parse::<u32>();
-        let instance = info_split[0].parse::<u32>();
-        let port = info_split[0].parse::<u16>();
+        let rdid = info_split[1].parse::<u32>();
+        let instance = info_split[2].parse::<u32>();
+        let port = info_split[3].parse::<u16>();
 
         if rid.is_err() || rdid.is_err() || instance.is_err() || port.is_err() {
             return ReceiveInfo::empty();
