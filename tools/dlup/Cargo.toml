@@ -3,10 +3,5 @@ name = "dlup"
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-name = "client"
-path = "src/client.rs"
-edition = "2021"
-
 [dependencies]
 dlwp = { path = "../../dlwp/" }

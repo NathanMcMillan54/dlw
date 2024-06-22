@@ -1,9 +1,24 @@
 use std::{thread::sleep, time::Duration};
 
-use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::{CONNECTION_ACCEPTED, INVALID_RR, REGULAR_RESPONSE, REQUEST_CONNECTION, REQUEST_RESPONSE}, encryption::EncryptionInfo, message::contents_to_string, stream::{Stream, StreamType}};
+use dlwp::{
+    cerpton::{libcerpton_decode, libcerpton_encode},
+    codes::{
+        CONNECTION_ACCEPTED, INVALID_RR, REGULAR_RESPONSE, REQUEST_CONNECTION, REQUEST_RESPONSE,
+    },
+    encryption::EncryptionInfo,
+    message::contents_to_string,
+    stream::{Stream, StreamType},
+};
 
 fn main() {
-    let mut stream = Stream::new(StreamType::Client { rid: 505051114, rdid: 3, port: 4998 }, false);
+    let mut stream = Stream::new(
+        StreamType::Client {
+            rid: 505051114,
+            rdid: 3,
+            port: 4998,
+        },
+        false,
+    );
     stream.add_encryption_info(EncryptionInfo {
         encode_function: libcerpton_encode,
         decode_function: libcerpton_decode,
@@ -25,7 +40,9 @@ fn main() {
             let contents = contents_to_string(r.contents);
             if r.ti.code == INVALID_RR.value() || r.ti.code == REGULAR_RESPONSE.value() {
                 println!("{}", contents);
-            } else if r.ti.code == CONNECTION_ACCEPTED.value() || r.ti.code == REQUEST_CONNECTION.value() {
+            } else if r.ti.code == CONNECTION_ACCEPTED.value()
+                || r.ti.code == REQUEST_CONNECTION.value()
+            {
                 continue;
             }
 

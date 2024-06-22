@@ -128,8 +128,14 @@ pub fn cmd_input_thread() {
                                 STREAMS_HANDLER.stream_info[j]
                                     .pending
                                     .push(message_str.clone());
-                                STREAMS_HANDLER.remove_stream_file(STREAMS_HANDLER.stream_info[j].rid, STREAMS_HANDLER.stream_info[j].port);
-                                STREAMS_HANDLER.create_stream_file(STREAMS_HANDLER.stream_info[j].rid, STREAMS_HANDLER.stream_info[j].port);
+                                STREAMS_HANDLER.remove_stream_file(
+                                    STREAMS_HANDLER.stream_info[j].rid,
+                                    STREAMS_HANDLER.stream_info[j].port,
+                                );
+                                STREAMS_HANDLER.create_stream_file(
+                                    STREAMS_HANDLER.stream_info[j].rid,
+                                    STREAMS_HANDLER.stream_info[j].port,
+                                );
                             }
                         }
                     }

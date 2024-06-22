@@ -2,8 +2,14 @@ use std::{fmt::format, thread::sleep, time::Duration};
 
 use dlcns::{CNS_DISTRIBUTOR, CNS_ID, CNS_PORT};
 use dlwp::{
-    cerpton::{alphabet::ALPHABET_LEN, libcerpton_encode, libcerpton_decode, Encoder}, chrono::{Timelike, Utc}, codes::{INVALID_RR, REGULAR_RESPONSE, REQUEST_CONNECTION, REQUEST_RESPONSE}, id::local_user_id, langs::is_human_readable_including, message::contents_to_string, stream::Stream,
-    encryption::EncryptionInfo
+    cerpton::{alphabet::ALPHABET_LEN, libcerpton_decode, libcerpton_encode, Encoder},
+    chrono::{Timelike, Utc},
+    codes::{INVALID_RR, REGULAR_RESPONSE, REQUEST_CONNECTION, REQUEST_RESPONSE},
+    encryption::EncryptionInfo,
+    id::local_user_id,
+    langs::is_human_readable_including,
+    message::contents_to_string,
+    stream::Stream,
 };
 use rand::{thread_rng, Rng};
 
@@ -36,7 +42,10 @@ pub fn setup_cns() -> ([i32; 6], String, String) {
     // In the future this value can (and should) be increased to i32::MAX
     s3 = rng.gen_range(1500..60000);
 
-    println!("Encoding your keys...\nThis may take a few minutes. Start time: {}:{}:{}", start_hour, start_minute, start_second);
+    println!(
+        "Encoding your keys...\nThis may take a few minutes. Start time: {}:{}:{}",
+        start_hour, start_minute, start_second
+    );
     if s3 > 3500 * 1000 {
         println!("This encryption setting is large");
     } else {
@@ -112,7 +121,13 @@ pub fn cns_add(input: Vec<&str>) {
         sleep(Duration::from_millis(100));
         if send_first == false {
             println!("Sending first...");
-            stream.write(format!("REQUEST_ADD0 {} {} {} {} {}", setting[0], setting[1], setting[2], current_key, first_key), REQUEST_RESPONSE);
+            stream.write(
+                format!(
+                    "REQUEST_ADD0 {} {} {} {} {}",
+                    setting[0], setting[1], setting[2], current_key, first_key
+                ),
+                REQUEST_RESPONSE,
+            );
             send_first = true;
             continue;
         }
@@ -129,10 +144,15 @@ pub fn cns_add(input: Vec<&str>) {
                 continue;
             }
             let contents = contents_to_string(read[0].contents).replace("\0", "");
-            if read[0].ti.code != REQUEST_CONNECTION.value() && read[0].ti.code == REGULAR_RESPONSE.value() {
+            if read[0].ti.code != REQUEST_CONNECTION.value()
+                && read[0].ti.code == REGULAR_RESPONSE.value()
+            {
                 if contents.contains("ALLOW_ADD0") {
                     recv_first = true;
-                    println!("Name request is allowed, {} names registered", contents.replace("ALLOW_ADD0 ", ""));
+                    println!(
+                        "Name request is allowed, {} names registered",
+                        contents.replace("ALLOW_ADD0 ", "")
+                    );
                     sleep(Duration::from_millis(500));
                 }
             } else if read[0].ti.code == INVALID_RR.value() {
@@ -146,7 +166,13 @@ pub fn cns_add(input: Vec<&str>) {
         if recv_first == true && recv_first == true && send_second == false {
             send_second = true;
             println!("sending second");
-            stream.write(format!("REQUEST_ADD1 {} {} {} {} {} {} {}", setting[0], setting[1], setting[2], current_key, first_key, input[0], input[1]), REQUEST_RESPONSE);
+            stream.write(
+                format!(
+                    "REQUEST_ADD1 {} {} {} {} {} {} {}",
+                    setting[0], setting[1], setting[2], current_key, first_key, input[0], input[1]
+                ),
+                REQUEST_RESPONSE,
+            );
         }
 
         if send_second == true && recv_second == false {
@@ -155,11 +181,18 @@ pub fn cns_add(input: Vec<&str>) {
                 continue;
             }
             let contents = contents_to_string(read[0].contents).replace("\0", "");
-            if read[0].ti.code != REQUEST_CONNECTION.value() && read[0].ti.code == REGULAR_RESPONSE.value() {
+            if read[0].ti.code != REQUEST_CONNECTION.value()
+                && read[0].ti.code == REGULAR_RESPONSE.value()
+            {
                 if contents.contains("Added name") {
                     println!("receving second");
                     recv_second = true;
-                    println!("Name: {} is now asociated with {}-{}", input[0], local_user_id().unwrap(), input[1]);
+                    println!(
+                        "Name: {} is now asociated with {}-{}",
+                        input[0],
+                        local_user_id().unwrap(),
+                        input[1]
+                    );
                 }
             } else if read[0].ti.code == INVALID_RR.value() {
                 println!("An error occured2: {}", contents);

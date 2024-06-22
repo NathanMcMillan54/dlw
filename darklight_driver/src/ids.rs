@@ -12,7 +12,7 @@ pub(crate) fn generate_local_id() -> String {
     let mut id = String::new();
 
     for b in key.as_bytes() {
-        if id.len() > 17 {
+        if id.len() > 16 {
             break;
         }
 

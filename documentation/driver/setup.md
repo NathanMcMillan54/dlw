@@ -25,6 +25,7 @@ git clone https://github.com/NathanMcMillan54/dlw && cd dlw/
 git checkout <latest version>
 make all DLU_KEY=<your valid key> RELEASE=true # Compiles dlwp, darklight_driver, and other tools
 DLU_KEY=<your valid key> cargo build -p darklight_driver --release # Or manually compile it
+# It's recomended that --release is used ^
 ```
 
 Running this will generate an executable in ``target/release`` called ``darklight_driver``, move this executable to a

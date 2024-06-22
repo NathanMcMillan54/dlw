@@ -145,39 +145,31 @@ impl Stream {
 
         let ri = message.ti.into_ri(message.ri.instance_id, message.ri.port);
 
-        if self.connections.not_allowed.contains(&ri) {
-            println!("is not allowed");
+        if self.connections.is_allowed(ri) {
             return false;
         }
 
         if self.connections.current.get(&ri).is_some() {
-            println!("already exists");
             return true;
         } else {
-            //if message.ti.code == REQUEST_CONNECTION.value() {
-                println!("adding");
-                self.connections.current.insert(
-                    ri,
-                    Stream::new(
-                        StreamType::Client {
-                            rid: ri.rid,
-                            rdid: ri.rdid,
-                            port: ri.port,
-                        },
-                        self.history,
-                    ),
-                );
-                self.connections
-                    .current
-                    .get_mut(&ri)
-                    .unwrap()
-                    .add_encryption_info(self.encryption);
-                self.connections.current.get_mut(&ri).unwrap().start();
-                return true;
-            /*} else {
-                println!("no: {}", message.ti.code);
-                return false;
-            }*/
+            self.connections.current.insert(
+                ri,
+                Stream::new(
+                    StreamType::Client {
+                        rid: ri.rid,
+                        rdid: ri.rdid,
+                        port: ri.port,
+                    },
+                    self.history,
+                ),
+            );
+            self.connections
+                .current
+                .get_mut(&ri)
+                .unwrap()
+                .add_encryption_info(self.encryption);
+            self.connections.current.get_mut(&ri).unwrap().start();
+            return true;
         }
     }
 
@@ -255,7 +247,9 @@ impl Stream {
         File::create(format!(
             "/tmp/darklight/connections/_dl_{}-{}",
             self.stream_type.rid(),
-            self.stream_type.port())).unwrap();
+            self.stream_type.port()
+        ))
+        .unwrap();
 
         ret
     }

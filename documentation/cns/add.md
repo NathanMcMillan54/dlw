@@ -1,9 +1,9 @@
 # Add a CNS name
 
-To register a name to the DarkLight Centralized Name Service you will need to send the command ``REQUEST-ADD-NAME`` to
-the DarkLight command interpreter. This process can take several minutes. It is recommended that you set your DarkLight
-configuration file to a distributor that is not directly connected to the DarkLight
-[information server](../information_servers.md).
+To register a name to the DarkLight Centralized Name Service you will need to send the command
+[``REQUEST-ADD-NAME``](../cmd.md) to the DarkLight command interpreter. This process can take several minutes. It is
+recommended that you set your DarkLight configuration file to a distributor that is not directly connected to the
+DarkLight [information server](../information_servers.md). 
 
 To start adding your name run:
 ```command line

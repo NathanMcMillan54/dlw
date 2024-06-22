@@ -1,6 +1,6 @@
 use std::{
     env,
-    fs::{create_dir, read_to_string, remove_dir, remove_file, File},
+    fs::{create_dir, read_to_string, remove_dir_all, remove_file, File},
     io::Write,
     path::Path,
     process::exit,
@@ -18,7 +18,8 @@ pub(crate) mod streams;
 fn files_setup() -> bool {
     if Path::new("/tmp/darklight/").exists() {
         println!("Removing \"/tmp/darklight/\"...");
-        remove_dir("/tmp/darklight/").unwrap();
+
+        remove_dir_all("/tmp/darklight/").unwrap();
         println!("Restart darklight_driver");
         return false;
     }
