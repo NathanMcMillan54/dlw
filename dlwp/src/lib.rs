@@ -1,3 +1,6 @@
+// Project README
+#![doc = include_str!("../../README.md")]
+
 pub extern crate cerpton;
 
 #[cfg(feature = "include_chrono")]

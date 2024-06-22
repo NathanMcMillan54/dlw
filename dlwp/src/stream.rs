@@ -254,7 +254,7 @@ impl Stream {
         ret
     }
 
-    /// Writes a ``Message`` to the stream
+    /// Writes a ``Message`` to the stream (client)
     pub fn write_message(&self, message: Message) {
         let encoded = message.encode(self.encryption);
 
@@ -276,6 +276,7 @@ impl Stream {
             .write(write, code);
     }
 
+    // Write a ``String`` to a client
     pub fn write(&self, write: String, code: Code) {
         if self.stream_type.is_client() {
             self.write_message(Message {
@@ -381,6 +382,7 @@ impl Stream {
         ret
     }
 
+    /// Stops the current stream.
     pub fn stop(&mut self) -> Code {
         self.running = false;
 
@@ -396,6 +398,7 @@ impl Stream {
         );
 
         // Wait for darklight_driver
+        sleep(Duration::from_micros(500));
 
         REMOVE_CLIENT
     }

@@ -1,3 +1,4 @@
+#![doc = include_str!("../README.md")]
 extern crate dlwp;
 
 use dlwp::id::{DId, LId, Port};
