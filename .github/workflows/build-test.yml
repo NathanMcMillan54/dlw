@@ -1,0 +1,14 @@
+name: build-test
+on: [push, pull_request]
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: cargo build -p dlwp
+        run: DLU_KEY=TEST cargo build -p darklight_driver --release
+      - name: Run tests
+        run: cargo test -p dlwp
