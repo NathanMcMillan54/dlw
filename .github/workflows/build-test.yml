@@ -7,8 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build
+      - name: Build lib
         run: cargo build -p dlwp
+      - name: Build driver
         run: DLU_KEY=TEST cargo build -p darklight_driver --release
       - name: Run tests
         run: cargo test -p dlwp
