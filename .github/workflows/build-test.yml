@@ -7,9 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Build lib
+      - name: Install libudev requirement
+        run: sudo apt install libudev-dev
+      - name: Build dlwp library
         run: cargo build -p dlwp
-      - name: Build driver
+      - name: Build darklight_driver
         run: DLU_KEY=TEST cargo build -p darklight_driver --release
-      - name: Run tests
+      - name: Run dlwp tests
         run: cargo test -p dlwp
