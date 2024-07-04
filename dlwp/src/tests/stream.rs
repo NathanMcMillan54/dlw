@@ -5,7 +5,7 @@ use crate::stream::*;
 #[test]
 fn test_stream_setup() {
     let encryption_info = EncryptionInfo {
-        function: cerpton::libcerpton_encode,
+        encode_function: libcerpton_encode,
         info: [1, 2, 3, 0, 0, 0],
     };
 

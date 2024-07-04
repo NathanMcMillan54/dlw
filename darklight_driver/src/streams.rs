@@ -1,3 +1,4 @@
+// This file contains the ``StreamsHandler`` struct which 
 use dlwp::chrono::{Timelike, Utc};
 use dlwp::codes::{READ_SUCCESS, WRITE_FAILED, WRITE_TIMEDOUT};
 use dlwp::config::DLConfig;
@@ -82,11 +83,13 @@ impl StreamsHandler {
             .expect("Failed to remove stream file");
     }
 
+    // This might be nonesense (2024/7/1) vvvvv
     // TODO: For some reason, at the current moment (2024/1/7), the darklight driver does not properly receive the
     // transmitting distributor's id adn sets it to zero (between ``self.run`` and ``self.write_to_stream_file``). For
-    // now, streams will only be recognized by their Id and port. This means that a driver can hand only one connection
-    // of "id" and "port". Having the distributor id can allow two devices to accidentally (or intentionally) have the
-    // local id. When that problem is fixed this function will be changed to include a distributor id.
+    // now, streams will only be recognized by their Id and port. This means that a driver can handle only one
+    // connection of "id" and "port". Having the distributor id can allow two devices to accidentally (or
+    // intentionally) have the local id. When that problem is fixed this function will be changed to include a 
+    // distributor id.
     pub fn stream_exists(&self, rid: u64, port: u16) -> bool {
         return match self.stream_info.len() {
             0 => false,
@@ -109,6 +112,7 @@ impl StreamsHandler {
         };
     }
 
+    // Adds a stream
     pub fn add_stream(&mut self, stream_info: StreamInfo) {
         let rid = stream_info.rid;
         let port = stream_info.port;
@@ -132,9 +136,11 @@ impl StreamsHandler {
         self.create_stream_file(rid, port);
     }
 
+    // This is the main loop of the StreamsHandler and basically the entirety of darklight_driver. If ``closed`` is set
+    // to ``false`` in the config, this does not run.
     pub fn run(&mut self) {
         loop {
-            sleep(Duration::from_millis(10));
+            sleep(Duration::from_millis(10)); // This might be unnecessary (or unnecessarily long)
 
             // Check the I/O method
             if self.io_method.is_none()
@@ -162,6 +168,8 @@ impl StreamsHandler {
                         );
                         _TCP.init();
                         _TCP.check_ready = false;
+
+                        // Find better way of doing this
                         self.io_method = Some(&mut _TCP as &mut dyn DLIO);
                     }
 
@@ -174,6 +182,8 @@ impl StreamsHandler {
                         info: (0, 0),
                     };
 
+                    println!("Using serial...");
+
                     unsafe {
                         _SERIAL.port = Some(
                             TTYPort::open(
@@ -184,6 +194,7 @@ impl StreamsHandler {
                         );
                         _SERIAL.init(true);
 
+                        // Find better way of doing this
                         self.io_method = Some(&mut _SERIAL as &mut dyn DLIO);
                     }
 
@@ -275,17 +286,6 @@ impl StreamsHandler {
 
             for i in 0..self.stream_info.len() {
                 // TODO: Check if stream received 200 within a certain amount of time
-                /*if self.stream_info[i].connected == false {
-                    if self.stream_info[i].waited == 5 {
-                        println!("Stream: {:?} connection timed out", self.stream_info[i]);
-                        self.stream_info.remove(i);
-                    }
-
-                    if self.stream_info[i].last_minute != minute {
-                        self.stream_info[i].last_minute = minute;
-                        self.stream_info[i].waited += 1;
-                    }
-                } else {*/
                 if !self.stream_info[i].received.is_empty() {
                     let stream_info = &self.stream_info[i];
                     self.write_to_stream_file(
@@ -302,14 +302,12 @@ impl StreamsHandler {
                         return;
                     } else {
                         let io_method = self.io_method.as_mut().unwrap();
-                        println!("writing to distributor");
                         io_method._write(format!(
                             "\\z {} \\q",
                             self.stream_info[i].pending.remove(0).replace("\0", "")
                         ));
                     }
                 }
-                //}
             }
 
             let io_method = self.io_method.as_mut().unwrap();
@@ -342,13 +340,6 @@ impl StreamsHandler {
                                 break;
                             }
 
-                            //self.stream_info[i].received.push(Cell::new(message));
-                            /*if message.ti.code == 200 {
-                                if self.stream_info[i].connected == false {
-                                    self.stream_info[i].connected = true;
-                                }
-                            }*/
-
                             if Path::new(&format!(
                                 "/tmp/darklight/connections/_dl_{}-{}",
                                 local_user_id().unwrap(),
@@ -373,6 +364,7 @@ impl StreamsHandler {
     }
 }
 
+// TODO: Find a way to make a StreamsHandler accesible while being thread-safe
 pub(crate) static mut STREAMS_HANDLER: StreamsHandler = StreamsHandler {
     config: DLConfig::empty(),
     stream_info: vec![],

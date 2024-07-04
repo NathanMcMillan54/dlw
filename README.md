@@ -1,2 +1,0 @@
-# DLW
-Public repository
