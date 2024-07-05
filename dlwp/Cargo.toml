@@ -4,6 +4,10 @@ authors = ["Nathan McMillan"]
 description = "The DLWP library"
 version = "0.1.0-alpha"
 edition = "2021"
+documentation = "https://docs.rs/"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/NathanMcMillan54/dlw/"
 
 [dependencies]
 cerpton = "0.1.1"
