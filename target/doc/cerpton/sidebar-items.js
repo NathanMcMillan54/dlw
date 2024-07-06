@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["libcerpton_decode","libcerpton_encode"],"mod":["alphabet","decode","encode","utf"]};

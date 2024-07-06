@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["CNS_DISTRIBUTOR","CNS_ID","CNS_PORT","OWNERS_LIST"],"mod":["get","name"]};

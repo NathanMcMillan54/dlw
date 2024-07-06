@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"externcrate":["cerpton"],"mod":["codes","config","connections","encryption","id","langs","message","stream"]};

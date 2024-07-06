@@ -1,4 +1,0 @@
-cargo:rustc-env=UC_DAY=1
-cargo:rustc-env=UC_MONTH=7
-cargo:rustc-env=UC_ARCH=0
-cargo:rustc-env=UC_OS=0

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["aio","epoll","eventfd","inotify","ioctl","memfd","mman","pthread","ptrace","quota","reboot","select","sendfile","signal","signalfd","socket","stat","statfs","statvfs","sysinfo","termios","time","uio","utsname","wait"]};
