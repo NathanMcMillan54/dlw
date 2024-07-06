@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"serialport":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.76.0/std/io/trait.Write.html\" title=\"trait std::io::Write\">Write</a> for <a class=\"struct\" href=\"serialport/posix/struct.TTYPort.html\" title=\"struct serialport::posix::TTYPort\">TTYPort</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

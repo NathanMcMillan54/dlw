@@ -1,0 +1,12 @@
+/home/nathan/Desktop/githubProjects/dlw/target/debug/deps/liblibudev-a1859901e2f88a73.rmeta: /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/lib.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/context.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/device.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/enumerator.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/error.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/monitor.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/handle.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/util.rs
+
+/home/nathan/Desktop/githubProjects/dlw/target/debug/deps/libudev-a1859901e2f88a73.d: /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/lib.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/context.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/device.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/enumerator.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/error.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/monitor.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/handle.rs /home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/util.rs
+
+/home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/lib.rs:
+/home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/context.rs:
+/home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/device.rs:
+/home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/enumerator.rs:
+/home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/error.rs:
+/home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/monitor.rs:
+/home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/handle.rs:
+/home/nathan/.cargo/registry/src/index.crates.io-6f17d22bba15001f/libudev-0.2.0/src/util.rs:

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Event","Request"],"fn":["attach","cont","detach","getevent","getregs","getsiginfo","kill","ptrace","read","setoptions","setregs","setsiginfo","step","syscall","traceme","write"],"struct":["Options"],"type":["AddressType"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["format_id_request","format_name_request","format_specific_id_request"],"struct":["CNSGet"]};
