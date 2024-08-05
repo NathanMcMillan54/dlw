@@ -1,5 +1,3 @@
-// This file contains the ``StreamsHandler`` struct which 
-use dlwp::chrono::{Timelike, Utc};
 use dlwp::codes::{READ_SUCCESS, WRITE_FAILED, WRITE_TIMEDOUT};
 use dlwp::config::DLConfig;
 use dlwp::distributor::{GET_DISTRIBUTOR, USER_INIT};
@@ -88,7 +86,7 @@ impl StreamsHandler {
     // transmitting distributor's id adn sets it to zero (between ``self.run`` and ``self.write_to_stream_file``). For
     // now, streams will only be recognized by their Id and port. This means that a driver can handle only one
     // connection of "id" and "port". Having the distributor id can allow two devices to accidentally (or
-    // intentionally) have the local id. When that problem is fixed this function will be changed to include a 
+    // intentionally) have the local id. When that problem is fixed this function will be changed to include a
     // distributor id.
     pub fn stream_exists(&self, rid: u64, port: u16) -> bool {
         return match self.stream_info.len() {
@@ -281,8 +279,8 @@ impl StreamsHandler {
                 sleep(Duration::from_millis(250));
             }
 
-            let utc = Utc::now();
-            let minute = utc.minute() as u8;
+            //let utc = Utc::now();
+            //let minute = utc.minute() as u8;
 
             for i in 0..self.stream_info.len() {
                 // TODO: Check if stream received 200 within a certain amount of time

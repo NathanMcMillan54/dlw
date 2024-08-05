@@ -1,19 +1,22 @@
 use dlwp::{
     cerpton::{libcerpton_decode, libcerpton_encode},
     codes::REQUEST_RESPONSE,
+        chrono::{Utc, Timelike},
     encryption::EncryptionInfo,
     message::{contents_to_string, Message},
     stream::Stream,
 };
 use std::io::{stdin, stdout, Write};
+use std::thread::sleep;
+use std::time::Duration;
 
 fn main() {
     let mut stream = Stream::new(
         // Add the client/server's ID and the Distributor ID
         dlwp::stream::StreamType::Client {
-            rid: 505051114, // Add Id here
+            rid: 505051114,
             rdid: 3,
-            port: 4998,
+            port: 5000,
         },
         false,
     );
@@ -26,22 +29,10 @@ fn main() {
     stream.start();
 
     while stream.running() {
-        let mut input = String::new();
-        print!("Enter message (\"r\") to refresh) > ");
-        stdout().flush().unwrap();
-        stdin()
-            .read_line(&mut input)
-            .expect("Failed to read string");
-        if let Some('\n') = input.chars().next_back() {
-            input.pop();
-        }
-        if let Some('\r') = input.chars().next_back() {
-            input.pop();
-        }
+        let utc = Utc::now();
+        let mut input = format!("Stuff2 {}:{}", utc.hour(), utc.minute());
 
-        if input != String::from("r") {
-            stream.write(input, REQUEST_RESPONSE);
-        }
+        stream.write(input, REQUEST_RESPONSE);
 
         let read = stream.read();
         for i in 0..read.len() {
@@ -50,5 +41,7 @@ fn main() {
                 contents_to_string(read[i].contents).replace("\0", "")
             );
         }
+
+        sleep(Duration::new(15, 0));
     }
 }

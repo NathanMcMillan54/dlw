@@ -1,7 +1,6 @@
 use crate::cns::cns_add;
 use crate::streams::{StreamInfo, STREAMS_HANDLER};
 use dlwp::id::local_user_id;
-use dlwp::message::Message;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::thread::{sleep, spawn};
@@ -10,7 +9,6 @@ use std::time::Duration;
 pub fn cmd_input_thread() {
     File::create("/tmp/darklight/cmd_input").unwrap();
 
-    println!("reading");
     loop {
         let reader = BufReader::new(File::open("/tmp/darklight/cmd_input").unwrap());
 
@@ -21,7 +19,7 @@ pub fn cmd_input_thread() {
                 continue;
             }
 
-            let mut inputs = read.split(" ").collect::<Vec<&str>>();
+            let inputs = read.split(" ").collect::<Vec<&str>>();
 
             if inputs[0].is_empty() {
                 sleep(Duration::from_millis(250));
@@ -188,18 +186,14 @@ pub fn cmd_input_thread() {
 
                     let arg1 = Box::leak(inputs[1].to_string().into_boxed_str());
                     let arg2 = Box::leak(inputs[2].to_string().into_boxed_str());
-                    unsafe {
-                        spawn(move || {
-                            cns_add(vec![arg1, arg2]);
-                        });
-                    }
+                    spawn(move || {
+                        cns_add(vec![arg1, arg2]);
+                    });
                 }
                 _ => {
                     println!("Invalid input: {:?}", inputs[0]);
                 }
             }
-
-            //drop(inputs);
 
             File::create("/tmp/darklight/cmd_input").unwrap();
         }

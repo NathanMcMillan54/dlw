@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-dlwp = { path = "../../dlwp/" }
+dlwp = { path = "../../dlwp/", features = ["include_chrono"] }

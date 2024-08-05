@@ -18,20 +18,18 @@ pub(crate) mod streams;
 fn files_setup() -> bool {
     if Path::new("/tmp/darklight/").exists() {
         println!("Removing \"/tmp/darklight/\"...");
-
         remove_dir_all("/tmp/darklight/").unwrap();
-        println!("Restart darklight_driver");
-        return false;
     }
 
     if !Path::new("/etc/dlw/").exists() {
-        println!("\"/etc/dlw/\" does not exist, creating dir, restart darklight_driver...");
+        println!("\"/etc/dlw/\" does not exist, creating directory...");
         create_dir("/etc/dlw/").unwrap();
-        return false;
-    } else if !Path::new("/etc/dlw/local_id").exists() {
+    }
+
+    if !Path::new("/etc/dlw/local_id").exists() {
         println!("Generating local id...");
         ids::write_local_id();
-    } else if Path::new("/etc/dlw/local_id").exists() {
+    } else {
         println!("Verifying local Id....");
         if ids::verify_id() == false {
             println!("Local Id could not be verified, deleting \"/etc/dlw/local_id\"");
@@ -40,6 +38,17 @@ fn files_setup() -> bool {
             return false;
         }
         println!("Local Id verified");
+    }
+
+    if !Path::new("/etc/dlw/local_did").exists() {
+        println!("Creating distributor Id file...");
+        File::options()
+            .create(true)
+            .write(true)
+            .open("/etc/dlw/local_did")
+            .unwrap()
+            .write_fmt(format_args!("{}", 1))
+            .unwrap();
     }
 
     if !Path::new("/etc/dlw/first_key").exists() {

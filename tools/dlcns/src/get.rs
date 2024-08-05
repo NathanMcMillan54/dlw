@@ -12,12 +12,12 @@ use dlwp::{
 
 use crate::{name::Owner, CNS_DISTRIBUTOR, CNS_ID, CNS_PORT, OWNERS_LIST};
 
-/// Getting the location of a name
+/// Getting the location (owner) of a name
 pub fn format_name_request(name: &String) -> String {
     return format!("GET_ID {}", name);
 }
 
-/// Getting all names by location
+/// Getting all names by location (owner)
 pub fn format_id_request(did: DId, id: LId) -> String {
     return format!("GET_ALL_NAMES {} {}", did, id);
 }
@@ -55,6 +55,7 @@ impl CNSGet {
         };
     }
 
+    /// Returns the owner of a name
     pub fn get_owner_name(&mut self, name: String) -> Option<Owner> {
         if self.stream.running() == false {
             return None;
@@ -108,40 +109,15 @@ impl CNSGet {
         return Some(owner);
     }
 
+    /// Return a list of all owners and their names
     pub fn get_all(&mut self) -> String {
         unimplemented!();
-        /*self.stream.write(String::from(OWNERS_LIST), REQUEST_FILE);
-
-        let mut read = vec![];
-        while read.is_empty() {
-            read = self.stream.read();
-        }
-
-        let message = read[0];
-        let contents = contents_to_string(message.contents);
-
-        if message.ti.code == FILE_RESPONSE.value() && contents.parse::<u64>().is_ok() {
-            let mut ret = String::new();
-            for i in 0..contents.parse::<u64>().unwrap() {
-                self.stream.write(format!("{}", i), REQUEST_CHUNK);
-
-                let mut chunk_read = vec![];
-                while chunk_read.is_empty() {
-                    chunk_read = self.stream.read();
-                }
-
-                ret.push_str(&contents_to_string(chunk_read[0].contents));
-            }
-
-            return ret;
-        } else if message.ti.code == FILE_RESPONSE.value() {
-            return contents;
-        } else {
-            return String::new();
-        }*/
+        
+        
     }
 
+    /// Returns the name of an onwer
     pub fn get_id(&mut self, id: LId, did: DId, port: Port) -> String {
-        unimplemented!();
+        unimplemented!()
     }
 }

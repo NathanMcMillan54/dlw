@@ -239,7 +239,6 @@ impl Stream {
 
         for i in 0..strings.len() {
             let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
-            println!("message ti: {:?}", received_message.ti);
             //let received_message = Message::from_string(&strings[i].to_owned());
             ret.push(received_message);
         }
