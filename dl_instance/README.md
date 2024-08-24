@@ -1,1 +1,1 @@
-todo: add code from private repo
+[what an instance should be](https://nathanmcmillan54.github.io/blog/24-08-2024/24-08-2024-20:35.html)

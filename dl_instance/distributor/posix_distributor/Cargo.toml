@@ -1,0 +1,7 @@
+[package]
+name = "posix_distributor"
+version = "0.1.0"
+edition = "2021"
+description = "A TCP and serial distributor intended to run on POSIX-like systems"
+
+[dependencies]

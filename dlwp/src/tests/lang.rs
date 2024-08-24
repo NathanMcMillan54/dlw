@@ -1,7 +1,7 @@
 use crate::langs::{is_human_readable, is_human_readable_including};
 
 #[test]
-fn test_lan() {
+fn test_lang() {
     let regular_text = "this is some text 12345932";
     let not_really_regular = ".,!?-";
 

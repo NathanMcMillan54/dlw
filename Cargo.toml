@@ -1,6 +1,8 @@
 [workspace]
 members = [
-    "darklight_driver/", "dl_instance",
+    "darklight_driver/", 
+    "dl_instance/",
+    "dl_instance/distributor/posix_distributor/",
     "dlwp/",
     "test_streams/test_client",
     "test_streams/test_server",

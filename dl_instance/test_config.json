@@ -1,0 +1,14 @@
+{
+    "id": 1,
+    "owners": [
+        "The Tester"
+    ],
+    "distributors": [],
+    "min_distributor_version": "0.1.0-alpha",
+    "min_library_version": "0.1.1-alpha",
+    "verify_server_addresses": [
+        "127.0.0.1:4999"
+    ],
+    "non_essential_services": ["./runs_forever"],
+    "information_message": "Currently running tests"
+}

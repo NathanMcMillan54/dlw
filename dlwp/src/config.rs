@@ -28,11 +28,11 @@ impl DLConfig {
     }
 }
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct DistributorConfig {
     pub tcp_connections: Vec<String>,
     pub serial_connections: Vec<String>,
     pub bind: String,
-    pub key: u128,
+    pub key: String,
     pub id: DId,
 }
