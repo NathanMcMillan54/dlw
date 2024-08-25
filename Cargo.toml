@@ -2,7 +2,7 @@
 members = [
     "darklight_driver/", 
     "dl_instance/",
-    "dl_instance/distributor/posix_distributor/",
+    "dl_instance/distributor/distributor/",
     "dlwp/",
     "test_streams/test_client",
     "test_streams/test_server",

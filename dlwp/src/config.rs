@@ -33,6 +33,5 @@ pub struct DistributorConfig {
     pub tcp_connections: Vec<String>,
     pub serial_connections: Vec<String>,
     pub bind: String,
-    pub key: String,
-    pub id: DId,
+    pub max_users: u16,
 }
