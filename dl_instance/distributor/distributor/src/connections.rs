@@ -8,6 +8,13 @@ pub struct LocalConnections {
 }
 
 impl LocalConnections {
+    pub fn empty() -> Self {
+        return LocalConnections {
+            tcp_connections: HashMap::new(),
+            serial_connections: HashMap::new(),
+        }
+    }
+
     pub fn connection_exists(&self, id: &LId) -> bool {
         return if self.tcp_connections.contains_key(id) || self.serial_connections.contains_key(id) {
             true
