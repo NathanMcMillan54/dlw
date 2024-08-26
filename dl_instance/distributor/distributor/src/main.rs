@@ -4,7 +4,8 @@ use distributor::DarkLightDistributor;
 
 extern crate dlwp;
 extern crate lib_dldistributor;
-#[macro_use] extern crate tokio;
+#[macro_use]
+extern crate tokio;
 
 // Verify Server Information Settings
 const VS1: &str = env!("VS1");

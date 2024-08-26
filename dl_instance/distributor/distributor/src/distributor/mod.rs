@@ -17,7 +17,13 @@ pub struct DarkLightDistributor {
 impl DarkLightDistributor {
     pub fn new() -> Self {
         return DarkLightDistributor {
-            info: DistributorInfo::new(DISTRIBUTOR_ID.parse().expect("Failed to parse DIST_ID to u64"), DISTRIBUTOR_UID.to_string(), DistributorConfig::default()),
+            info: DistributorInfo::new(
+                DISTRIBUTOR_ID
+                    .parse()
+                    .expect("Failed to parse DIST_ID to u64"),
+                DISTRIBUTOR_UID.to_string(),
+                DistributorConfig::default(),
+            ),
             user_connections: LocalConnections::empty(),
             verify_server: None,
         };
@@ -25,7 +31,8 @@ impl DarkLightDistributor {
 
     pub fn set_config(&mut self, config_path: &'static str) {
         let contents = read_to_string(config_path).expect("Failed to read config file");
-        let parsed_file: DistributorConfig = serde_json::from_str(&contents).expect("Failed to parse config file");
+        let parsed_file: DistributorConfig =
+            serde_json::from_str(&contents).expect("Failed to parse config file");
 
         self.info.config = parsed_file;
     }

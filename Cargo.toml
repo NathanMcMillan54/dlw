@@ -1,6 +1,19 @@
+[package]
+name = "darklight"
+edition = "2021"
+version = "0.1.0-alpha"
+
+[[bin]]
+name = "verify_server"
+path = "src/verify_server.rs"
+
+[dependencies]
+dlwp = { path = "dlwp/", features = ["include_serde"] }
+serde = { version = "1.0.188", features = ["serde_derive", "std"] }
+
 [workspace]
 members = [
-    "darklight_driver/", 
+    "darklight_driver/",
     "dl_instance/",
     "dl_instance/distributor/distributor/",
     "dlwp/",

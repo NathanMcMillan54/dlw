@@ -1,4 +1,3 @@
-use std::{thread::sleep, time::Duration};
 use dlcns::{CNS_DISTRIBUTOR, CNS_ID, CNS_PORT};
 use dlwp::{
     cerpton::{alphabet::ALPHABET_LEN, libcerpton_decode, libcerpton_encode, Encoder},
@@ -11,6 +10,7 @@ use dlwp::{
     stream::Stream,
 };
 use rand::{thread_rng, Rng};
+use std::{thread::sleep, time::Duration};
 
 use crate::ids::first_key;
 

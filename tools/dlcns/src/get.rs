@@ -112,8 +112,6 @@ impl CNSGet {
     /// Return a list of all owners and their names
     pub fn get_all(&mut self) -> String {
         unimplemented!();
-        
-        
     }
 
     /// Returns the name of an onwer

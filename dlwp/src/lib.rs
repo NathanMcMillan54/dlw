@@ -15,6 +15,8 @@ extern crate serde_json;
 #[cfg(feature = "include_serde")]
 #[macro_use]
 pub extern crate serde;
+#[cfg(feature = "include_serde")]
+pub use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "include_serde")]
 pub extern crate serde_json;

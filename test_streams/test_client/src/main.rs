@@ -1,7 +1,7 @@
 use dlwp::{
     cerpton::{libcerpton_decode, libcerpton_encode},
+    chrono::{Timelike, Utc},
     codes::REQUEST_RESPONSE,
-        chrono::{Utc, Timelike},
     encryption::EncryptionInfo,
     message::{contents_to_string, Message},
     stream::Stream,
