@@ -12,8 +12,7 @@ extern crate dlwp;
 extern crate serde;
 
 use std::{
-    io::{Read, Write},
-    net::{Shutdown, TcpListener, TcpStream},
+    fs::{read_to_string, File}, io::{Read, Write}, net::{Shutdown, TcpListener, TcpStream}, path::Path
 };
 
 use dlwp::{
@@ -93,7 +92,38 @@ struct DistributorKey {
     id: u64,
 }
 
+impl DistributorKey {
+    pub fn new(key: String, id: u64) -> Self {
+        return DistributorKey {
+            key,
+            id,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize)]
+struct DistirbutorKeys {
+    keys: Vec<DistributorKey>
+}
+
+impl DistirbutorKeys {
+    pub const fn empty() -> Self {
+        return DistirbutorKeys {
+            keys: vec![],
+        };
+    }
+}
+
 static mut USER_KEYS: UserKeys = UserKeys::empty();
+static mut DISTRIBUTOR_KEYS: DistirbutorKeys = DistirbutorKeys::empty();
+
+extern "C" {
+    fn atexit(f: extern "C" fn()) -> i32;
+}
+
+extern "C" fn termination_handler() {
+    panic!("Stopping verify_server...");
+}
 
 fn verify_user_key(mut client: TcpStream, input: Vec<&str>) {
     let key = input[0];
@@ -178,7 +208,31 @@ fn handle_client(mut client: TcpStream) {
     }
 }
 
+fn setup() {
+    if Path::new(USER_KEYS_FILE).exists() {
+        let file_contents = read_to_string(USER_KEYS_FILE).unwrap();
+        let user_keys: UserKeys = serde_json::from_str(&file_contents).unwrap();
+        unsafe { USER_KEYS = user_keys; }
+    } else {
+        File::create(USER_KEYS_FILE).unwrap();
+    }
+
+    if Path::new(DISTRIBUTOR_KEYS_FILE).exists() {
+        let file_contents = read_to_string(DISTRIBUTOR_KEYS_FILE).unwrap();
+        let distributor_keys = serde_json::from_str(&file_contents).unwrap();
+        unsafe { DISTRIBUTOR_KEYS = distributor_keys; }
+    } else {
+        File::create(DISTRIBUTOR_KEYS_FILE).unwrap();
+    }
+
+    unsafe { atexit(termination_handler); }
+}
+
 fn main() {
+    println!("Reading key files...");
+    setup();
+
+    println!("Starting...");
     #[cfg(not(debug_assertions))]
     let mut tcp_listener = TcpListener::bind(env!("BIND_ADDR")).unwrap();
 

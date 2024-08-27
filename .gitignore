@@ -1,4 +1,6 @@
 target/
 
 distributor_config.json
+distributor_keys.json
+user_keys.json
 Cargo.lock
