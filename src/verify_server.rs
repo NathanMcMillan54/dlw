@@ -12,13 +12,14 @@ extern crate dlwp;
 extern crate serde;
 
 use std::{
-    fs::{read_to_string, File}, io::{Read, Write}, net::{Shutdown, TcpListener, TcpStream}, path::Path
+    fs::{read_to_string, File}, io::{Read, Write}, net::{Shutdown, TcpListener, TcpStream}, panic::{set_hook, PanicInfo}, path::Path, process::exit, thread
 };
 
 use dlwp::{
     cerpton::{libcerpton_decode, libcerpton_encode},
     serde_json,
 };
+use signal_hook::{consts::{SIGINT, SIGTERM}, iterator::Signals};
 
 // This should be a proper database someday
 const USER_KEYS_FILE: &str = "user_keys.json";
@@ -117,14 +118,6 @@ impl DistirbutorKeys {
 static mut USER_KEYS: UserKeys = UserKeys::empty();
 static mut DISTRIBUTOR_KEYS: DistirbutorKeys = DistirbutorKeys::empty();
 
-extern "C" {
-    fn atexit(f: extern "C" fn()) -> i32;
-}
-
-extern "C" fn termination_handler() {
-    panic!("Stopping verify_server...");
-}
-
 fn verify_user_key(mut client: TcpStream, input: Vec<&str>) {
     let key = input[0];
     let id = input[1].parse::<u64>();
@@ -208,6 +201,17 @@ fn handle_client(mut client: TcpStream) {
     }
 }
 
+// Save all information before termination
+fn panic_handler(info: &PanicInfo) {
+    unsafe {
+        File::options().write(true).open(USER_KEYS_FILE).unwrap().write_fmt(format_args!("{}", serde_json::to_string_pretty(&USER_KEYS).unwrap()));
+        File::options().write(true).open(DISTRIBUTOR_KEYS_FILE).unwrap().write_fmt(format_args!("{}", serde_json::to_string_pretty(&DISTRIBUTOR_KEYS).unwrap()));
+    }
+
+    println!("{:?}", info);
+    exit(0);
+}
+
 fn setup() {
     if Path::new(USER_KEYS_FILE).exists() {
         let file_contents = read_to_string(USER_KEYS_FILE).unwrap();
@@ -225,12 +229,22 @@ fn setup() {
         File::create(DISTRIBUTOR_KEYS_FILE).unwrap();
     }
 
-    unsafe { atexit(termination_handler); }
+    set_hook(Box::new(panic_handler));
 }
 
 fn main() {
     println!("Reading key files...");
     setup();
+
+    // Handle intentional or unexpected termination
+    let mut signals = Signals::new(&[SIGTERM, SIGINT]).unwrap();
+    thread::spawn(move || {
+        for signal in signals.forever() {
+            if signal == SIGTERM || signal == SIGTERM {
+                panic!("Stopping verify_server...");
+            }
+        }
+    });
 
     println!("Starting...");
     #[cfg(not(debug_assertions))]
