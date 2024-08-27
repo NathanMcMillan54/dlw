@@ -1,6 +1,5 @@
 use std::{
-    net::{SocketAddrV4, TcpStream},
-    str::FromStr,
+    io::{Read, Write}, net::{SocketAddrV4, TcpStream}, str::FromStr
 };
 
 use dlwp::cerpton::libcerpton_decode;
@@ -43,7 +42,36 @@ impl DarkLightDistributor {
         #[cfg(debug_assertions)]
         let test_address = SocketAddrV4::from_str("127.0.0.1:5000").unwrap();
 
-        self.verify_server =
-            Some(TcpStream::connect(test_address).expect("Failed to connect to verify server"));
+        self.verify_server = test_address;
+    }
+
+    pub fn verify_input(&self, input: Vec<u8>) -> bool {
+        if input.len() > 100 {
+            return false;
+        }
+
+        let mut _verify_server = TcpStream::connect(self.verify_server);
+
+        if _verify_server.is_err() {
+            return false;
+        }
+
+        let mut verify_server = _verify_server.unwrap();
+
+        verify_server.write(&input.as_slice());
+        verify_server.flush();
+
+        let mut response_buf = [0; 10];
+
+        while response == [0; 10] {
+            verify_server.read(&mut response);
+        }
+
+        let response = String::from_utf8(response_buf.to_vec()).unwrap_or(String::new()).replace("\0", "");
+        if response == String::from("VALID") {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
