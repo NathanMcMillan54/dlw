@@ -119,6 +119,7 @@ static mut USER_KEYS: UserKeys = UserKeys::empty();
 static mut DISTRIBUTOR_KEYS: DistirbutorKeys = DistirbutorKeys::empty();
 
 fn verify_user_key(mut client: TcpStream, input: Vec<&str>) {
+    println!("Verifying user...");
     let key = input[0];
     let id = input[1].parse::<u64>();
     let os = input[2].parse::<u8>();
@@ -161,7 +162,9 @@ fn verify_user_key(mut client: TcpStream, input: Vec<&str>) {
     client.shutdown(Shutdown::Both);
 }
 
-fn add_key(mut client: TcpStream, input: Vec<&str>) {}
+fn add_key(mut client: TcpStream, input: Vec<&str>) {
+    println!("Creating new key");
+}
 
 fn handle_client(mut client: TcpStream) {
     let mut buf = [0; 100];

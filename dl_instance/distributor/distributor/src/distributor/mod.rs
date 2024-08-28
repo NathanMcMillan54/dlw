@@ -1,4 +1,4 @@
-use std::{fs::read_to_string, io::{Read, Write}, net::{Ipv4Addr, Shutdown, TcpListener, TcpStream}};
+use std::{fs::read_to_string, io::{Read, Write}, net::{Ipv4Addr, Shutdown, SocketAddrV4, TcpListener, TcpStream}, str::FromStr};
 
 use dlwp::config::DistributorConfig;
 use dlwp::serde_json;
@@ -14,7 +14,7 @@ pub(crate) mod verify_server;
 pub struct DarkLightDistributor {
     pub info: DistributorInfo,
     pub user_connections: LocalConnections,
-    pub verify_server: Ipv4Addr,
+    pub verify_server: SocketAddrV4,
 }
 
 impl DarkLightDistributor {
@@ -28,7 +28,7 @@ impl DarkLightDistributor {
                 DistributorConfig::default(),
             ),
             user_connections: LocalConnections::empty(),
-            verify_server: Ipv4Addr::new(0, 0, 0, 0),
+            verify_server: SocketAddrV4::from_str("0.0.0.0:0").unwrap()
         };
     }
 
@@ -42,7 +42,7 @@ impl DarkLightDistributor {
 
     // When a user or distributor connects to this distributor this function will verify and add it
     pub fn tcp_check_add(&mut self) {
-        let mut listener = TcpListener::bind(self.info.config.bind).unwrap();
+        let mut listener = TcpListener::bind(self.info.config.bind.clone()).unwrap();
 
         loop {
             let mut _accept = listener.accept();
@@ -67,11 +67,10 @@ impl DarkLightDistributor {
                     accept.0.shutdown(Shutdown::Both);
                     continue;
                 } else {
+                    println!("Added user!");
                     self.user_connections.add_tcp_connection(0, accept.0);
                 }
             }
-
-            self.verify_input(read.to_vec());
         }
     }
 }

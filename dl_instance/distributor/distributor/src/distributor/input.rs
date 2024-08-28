@@ -1,3 +1,5 @@
+use dlwp::message::{MSG_END, MSG_INIT};
+
 use crate::DISTRIBUTOR_ID;
 
 pub fn check_input(input: Vec<u8>) -> String {
@@ -6,7 +8,8 @@ pub fn check_input(input: Vec<u8>) -> String {
         return String::from("INVALID INPUT");
     }
 
-    let read = _read.unwrap().split(" ").collect::<Vec<&str>>();
+    let trimmed = _read.clone().unwrap().replace(MSG_INIT, "").replace(MSG_END, "");
+    let read = trimmed.split(" ").collect::<Vec<&str>>();
 
     return match read[0] {
         "USR-INIT" => {
