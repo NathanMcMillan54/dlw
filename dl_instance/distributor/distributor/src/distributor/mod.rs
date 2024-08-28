@@ -53,23 +53,42 @@ impl DarkLightDistributor {
             let mut accept = _accept.unwrap();
             let mut read = [0; 100];
 
-            if accept.0.read(&mut read).is_err() {
-                continue;
+            let mut accepted = false;
+            let mut reads = 0;
+
+            // Allows for distributor information to be collected before properly connecting
+            while reads < 5 && accepted == false {
+                reads += 1;
+                if accept.0.read(&mut read).is_err() {
+                    println!("Failed to read");
+                    continue;
+                }
+
+                let check = check_input(read.to_vec());
+                println!("{:?}", check);
+
+                if check.starts_with("INIT-USR") {
+                    let verify = self.verify_input(check.as_bytes().to_vec());
+
+                    if verify == false {
+                        accept.0.write(b"INVALID USER");
+                        accept.0.shutdown(Shutdown::Both);
+                        continue;
+                    } else {
+                        println!("User can be added!");
+                        accepted = true;
+                        //self.user_connections.add_tcp_connection(0, accept.0);
+                    }
+                } else {
+                    accept.0.write(check.as_bytes());
+                    accept.0.flush();
+                }
             }
 
-            let check = check_input(read.to_vec());
-
-            if check.starts_with("USR-INIT") {
-                let verify = self.verify_input(check.as_bytes().to_vec());
-
-                if verify == false {
-                    accept.0.write(b"INVALID USER");
-                    accept.0.shutdown(Shutdown::Both);
-                    continue;
-                } else {
-                    println!("Added user!");
-                    self.user_connections.add_tcp_connection(0, accept.0);
-                }
+            if accepted {
+                self.user_connections.add_tcp_connection(0, accept.0);
+            } else {
+                accept.0.shutdown(Shutdown::Both);
             }
         }
     }

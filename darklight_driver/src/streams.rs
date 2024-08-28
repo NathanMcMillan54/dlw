@@ -230,6 +230,7 @@ impl StreamsHandler {
                     if id != distributor_id().unwrap_or(0).to_string() {
                         println!("Setting new Distributor ID");
                     } else {
+                        println!("Conencted to distributor: {}", id);
                         self.dist_init = true;
                         continue;
                     }
@@ -242,12 +243,13 @@ impl StreamsHandler {
                     did_file.write_fmt(format_args!("{}", id)).unwrap();
                     self.dist_init = true;
                 } else {
-                    println!("Failed to read Distributor ID")
+                    panic!("Failed to read Distributor ID: {:?}", id);
                 }
 
                 continue;
             } else if self.dist_init == true && self.dist_conn == false {
                 println!("Connecting Stream to Distributor...");
+                
                 let ret = self.io_method.as_mut().unwrap()._write(format!(
                     "{} {} {} {} {} {} {}",
                     USER_INIT,

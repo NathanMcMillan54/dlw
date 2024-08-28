@@ -16,7 +16,7 @@ use std::{
 };
 
 use dlwp::{
-    cerpton::{libcerpton_decode, libcerpton_encode},
+    cerpton::{libcerpton_decode, libcerpton_encode, utf::utf8_to_string},
     serde_json,
 };
 use signal_hook::{consts::{SIGINT, SIGTERM}, iterator::Signals};
@@ -175,11 +175,7 @@ fn handle_client(mut client: TcpStream) {
         return;
     }
 
-    let read_str = String::from_utf8(buf.to_vec());
-    if read_str.is_err() {
-        client.shutdown(Shutdown::Both);
-        return;
-    }
+    let read_str = utf8_to_string(buf.to_vec()).replace("\0", "");
 
     let read = libcerpton_decode(
         [
@@ -190,7 +186,7 @@ fn handle_client(mut client: TcpStream) {
             0,
             0,
         ],
-        read_str.unwrap(),
+        read_str,
     );
     let split = read.split(" ").collect::<Vec<&str>>();
 

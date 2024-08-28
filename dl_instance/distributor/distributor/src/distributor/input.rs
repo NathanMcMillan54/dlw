@@ -8,11 +8,12 @@ pub fn check_input(input: Vec<u8>) -> String {
         return String::from("INVALID INPUT");
     }
 
-    let trimmed = _read.clone().unwrap().replace(MSG_INIT, "").replace(MSG_END, "");
+    let trimmed = _read.clone().unwrap().replace(MSG_INIT, "").replace(MSG_END, "").replace("\0", "");
     let read = trimmed.split(" ").collect::<Vec<&str>>();
+    println!("input: {:?}", read[0]);
 
     return match read[0] {
-        "USR-INIT" => {
+        "INIT-USR" => {
             if read.len() == 7 {
                 if read[2].parse::<u64>().is_err() || read[3].parse::<u8>().is_err() || read[4].parse::<u8>().is_err() || read[5].parse::<u8>().is_err() || read[6].parse::<u8>().is_err() {
                     String::from("Invalid user values")

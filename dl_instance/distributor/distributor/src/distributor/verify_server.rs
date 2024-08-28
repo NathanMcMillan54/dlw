@@ -53,17 +53,19 @@ impl DarkLightDistributor {
         let mut _verify_server = TcpStream::connect(self.verify_server);
 
         if _verify_server.is_err() {
+            println!("Cannot connect to verify_server");
             return false;
         }
 
         let mut verify_server = _verify_server.unwrap();
 
-        let encrypted = libcerpton_encode([VS1.parse().unwrap(), VS2.parse().unwrap(), VS3.parse().unwrap(), 0, 0, 0], String::from_utf8(input).unwrap());
+        let encrypted = libcerpton_encode([VS1.parse().unwrap(), VS2.parse().unwrap(), VS3.parse().unwrap(), 0, 0, 0], String::from_utf8(input).unwrap().replace("INIT-USR ", ""));
         verify_server.write(encrypted.as_bytes());
         verify_server.flush();
 
         let mut response_buf = [0; 10];
 
+        println!("Waiting for response");
         while response_buf == [0; 10] {
             verify_server.read(&mut response_buf);
         }

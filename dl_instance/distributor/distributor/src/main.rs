@@ -33,4 +33,5 @@ async fn main() {
     println!("Set config file");
     println!("Connecting to verify server...");
     DISTRIBUTOR.lock().unwrap().get_verify_server().await;
+    DISTRIBUTOR.lock().unwrap().tcp_check_add();
 }
