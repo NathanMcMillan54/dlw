@@ -1,4 +1,4 @@
-use std::{collections::HashMap, net::TcpStream};
+use std::{borrow::{Borrow, BorrowMut}, collections::{hash_map::{IntoIter, IntoKeys}, HashMap}, io::Write, net::TcpStream};
 
 use dlwp::{
     id::{DId, LId},
@@ -6,8 +6,8 @@ use dlwp::{
 };
 
 pub struct LocalConnections {
-    tcp_connections: HashMap<LId, TcpStream>,
-    serial_connections: HashMap<LId, DLSerialIO>,
+    pub tcp_connections: HashMap<LId, TcpStream>,
+    pub serial_connections: HashMap<LId, DLSerialIO>,
 }
 
 impl LocalConnections {
@@ -16,6 +16,12 @@ impl LocalConnections {
             tcp_connections: HashMap::new(),
             serial_connections: HashMap::new(),
         };
+    }
+
+    // If other forms of communication are directly supported then this will need to return something else to indicate
+    // how a user is connected
+    pub fn connection_is_tcp(&self, id: &LId) -> bool {
+        self.tcp_connections.contains_key(id)
     }
 
     pub fn connection_exists(&self, id: &LId) -> bool {
