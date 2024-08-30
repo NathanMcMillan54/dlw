@@ -7,8 +7,14 @@ version = "0.1.0-alpha"
 name = "verify_server"
 path = "src/verify_server.rs"
 
+[[bin]]
+name = "keyss"
+path = "src/keyss.rs"
+
 [dependencies]
 dlwp = { path = "dlwp/", features = ["include_serde"] }
+fernet = "0.2.2"
+rand = "0.8.5"
 serde = { version = "1.0.188", features = ["serde_derive", "std"] }
 signal-hook = "0.3.17"
 

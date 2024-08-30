@@ -12,13 +12,15 @@ extern crate dlwp;
 extern crate serde;
 
 use std::{
-    fs::{read_to_string, File}, io::{Read, Write}, net::{Shutdown, TcpListener, TcpStream}, panic::{set_hook, PanicInfo}, path::Path, process::exit, thread
+    fs::{read_to_string, File}, io::{Read, Write}, net::{Shutdown, TcpListener, TcpStream}, panic::{set_hook, PanicInfo}, path::Path, process::exit, thread::{self, sleep}, time::Duration
 };
 
 use dlwp::{
     cerpton::{libcerpton_decode, libcerpton_encode, utf::utf8_to_string},
     serde_json,
 };
+use fernet::Fernet;
+use rand::{thread_rng, Rng};
 use signal_hook::{consts::{SIGINT, SIGTERM}, iterator::Signals};
 
 // This should be a proper database someday
@@ -84,6 +86,10 @@ impl UserKeys {
         } else {
             false
         };
+    }
+
+    pub fn add_unused(&mut self, key: &String) {
+        self.unused_keys.push(key.clone());
     }
 }
 
@@ -164,6 +170,23 @@ fn verify_user_key(mut client: TcpStream, input: Vec<&str>) {
 
 fn add_key(mut client: TcpStream, input: Vec<&str>) {
     println!("Creating new key");
+
+    if input[0] != REQUEST_KEY[0] && input[1] != REQUEST_KEY[1] && input[2] != REQUEST_KEY[2] {
+        client.write(b"INVALID");
+        client.shutdown(Shutdown::Both);
+        return;
+    }
+
+    let fernet = Fernet::new(input[3]);
+    if fernet.is_none() {
+        client.write(b"INVALID");
+        client.shutdown(Shutdown::Both);
+    }
+
+    unsafe { USER_KEYS.unused_keys.push(input[3].to_string()); }
+    client.write(b"VALID");
+    client.flush();
+    client.shutdown(Shutdown::Both);
 }
 
 fn handle_client(mut client: TcpStream) {
