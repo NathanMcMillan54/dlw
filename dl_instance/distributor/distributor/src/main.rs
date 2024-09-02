@@ -1,6 +1,11 @@
-use std::sync::Mutex;
+use std::{
+    borrow::BorrowMut,
+    sync::{Arc, Mutex},
+    thread::{self, sleep},
+    time::Duration,
+};
 
-use distributor::DarkLightDistributor;
+use distributor::{users, DarkLightDistributor};
 
 extern crate dlwp;
 extern crate lib_dldistributor;
@@ -22,16 +27,30 @@ const CONFIG_PATH: &str = "distributor_config.json";
 
 mod distributor;
 
-lazy_static::lazy_static! {
-    pub(crate) static ref DISTRIBUTOR: Mutex<DarkLightDistributor> = Mutex::new(DarkLightDistributor::new());
-}
+static mut DISTRIBUTOR: Option<DarkLightDistributor> = None;
 
 #[tokio::main]
 async fn main() {
     println!("Reading config...");
-    DISTRIBUTOR.lock().unwrap().set_config(&CONFIG_PATH);
-    println!("Set config file");
-    println!("Connecting to verify server...");
-    DISTRIBUTOR.lock().unwrap().get_verify_server().await;
-    DISTRIBUTOR.lock().unwrap().tcp_check_add();
+    let mut distributor = DarkLightDistributor::new();
+    unsafe {
+        DISTRIBUTOR = Some(distributor);
+        DISTRIBUTOR.as_mut().unwrap().set_config(&CONFIG_PATH);
+        println!("Set config file");
+        println!("Connecting to verify server...");
+        DISTRIBUTOR.as_mut().unwrap().get_verify_server().await;
+
+        println!("Starting...");
+        thread::spawn(|| {
+            DISTRIBUTOR.as_mut().unwrap().tcp_check_add();
+        });
+
+        thread::spawn(|| {
+            DISTRIBUTOR.as_mut().unwrap().tcp_user_handler();
+        });
+    }
+
+    loop {
+        sleep(Duration::from_millis(1000))
+    }
 }

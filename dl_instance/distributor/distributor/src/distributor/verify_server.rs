@@ -1,5 +1,7 @@
 use std::{
-    io::{Read, Write}, net::{SocketAddrV4, TcpStream}, str::FromStr
+    io::{Read, Write},
+    net::{SocketAddrV4, TcpStream},
+    str::FromStr,
 };
 
 use dlwp::cerpton::{libcerpton_decode, libcerpton_encode};
@@ -59,7 +61,17 @@ impl DarkLightDistributor {
 
         let mut verify_server = _verify_server.unwrap();
 
-        let encrypted = libcerpton_encode([VS1.parse().unwrap(), VS2.parse().unwrap(), VS3.parse().unwrap(), 0, 0, 0], String::from_utf8(input).unwrap().replace("INIT-USR ", ""));
+        let encrypted = libcerpton_encode(
+            [
+                VS1.parse().unwrap(),
+                VS2.parse().unwrap(),
+                VS3.parse().unwrap(),
+                0,
+                0,
+                0,
+            ],
+            String::from_utf8(input).unwrap().replace("INIT-USR ", ""),
+        );
         verify_server.write(encrypted.as_bytes());
         verify_server.flush();
 
@@ -70,7 +82,9 @@ impl DarkLightDistributor {
             verify_server.read(&mut response_buf);
         }
 
-        let response = String::from_utf8(response_buf.to_vec()).unwrap_or(String::new()).replace("\0", "");
+        let response = String::from_utf8(response_buf.to_vec())
+            .unwrap_or(String::new())
+            .replace("\0", "");
         if response == String::from("VALID") {
             return true;
         } else {

@@ -1,4 +1,12 @@
-use std::{borrow::{Borrow, BorrowMut}, collections::{hash_map::{IntoIter, IntoKeys}, HashMap}, io::Write, net::TcpStream};
+use std::{
+    borrow::{Borrow, BorrowMut},
+    collections::{
+        hash_map::{IntoIter, IntoKeys},
+        HashMap,
+    },
+    io::Write,
+    net::TcpStream,
+};
 
 use dlwp::{
     id::{DId, LId},
@@ -63,3 +71,10 @@ impl LocalConnections {
         };
     }
 }
+
+pub struct PendingMessage {
+    pub can_send: bool,
+    pub message_str: String,
+}
+
+pub type PendingMessages = HashMap<LId, PendingMessage>;

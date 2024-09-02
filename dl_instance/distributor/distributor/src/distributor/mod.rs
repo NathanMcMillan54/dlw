@@ -1,11 +1,23 @@
-use std::{fs::read_to_string, io::{Read, Write}, net::{Ipv4Addr, Shutdown, SocketAddrV4, TcpListener, TcpStream}, str::FromStr};
+use std::{
+    collections::HashMap,
+    fs::read_to_string,
+    io::{Read, Write},
+    net::{Ipv4Addr, Shutdown, SocketAddrV4, TcpListener, TcpStream},
+    str::FromStr,
+    sync::Arc,
+    thread::sleep,
+    time::Duration,
+};
 
 use dlwp::config::DistributorConfig;
 use dlwp::serde_json;
 use input::check_input;
-use lib_dldistributor::{connections::LocalConnections, info::DistributorInfo};
+use lib_dldistributor::{
+    connections::{LocalConnections, PendingMessages},
+    info::DistributorInfo,
+};
 
-use crate::{DISTRIBUTOR_ID, DISTRIBUTOR_UID};
+use crate::{DISTRIBUTOR, DISTRIBUTOR_ID, DISTRIBUTOR_UID};
 
 pub(crate) mod input;
 pub(crate) mod users;
@@ -14,6 +26,7 @@ pub(crate) mod verify_server;
 pub struct DarkLightDistributor {
     pub info: DistributorInfo,
     pub user_connections: LocalConnections,
+    pub pending_messages: PendingMessages,
     pub verify_server: SocketAddrV4,
 }
 
@@ -28,7 +41,8 @@ impl DarkLightDistributor {
                 DistributorConfig::default(),
             ),
             user_connections: LocalConnections::empty(),
-            verify_server: SocketAddrV4::from_str("0.0.0.0:0").unwrap()
+            pending_messages: HashMap::new(),
+            verify_server: SocketAddrV4::from_str("0.0.0.0:0").unwrap(),
         };
     }
 
@@ -45,6 +59,7 @@ impl DarkLightDistributor {
         let mut listener = TcpListener::bind(self.info.config.bind.clone()).unwrap();
 
         loop {
+            sleep(Duration::from_millis(40));
             let mut _accept = listener.accept();
             if _accept.is_err() {
                 continue;
@@ -58,9 +73,8 @@ impl DarkLightDistributor {
 
             // Allows for distributor information to be collected before properly connecting
             while reads < 5 && accepted == false {
-                reads += 1;
                 if accept.0.read(&mut read).is_err() {
-                    println!("Failed to read");
+                    reads += 1;
                     continue;
                 }
 
@@ -75,14 +89,15 @@ impl DarkLightDistributor {
                         accept.0.shutdown(Shutdown::Both);
                         continue;
                     } else {
-                        println!("User can be added!");
                         accepted = true;
-                        //self.user_connections.add_tcp_connection(0, accept.0);
+                        break;
                     }
                 } else {
                     accept.0.write(check.as_bytes());
                     accept.0.flush();
                 }
+
+                reads += 1;
             }
 
             if accepted {
