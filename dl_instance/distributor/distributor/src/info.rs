@@ -1,14 +1,14 @@
-use dlwp::config::DistributorConfig;
+use dlwp::{config::DistributorConfig, id::DId};
 
 pub struct DistributorInfo {
-    pub id: u64,
+    pub id: DId,
     pub uid: String,
     pub config: DistributorConfig,
     pub version: String,
 }
 
 impl DistributorInfo {
-    pub fn new(id: u64, uid: String, config: DistributorConfig) -> Self {
+    pub fn new(id: DId, uid: String, config: DistributorConfig) -> Self {
         return DistributorInfo {
             id,
             uid,

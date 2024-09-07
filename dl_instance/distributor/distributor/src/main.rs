@@ -1,6 +1,5 @@
 use std::{
     borrow::BorrowMut,
-    sync::{Arc, Mutex},
     thread::{self, sleep},
     time::Duration,
 };

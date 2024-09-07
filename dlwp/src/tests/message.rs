@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use cerpton::{libcerpton_decode, libcerpton_encode};
 
 use crate::{
@@ -62,4 +64,17 @@ fn test_string_message_conversions() {
 
     let message_from_string = Message::from_string(&message_string);
     assert_eq!(false, message_from_string == Message::empty());
+}
+
+#[test]
+fn get_ri_from_message() {
+    let message_str = String::from_str("123345568 3 0 5000 \\|\\ ZZ5ZZZZZcZZHZ5ZЩь Z С Н Z Н \\|\\ 人T,66Н НZ74ь").unwrap();
+    let ri = ReceiveInfo {
+        rid: 123345568,
+        rdid: 3,
+        instance_id: 0,
+        port: 5000
+    };
+
+    assert_eq!(ri, ReceiveInfo::get_from_message_string(message_str));
 }

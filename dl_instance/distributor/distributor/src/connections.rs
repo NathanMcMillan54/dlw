@@ -77,4 +77,13 @@ pub struct PendingMessage {
     pub message_str: String,
 }
 
+impl PendingMessage {
+    pub fn new(send: bool, msg: String) -> Self {
+        return PendingMessage {
+            can_send: send,
+            message_str: msg,
+        };
+    }
+}
+
 pub type PendingMessages = HashMap<LId, PendingMessage>;

@@ -13,7 +13,7 @@ use dlwp::config::DistributorConfig;
 use dlwp::serde_json;
 use input::check_input;
 use lib_dldistributor::{
-    connections::{LocalConnections, PendingMessages},
+    connections::{LocalConnections, PendingMessage, PendingMessages},
     info::DistributorInfo,
 };
 
@@ -26,7 +26,7 @@ pub(crate) mod verify_server;
 pub struct DarkLightDistributor {
     pub info: DistributorInfo,
     pub user_connections: LocalConnections,
-    pub pending_messages: PendingMessages,
+    pub pending_messages: PendingMessages, // This is used to prevent conflicting data in threads
     pub verify_server: SocketAddrV4,
 }
 
@@ -79,7 +79,6 @@ impl DarkLightDistributor {
                 }
 
                 let check = check_input(read.to_vec());
-                println!("{:?}", check);
 
                 if check.starts_with("INIT-USR") {
                     let verify = self.verify_input(check.as_bytes().to_vec());
@@ -101,7 +100,14 @@ impl DarkLightDistributor {
             }
 
             if accepted {
+                // Let the user know they can connect
+                accept.0.write(b"CONN");
+                accept.0.flush();
                 self.user_connections.add_tcp_connection(0, accept.0);
+
+                // This prevents the main loop from immediatley writing to the user and giving it time to acknowledge
+                // that it is connected to the distributor
+                self.pending_messages.insert(0, PendingMessage::new(false, String::new()));
             } else {
                 accept.0.shutdown(Shutdown::Both);
             }

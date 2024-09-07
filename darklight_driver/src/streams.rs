@@ -81,8 +81,8 @@ impl StreamsHandler {
             .expect("Failed to remove stream file");
     }
 
-    // This might be nonesense (2024/7/1) vvvvv
-    // TODO: For some reason, at the current moment (2024/1/7), the darklight driver does not properly receive the
+    // This might be nonesense (7/1/2024) vvvvv
+    // TODO: For some reason, at the current moment (7/1/2024), the darklight driver does not properly receive the
     // transmitting distributor's id adn sets it to zero (between ``self.run`` and ``self.write_to_stream_file``). For
     // now, streams will only be recognized by their Id and port. This means that a driver can handle only one
     // connection of "id" and "port". Having the distributor id can allow two devices to accidentally (or
@@ -136,6 +136,7 @@ impl StreamsHandler {
 
     // This is the main loop of the StreamsHandler and basically the entirety of darklight_driver. If ``closed`` is set
     // to ``false`` in the config, this does not run.
+    // 3/11/2024 vvvvv as mentioned here: https://nathanmcmillan54.github.io/blog/24-08-2024/24-08-2024-20:35.html, this is terrible
     pub fn run(&mut self) {
         loop {
             sleep(Duration::from_millis(10)); // This might be unnecessary (or unnecessarily long)
@@ -325,6 +326,11 @@ impl StreamsHandler {
 
                             while waiting {
                                 let read = self.io_method.as_mut().unwrap()._read();
+                                if !read.0.is_empty() {
+                                    println!("read: {}", read.0);
+                                } else {
+                                    println!("Empty");
+                                }
 
                                 if read.0.contains("SSS") {
                                     waiting = false;
