@@ -66,6 +66,8 @@ impl DarkLightDistributor {
             }
 
             let mut accept = _accept.unwrap();
+            accept.0.set_read_timeout(Some(Duration::from_millis(1)));
+
             let mut read = [0; 100];
 
             let mut accepted = false;
@@ -89,6 +91,12 @@ impl DarkLightDistributor {
                         continue;
                     } else {
                         accepted = true;
+                        let id = check.split(" ").collect::<Vec<&str>>()[2];
+                        accept.0.write(b"CONN");
+                        accept.0.flush();
+                        self.user_connections.add_tcp_connection(id.parse().unwrap(), accept.0);
+
+                        self.pending_messages.insert(id.parse().unwrap(), PendingMessage::new(false, String::new()));
                         break;
                     }
                 } else {
@@ -99,18 +107,7 @@ impl DarkLightDistributor {
                 reads += 1;
             }
 
-            if accepted {
-                // Let the user know they can connect
-                accept.0.write(b"CONN");
-                accept.0.flush();
-                self.user_connections.add_tcp_connection(0, accept.0);
-
-                // This prevents the main loop from immediatley writing to the user and giving it time to acknowledge
-                // that it is connected to the distributor
-                self.pending_messages.insert(0, PendingMessage::new(false, String::new()));
-            } else {
-                accept.0.shutdown(Shutdown::Both);
-            }
+            // Get rid of client (not "Id")
         }
     }
 }

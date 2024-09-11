@@ -33,7 +33,10 @@ impl DarkLightDistributor {
                 sleep(Duration::from_micros(100));
             }
 
-            stream.read(&mut buf);
+            let ret = stream.read(&mut buf);
+            if ret.is_err() {
+                continue; // Write proper error handler
+            }
 
             if buf != [0; 4096] {
                 break;
@@ -49,13 +52,23 @@ impl DarkLightDistributor {
         return read_str;
     }
 
+    fn tcp_user_write(&self, mut stream: &TcpStream, write: String) -> bool {
+        let ret = stream.write(format!("{}{}{}", MSG_INIT, write, MSG_END).as_bytes());
+        return if ret.is_ok() {
+            stream.flush();
+            true
+        } else {
+            false
+        }
+    }
+
     fn tcp_user_write_pending(&self, id: &LId) {
 
     }
 
     pub fn tcp_user_handler(&mut self) {
         loop {
-            if self.user_connections.tcp_connections.len() <= 0 {
+            if self.user_connections.tcp_connections.len() <= 1 {
                 sleep(Duration::from_millis(15)); // Slow down the loop
                 continue;
             }
@@ -83,7 +96,14 @@ impl DarkLightDistributor {
                 }
 
                 if ri.rdid == self.info.id {
-                    // Local message
+                    if !self.user_connections.connection_exists(&ri.rid) {
+                        // Notify user that connection doesn't exist
+                    } else if self.user_connections.connection_is_tcp(&ri.rid) {
+                        let ret = self.tcp_user_write(&self.user_connections.tcp_connections[&ri.rid], read);
+                        // if ret == false, notify the user
+                    } else {
+                        // It is a serial connection
+                    }
                 } else {
                     // Message for external distributor
                 }
