@@ -56,7 +56,6 @@ pub struct StreamsHandler {
 
 impl StreamsHandler {
     pub(crate) fn create_stream_file(&self, rid: u64, port: u16) {
-        println!("created file");
         File::options()
             .read(true)
             .write(true)
@@ -66,7 +65,6 @@ impl StreamsHandler {
     }
 
     fn write_to_stream_file(&self, rid: u64, port: u16, write: &String) {
-        println!("rid: {}, port: {}", rid, port);
         File::options()
             .write(true)
             .create(true)
@@ -326,10 +324,8 @@ impl StreamsHandler {
 
                             while waiting {
                                 let read = self.io_method.as_mut().unwrap()._read();
-                                if !read.0.is_empty() {
-                                    println!("read: {}", read.0);
-                                } else {
-                                    println!("Empty");
+                                if read.0.is_empty() {
+                                    continue;
                                 }
 
                                 if read.0.contains("SSS") {

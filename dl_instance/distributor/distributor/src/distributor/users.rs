@@ -1,7 +1,15 @@
-use std::{borrow::{Borrow, BorrowMut}, io::{Read, Write}, net::TcpStream, thread::sleep, time::Duration};
+use std::{
+    borrow::{Borrow, BorrowMut},
+    io::{Read, Write},
+    net::TcpStream,
+    thread::sleep,
+    time::Duration,
+};
 
 use dlwp::{
-    distributor::READ_AVAILABLE, id::LId, message::{ReceiveInfo, MSG_END, MSG_INIT}
+    distributor::READ_AVAILABLE,
+    id::LId,
+    message::{ReceiveInfo, MSG_END, MSG_INIT},
 };
 
 use super::DarkLightDistributor;
@@ -19,7 +27,7 @@ impl DarkLightDistributor {
             }
         } else {
             true
-        }
+        };
     }
 
     fn tcp_user_read(&self, mut stream: &TcpStream) -> String {
@@ -45,7 +53,9 @@ impl DarkLightDistributor {
             wait += 1;
         }
 
-        let mut read_str = String::from_utf8(buf.to_vec()).unwrap_or(String::new()).replace("\0", "");
+        let mut read_str = String::from_utf8(buf.to_vec())
+            .unwrap_or(String::new())
+            .replace("\0", "");
         if read_str.starts_with(MSG_INIT) && read_str.ends_with(MSG_END) {
             read_str = read_str.replace(MSG_INIT, "").replace(MSG_END, "");
         }
@@ -59,12 +69,10 @@ impl DarkLightDistributor {
             true
         } else {
             false
-        }
+        };
     }
 
-    fn tcp_user_write_pending(&self, id: &LId) {
-
-    }
+    fn tcp_user_write_pending(&self, id: &LId) {}
 
     pub fn tcp_user_handler(&mut self) {
         loop {
@@ -99,7 +107,8 @@ impl DarkLightDistributor {
                     if !self.user_connections.connection_exists(&ri.rid) {
                         // Notify user that connection doesn't exist
                     } else if self.user_connections.connection_is_tcp(&ri.rid) {
-                        let ret = self.tcp_user_write(&self.user_connections.tcp_connections[&ri.rid], read);
+                        let ret = self
+                            .tcp_user_write(&self.user_connections.tcp_connections[&ri.rid], read);
                         // if ret == false, notify the user
                     } else {
                         // It is a serial connection

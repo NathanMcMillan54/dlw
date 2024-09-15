@@ -77,7 +77,6 @@ impl DarkLightDistributor {
 
         let mut response_buf = [0; 10];
 
-        println!("Waiting for response");
         while response_buf == [0; 10] {
             verify_server.read(&mut response_buf);
         }

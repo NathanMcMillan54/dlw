@@ -19,6 +19,7 @@ use lib_dldistributor::{
 
 use crate::{DISTRIBUTOR, DISTRIBUTOR_ID, DISTRIBUTOR_UID};
 
+pub(crate) mod distributors;
 pub(crate) mod input;
 pub(crate) mod users;
 pub(crate) mod verify_server;
@@ -94,9 +95,13 @@ impl DarkLightDistributor {
                         let id = check.split(" ").collect::<Vec<&str>>()[2];
                         accept.0.write(b"CONN");
                         accept.0.flush();
-                        self.user_connections.add_tcp_connection(id.parse().unwrap(), accept.0);
+                        self.user_connections
+                            .add_tcp_connection(id.parse().unwrap(), accept.0);
 
-                        self.pending_messages.insert(id.parse().unwrap(), PendingMessage::new(false, String::new()));
+                        self.pending_messages.insert(
+                            id.parse().unwrap(),
+                            PendingMessage::new(false, String::new()),
+                        );
                         break;
                     }
                 } else {
