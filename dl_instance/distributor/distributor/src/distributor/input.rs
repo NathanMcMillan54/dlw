@@ -2,7 +2,7 @@ use dlwp::message::{MSG_END, MSG_INIT};
 
 use crate::DISTRIBUTOR_ID;
 
-pub fn check_input(input: Vec<u8>) -> String {
+pub fn check_user_input(input: Vec<u8>) -> String {
     let _read = String::from_utf8(input);
     if _read.is_err() {
         return String::from("INVALID INPUT");

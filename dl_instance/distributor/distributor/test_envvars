@@ -1,0 +1,9 @@
+# Verify server information
+VS1=2
+VS2=1
+VS3=2
+# Distributor information
+DIST_ID=3
+DIST_UID=abc
+MAGIC_NUMBER_1L=4
+MAGIC_NUMBER_1H=6

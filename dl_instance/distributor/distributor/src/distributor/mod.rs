@@ -11,7 +11,7 @@ use std::{
 
 use dlwp::config::DistributorConfig;
 use dlwp::serde_json;
-use input::check_input;
+use input::check_user_input;
 use lib_dldistributor::{
     connections::{LocalConnections, PendingMessage, PendingMessages},
     info::DistributorInfo,
@@ -81,7 +81,7 @@ impl DarkLightDistributor {
                     continue;
                 }
 
-                let check = check_input(read.to_vec());
+                let check = check_user_input(read.to_vec());
 
                 if check.starts_with("INIT-USR") {
                     let verify = self.verify_input(check.as_bytes().to_vec());
