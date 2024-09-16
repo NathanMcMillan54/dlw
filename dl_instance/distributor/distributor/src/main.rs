@@ -7,6 +7,7 @@ use std::{
 use distributor::{users, DarkLightDistributor};
 
 extern crate dlwp;
+#[macro_use]
 extern crate lib_dldistributor;
 #[macro_use]
 extern crate tokio;
@@ -46,6 +47,10 @@ async fn main() {
 
         thread::spawn(|| {
             DISTRIBUTOR.as_mut().unwrap().tcp_user_handler();
+        });
+
+        thread::spawn(|| {
+            DISTRIBUTOR.as_mut().unwrap().tcp_distributor_handler();
         });
     }
 

@@ -1,7 +1,7 @@
 use lib_dldistributor::external::{ExternalDistributorInfo, ExternalDistributorRW};
 use std::net::TcpStream;
 
-struct TcpDistributor {
+pub struct TcpDistributor {
     pub stream: TcpStream,
     pub info: ExternalDistributorInfo,
 }
@@ -17,6 +17,13 @@ impl TcpDistributor {
             Some(tcp_dist)
         } else {
             None
+        };
+    }
+
+    pub fn new(stream: TcpStream) -> Self {
+        return TcpDistributor {
+            stream,
+            info: ExternalDistributorInfo::default(),
         };
     }
 }

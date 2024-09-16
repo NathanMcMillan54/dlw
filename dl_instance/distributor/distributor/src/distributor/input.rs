@@ -34,8 +34,8 @@ pub fn check_user_input(input: Vec<u8>) -> String {
                 String::from("Invalid user values")
             }
         }
-        "INIT-DIS" => String::new(),
         "GET-DIS" => String::from(DISTRIBUTOR_ID),
+        "INIT-DIS" => String::from("INIT-DIS"),
         _ => String::from("Unknown input"),
     };
 }

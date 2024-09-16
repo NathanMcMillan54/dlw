@@ -11,6 +11,7 @@ use dlwp::{
     id::LId,
     message::{ReceiveInfo, MSG_END, MSG_INIT},
 };
+use lib_dldistributor::connections::PendingMessage;
 
 use super::DarkLightDistributor;
 use crate::DISTRIBUTOR;
@@ -18,8 +19,7 @@ use crate::DISTRIBUTOR;
 impl DarkLightDistributor {
     fn check_can_read(&self, id: &LId) -> bool {
         return if self.pending_messages.contains_key(id) {
-            // For users just recently added
-            if self.pending_messages[id].message_str == String::new() {
+            if self.pending_messages[id].message_str == String::new() { // For users just recently added
                 sleep(Duration::from_micros(1000));
                 true
             } else {
@@ -29,7 +29,9 @@ impl DarkLightDistributor {
             true
         };
     }
+}
 
+impl DarkLightDistributor {
     fn tcp_user_read(&self, mut stream: &TcpStream) -> String {
         let mut buf = [0; 4096];
         let mut wait = 0;
@@ -76,10 +78,7 @@ impl DarkLightDistributor {
 
     pub fn tcp_user_handler(&mut self) {
         loop {
-            if self.user_connections.tcp_connections.len() <= 1 {
-                sleep(Duration::from_millis(15)); // Slow down the loop
-                continue;
-            }
+            sleep_condition!(self.user_connections.tcp_connections.len() <= 1); // Loop delays then continues if there <= 1 users
 
             for (id, mut stream) in self.user_connections.tcp_connections.iter() {
                 if self.check_can_read(id) == false {
@@ -107,6 +106,7 @@ impl DarkLightDistributor {
                     if !self.user_connections.connection_exists(&ri.rid) {
                         // Notify user that connection doesn't exist
                     } else if self.user_connections.connection_is_tcp(&ri.rid) {
+                        // Send immediatley
                         let ret = self
                             .tcp_user_write(&self.user_connections.tcp_connections[&ri.rid], read);
                         // if ret == false, notify the user
@@ -115,6 +115,7 @@ impl DarkLightDistributor {
                     }
                 } else {
                     // Message for external distributor
+                    self.pending_messages.insert(ri.rid, PendingMessage::new(true, ri.rdid, read));
                 }
             }
         }

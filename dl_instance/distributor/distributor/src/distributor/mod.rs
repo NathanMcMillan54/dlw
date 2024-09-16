@@ -9,6 +9,7 @@ use std::{
     time::Duration,
 };
 
+use distributors::tcp::TcpDistributor;
 use dlwp::config::DistributorConfig;
 use dlwp::serde_json;
 use input::check_user_input;
@@ -29,6 +30,7 @@ pub struct DarkLightDistributor {
     pub user_connections: LocalConnections,
     pub pending_messages: PendingMessages, // This is used to prevent conflicting data in threads
     pub verify_server: SocketAddrV4,
+    pub tcp_distributors: Vec<TcpDistributor>,
 }
 
 impl DarkLightDistributor {
@@ -44,6 +46,7 @@ impl DarkLightDistributor {
             user_connections: LocalConnections::empty(),
             pending_messages: HashMap::new(),
             verify_server: SocketAddrV4::from_str("0.0.0.0:0").unwrap(),
+            tcp_distributors: vec![]
         };
     }
 
@@ -100,11 +103,14 @@ impl DarkLightDistributor {
 
                         self.pending_messages.insert(
                             id.parse().unwrap(),
-                            PendingMessage::new(false, String::new()),
+                            PendingMessage::new(false, 0, String::new()),
                         );
                         break;
                     }
-                } else {
+                } else if check.starts_with("INIT-DIS") {
+                    
+                } 
+                else {
                     accept.0.write(check.as_bytes());
                     accept.0.flush();
                 }

@@ -74,16 +74,19 @@ impl LocalConnections {
 
 pub struct PendingMessage {
     pub can_send: bool,
+    pub did: DId,
     pub message_str: String,
 }
 
 impl PendingMessage {
-    pub fn new(send: bool, msg: String) -> Self {
+    pub fn new(send: bool, did: DId, msg: String) -> Self {
         return PendingMessage {
             can_send: send,
+            did,
             message_str: msg,
         };
     }
 }
 
+/// Easily index ``PendingMessage``s
 pub type PendingMessages = HashMap<LId, PendingMessage>;
