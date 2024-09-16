@@ -14,8 +14,7 @@ use dlwp::config::DistributorConfig;
 use dlwp::serde_json;
 use input::check_user_input;
 use lib_dldistributor::{
-    connections::{LocalConnections, PendingMessage, PendingMessages},
-    info::DistributorInfo,
+    connections::{LocalConnections, PendingMessage, PendingMessages}, get_a_magic_num, info::DistributorInfo
 };
 
 use crate::{DISTRIBUTOR, DISTRIBUTOR_ID, DISTRIBUTOR_UID};
@@ -24,6 +23,15 @@ pub(crate) mod distributors;
 pub(crate) mod input;
 pub(crate) mod users;
 pub(crate) mod verify_server;
+
+// "Magic number" information
+#[cfg(debug_assertions)]
+#[path = "magicn_debug.rs"]
+pub(crate) mod magicn;
+
+#[cfg(not(debug_assertions))]
+#[path = "magicn_release.rs"]
+pub(crate) mod magicn;
 
 pub struct DarkLightDistributor {
     pub info: DistributorInfo,

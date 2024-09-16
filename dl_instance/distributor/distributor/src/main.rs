@@ -5,6 +5,8 @@ use std::{
 };
 
 use distributor::{users, DarkLightDistributor};
+use dlwp::encryption::EncryptionInfo;
+use lib_dldistributor::encryption::DistributorEncryption;
 
 extern crate dlwp;
 #[macro_use]
@@ -55,6 +57,6 @@ async fn main() {
     }
 
     loop {
-        sleep(Duration::from_millis(1000))
+        sleep(Duration::from_millis(250))
     }
 }

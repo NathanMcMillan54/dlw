@@ -1,5 +1,6 @@
 pub mod connections;
 pub mod external;
+pub mod encryption;
 pub mod info;
 pub mod macros;
 
