@@ -24,7 +24,7 @@ impl DistributorEncryption {
     }
 
     /// If the time since ``last_update`` is equal to or greater than ``update_interval`` ``update_fn`` gets called and
-    /// changes ``info``. Call this function every few milliseconds.
+    /// changes ``info``. Call this function regularaly.
     pub fn check_and_update(&mut self) {
         let current_time = Utc::now().time();
         let diff = current_time - self.last_update;

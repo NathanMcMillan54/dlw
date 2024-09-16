@@ -10,11 +10,11 @@ use std::{
 };
 
 use distributors::tcp::TcpDistributor;
-use dlwp::config::DistributorConfig;
+use dlwp::{config::DistributorConfig, encryption::EncryptionInfo};
 use dlwp::serde_json;
 use input::check_user_input;
 use lib_dldistributor::{
-    connections::{LocalConnections, PendingMessage, PendingMessages}, get_a_magic_num, info::DistributorInfo
+    connections::{LocalConnections, PendingMessage, PendingMessages}, encryption::DistributorEncryption, get_a_magic_num, info::DistributorInfo
 };
 
 use crate::{DISTRIBUTOR, DISTRIBUTOR_ID, DISTRIBUTOR_UID};
@@ -33,8 +33,18 @@ pub(crate) mod magicn;
 #[path = "magicn_release.rs"]
 pub(crate) mod magicn;
 
+// Update encrpytion
+#[cfg(debug_assertions)]
+#[path = "encryption_debug.rs"]
+pub(crate) mod encrpytion;
+
+#[cfg(not(debug_assertions))]
+#[path = "encryption_release.rs"]
+pub(crate) mod encryption;
+
 pub struct DarkLightDistributor {
     pub info: DistributorInfo,
+    pub dist_encrption: DistributorEncryption,
     pub user_connections: LocalConnections,
     pub pending_messages: PendingMessages, // This is used to prevent conflicting data in threads
     pub verify_server: SocketAddrV4,
@@ -51,6 +61,13 @@ impl DarkLightDistributor {
                 DISTRIBUTOR_UID.to_string(),
                 DistributorConfig::default(),
             ),
+            // Where ``DistributorEncryption`` is initally set:
+            // There is no encrpyion inforomation and it's update interval is set to 24 hours
+            dist_encrption: DistributorEncryption::new(EncryptionInfo {
+                decode_function: encrpytion::libcerpton_decode,
+                encode_function: encrpytion::libcerpton_encode,
+                info: [0; 6],
+            }, Duration::from_secs(24 * 3600), encrpytion::update_encryption),
             user_connections: LocalConnections::empty(),
             pending_messages: HashMap::new(),
             verify_server: SocketAddrV4::from_str("0.0.0.0:0").unwrap(),
@@ -64,6 +81,14 @@ impl DarkLightDistributor {
             serde_json::from_str(&contents).expect("Failed to parse config file");
 
         self.info.config = parsed_file;
+    }
+
+    pub fn set_encrption(&mut self) {
+        let s1 = crate::S1.parse().unwrap();
+        let s2 = crate::S2.parse().unwrap();
+        let s3 = crate::S3.parse().unwrap();
+
+        self.dist_encrption.info.info = [s1, s2, s3, 0, 0, 0];
     }
 
     // When a user or distributor connects to this distributor this function will verify and add it

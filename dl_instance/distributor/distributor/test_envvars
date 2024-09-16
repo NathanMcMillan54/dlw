@@ -1,9 +1,15 @@
-# Verify server information
+## Verify server information
+# Encryption setting (debug)
 VS1=2
 VS2=1
 VS3=2
-# Distributor information
+## Distributor information
 DIST_ID=3
 DIST_UID=abc
+# Start encryption setting
+SS1=2
+SS2=1
+SS3=2
+# Magic numbers
 MAGIC_NUMBER_1L=4
 MAGIC_NUMBER_1H=6

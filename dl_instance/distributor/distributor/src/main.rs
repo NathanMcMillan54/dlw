@@ -14,10 +14,15 @@ extern crate lib_dldistributor;
 #[macro_use]
 extern crate tokio;
 
-// Verify Server Information Settings
+// Verify Server encryption Settings
 const VS1: &str = env!("VS1");
 const VS2: &str = env!("VS2");
 const VS3: &str = env!("VS3");
+
+// Distributor encryption setting
+const S1: &str = env!("SS1");
+const S2: &str = env!("SS2");
+const S3: &str = env!("SS3");
 
 // Given distributor ID
 const DISTRIBUTOR_ID: &str = env!("DIST_ID");
@@ -41,6 +46,7 @@ async fn main() {
         println!("Set config file");
         println!("Connecting to verify server...");
         DISTRIBUTOR.as_mut().unwrap().get_verify_server().await;
+        DISTRIBUTOR.as_mut().unwrap().set_encrption();
 
         println!("Starting...");
         thread::spawn(|| {
@@ -57,6 +63,7 @@ async fn main() {
     }
 
     loop {
-        sleep(Duration::from_millis(250))
+        sleep(Duration::from_millis(250));
+        unsafe { DISTRIBUTOR.as_mut().unwrap().dist_encrption.check_and_update() }
     }
 }
