@@ -13,3 +13,5 @@ SS3=2
 # Magic numbers
 MAGIC_NUMBER_1L=4
 MAGIC_NUMBER_1H=6
+# External distributor stuff
+DIST_IDENT=imadistributor

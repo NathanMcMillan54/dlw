@@ -46,6 +46,8 @@ async fn main() {
         println!("Set config file");
         println!("Connecting to verify server...");
         DISTRIBUTOR.as_mut().unwrap().get_verify_server().await;
+
+        println!("Setting encryption setting");
         DISTRIBUTOR.as_mut().unwrap().set_encrption();
 
         println!("Starting...");

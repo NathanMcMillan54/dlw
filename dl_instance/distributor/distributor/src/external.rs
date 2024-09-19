@@ -74,16 +74,16 @@ pub struct ExternalDistributorInfo {
 /// ```
 pub trait ExternalDistributorRW {
     /// Encrypt input then send
-    fn write(&self, _inputs: Vec<u8>) -> Code {
+    fn write(&mut self, _inputs: String) -> Code {
         unimplemented!()
     }
 
     // Read and decrypt input
-    fn read(&self, _inputs: Vec<u8>) -> Result<Vec<u8>, Code> {
+    fn read(&mut self) -> (String, Code) {
         unimplemented!()
     }
 
-    fn attempt_connect(&self) -> bool {
+    fn attempt_connect(&mut self) -> bool {
         unimplemented!()
     }
 
