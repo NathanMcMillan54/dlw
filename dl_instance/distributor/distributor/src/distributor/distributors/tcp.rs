@@ -1,8 +1,8 @@
-use dlwp::{codes::{INVALID_RR, STATUS_OK}, distributor::DIST_INIT};
+use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::{INVALID_RR, STATUS_OK}, distributor::DIST_INIT};
 use lib_dldistributor::external::{ExternalDistributorInfo, ExternalDistributorRW};
 use std::{borrow::Borrow, io::{Read, Write}, net::TcpStream, time::Duration};
 
-use crate::{distributor::encrpytion::current_encryption, VS1, VS2, VS3};
+use crate::{distributor::{encrpytion::current_encryption, magicn::get_my_magic_num}, DISTRIBUTOR_ID, VS1, VS2, VS3};
 
 pub struct TcpDistributor {
     pub stream: TcpStream,
@@ -59,7 +59,6 @@ impl ExternalDistributorRW for TcpDistributor {
         return ((encryption.decode_function)(encryption.info, ret.unwrap()), STATUS_OK);
     }
 
-    // Gets called when a distributor attempts to connect
     fn verify_distributor(&mut self) -> bool {
         if !unsafe { crate::DISTRIBUTOR.as_ref().unwrap().info.config.tcp_connections.contains(&self.stream.peer_addr().unwrap().to_string()) } {
             return false;
@@ -97,9 +96,11 @@ impl ExternalDistributorRW for TcpDistributor {
             }
 
             let mut read_ret = self.read();
+            read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
             
             while read_ret.1 != STATUS_OK || errors < 9 || !read_ret.0.contains(env!("DIST_IDENT")) {
                 read_ret = self.read();
+                read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
                 errors += 1;
             }
 
@@ -111,10 +112,10 @@ impl ExternalDistributorRW for TcpDistributor {
                 read_ret.0 = read_ret.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
                 match i {
                     0 => self.info.version = read_ret.0,
-                    1 => self.info.id = read_ret.0.parse().unwrap(),
-                    2 => self.info.os = Some(read_ret.0.parse().unwrap()),
-                    3 => self.info.arch = Some(read_ret.0.parse().unwrap()),
-                    4 => self.info.magic_number = read_ret.0.parse().unwrap(),
+                    1 => self.info.id = read_ret.0.parse().unwrap_or(0),
+                    2 => self.info.os = Some(read_ret.0.parse().unwrap_or(255)),
+                    3 => self.info.arch = Some(read_ret.0.parse().unwrap_or(255)),
+                    4 => self.info.magic_number = read_ret.0.parse().unwrap_or(0),
                     _ => {},
                 }
             }
@@ -125,11 +126,75 @@ impl ExternalDistributorRW for TcpDistributor {
         true
     }
 
-    // Call this early when the distributor is being setup
     fn attempt_connect(&mut self) -> bool {
+        self.stream.set_read_timeout(Some(Duration::from_millis(500)));
         self.stream.write(DIST_INIT.as_bytes());
         self.stream.flush();
 
-        false
+        let s1 = VS1.parse::<i32>().unwrap();
+        let s2 = VS2.parse::<i32>().unwrap();
+        let s3 = VS3.parse::<i32>().unwrap() * 30;
+
+        #[cfg(debug_assertions)]
+        let magic_num = get_my_magic_num(vec![]).to_string();
+
+        let mut responses = [
+            env!("CARGO_PKG_VERSION"),
+            DISTRIBUTOR_ID,
+            env!("DIST_OS"),
+            env!("DIST_ARCH"),
+            magic_num.as_str()
+        ];
+        let mut errors = 0;
+
+        for i in 0..responses.len() {
+            let mut read_ret = self.read();
+            read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
+            
+            while read_ret.1 != STATUS_OK || errors < 9 || !read_ret.0.contains(env!("DIST_IDENT")) {
+                read_ret = self.read();
+                read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
+                errors += 1;
+            }
+
+            read_ret.0 = read_ret.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
+
+            if errors < 9 {
+                return false;
+            }
+
+            match i {
+                0 => {
+                    if !read_ret.0.contains("VERSION") {
+                        return false;
+                    }
+                },
+                1 => {
+                    if !read_ret.0.contains("DIST_ID") {
+                        return false;
+                    }
+                },
+                2 => {
+                    if !read_ret.0.contains("GET_OS") {
+                        return false;
+                    }
+                },
+                3 => {
+                    if read_ret.0.contains("GET_ARCH") {
+                        return false;
+                    }
+                },
+                4 => {
+                    if !read_ret.0.contains("GET_MN") {
+                        return false;
+                    }
+                },
+                _ => {}
+            }
+
+            self.write(libcerpton_encode([s1, s2, s3, 0, 0, 0], responses[i].to_string()));
+        }
+
+        true
     }
 }

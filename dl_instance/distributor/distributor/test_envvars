@@ -10,6 +10,9 @@ DIST_UID=abc
 SS1=2
 SS2=1
 SS3=2
+# Platform information
+DIST_OS=1
+DIST_ARCH=1
 # Magic numbers
 MAGIC_NUMBER_1L=4
 MAGIC_NUMBER_1H=6
