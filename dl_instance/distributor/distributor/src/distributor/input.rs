@@ -35,7 +35,8 @@ pub fn check_user_input(input: Vec<u8>) -> String {
             }
         }
         "GET-DIS" => String::from(DISTRIBUTOR_ID),
-        "INIT-DIS" => String::from("INIT-DIS"),
+        "INIT-DIS-CONN" => String::from("INIT-DIS-CONN"),
+        "INIT-DIS-VRFY" => String::from("INIT-DIS-VRFY"),
         _ => String::from("Unknown input"),
     };
 }

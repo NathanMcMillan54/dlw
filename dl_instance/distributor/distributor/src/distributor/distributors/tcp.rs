@@ -7,6 +7,7 @@ use crate::{distributor::{encrpytion::current_encryption, magicn::get_my_magic_n
 pub struct TcpDistributor {
     pub stream: TcpStream,
     pub info: ExternalDistributorInfo,
+    pub msg: String,
 }
 
 impl TcpDistributor {
@@ -14,6 +15,7 @@ impl TcpDistributor {
         let mut tcp_dist = TcpDistributor {
             stream: stream,
             info: ExternalDistributorInfo::default(),
+            msg: String::new(),
         };
 
         return if tcp_dist.verify_distributor() {
@@ -23,10 +25,11 @@ impl TcpDistributor {
         };
     }
 
-    pub fn new(stream: TcpStream) -> Self {
+    pub fn new(stream: TcpStream, msg: String) -> Self {
         return TcpDistributor {
             stream,
             info: ExternalDistributorInfo::default(),
+            msg: msg,
         };
     }
 }
