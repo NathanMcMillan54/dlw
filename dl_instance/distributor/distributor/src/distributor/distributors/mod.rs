@@ -14,6 +14,7 @@ impl DarkLightDistributor {
         for i in 0..self.info.config.tcp_connections.len() {
             let mut test_stream = TcpStream::connect(self.info.config.tcp_connections[i].clone());
             if test_stream.is_err() {
+                println!("Cannot connect to {}", self.info.config.tcp_connections[i]);
                 continue;
             }
 
@@ -33,6 +34,8 @@ impl DarkLightDistributor {
 
             if verify_ret == false {
                 continue;
+            } else {
+                println!("Failed to verify");
             }
 
             self.tcp_distributors.push(tcp_distributor);
@@ -47,13 +50,13 @@ impl DarkLightDistributor {
 
             for i in 0..self.tcp_distributors.len() {
                 if self.tcp_distributors[i].msg == String::from("INIT-DIS-VRFY") {
-                    let verify_ret = self.tcp_distributors[i].verify_distributor();
-                    if verify_ret == false {
+                    let conn_ret = self.tcp_distributors[i].attempt_connect();
+                    if conn_ret == false {
                         self.tcp_distributors.remove(i);
                         break;
                     }
                 } else if self.tcp_distributors[i].msg == String::from("INIT-DIS-CONN") {
-                    let verify_ret = self.tcp_distributors[i].attempt_connect();
+                    let verify_ret = self.tcp_distributors[i].verify_distributor();
                     if verify_ret == false {
                         self.tcp_distributors.remove(i);
                         break;

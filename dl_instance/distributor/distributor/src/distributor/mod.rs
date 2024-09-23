@@ -142,6 +142,7 @@ impl DarkLightDistributor {
                     }
                 } else if check.starts_with("INIT-DIS") {
                     // Add to list of distributors to be checked
+                    println!("Adding {:?}", check);
                     self.tcp_distributors.push(TcpDistributor::new(accept.0, check));
                     break;
                 } 

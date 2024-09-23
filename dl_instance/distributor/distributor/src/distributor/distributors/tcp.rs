@@ -63,9 +63,9 @@ impl ExternalDistributorRW for TcpDistributor {
     }
 
     fn verify_distributor(&mut self) -> bool {
-        if !unsafe { crate::DISTRIBUTOR.as_ref().unwrap().info.config.tcp_connections.contains(&self.stream.peer_addr().unwrap().to_string()) } {
+        /*if !unsafe { crate::DISTRIBUTOR.as_ref().unwrap().info.config.tcp_connections.contains(&self.stream.peer_addr().unwrap().ip().to_string()) } {
             return false;
-        }
+        }*/
 
         self.stream.set_read_timeout(Some(Duration::from_millis(500)));
         let checks = [
@@ -89,7 +89,7 @@ impl ExternalDistributorRW for TcpDistributor {
             let write = dlwp::cerpton::libcerpton_encode([s1, s2, s3, 0, 0, 0], format!("{} {}", env!("DIST_IDENT"), checks[i]));
             let mut write_ret = self.write(write.clone());
 
-            while write_ret != STATUS_OK || errors < 9 {
+            while write_ret != STATUS_OK || errors > 9 {
                 write_ret = self.write(write.clone());
                 errors += 1;
             }
@@ -101,7 +101,7 @@ impl ExternalDistributorRW for TcpDistributor {
             let mut read_ret = self.read();
             read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
             
-            while read_ret.1 != STATUS_OK || errors < 9 || !read_ret.0.contains(env!("DIST_IDENT")) {
+            while read_ret.1 != STATUS_OK || errors > 9 || !read_ret.0.contains(env!("DIST_IDENT")) {
                 read_ret = self.read();
                 read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
                 errors += 1;
@@ -195,7 +195,7 @@ impl ExternalDistributorRW for TcpDistributor {
                 _ => {}
             }
 
-            self.write(libcerpton_encode([s1, s2, s3, 0, 0, 0], responses[i].to_string()));
+            self.write(libcerpton_encode([s1, s2, s3, 0, 0, 0], format!("{} {}", responses[i], env!("DIST_IDENT"))));
         }
 
         true
