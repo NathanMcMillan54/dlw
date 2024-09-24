@@ -20,7 +20,6 @@ impl DarkLightDistributor {
 
             let mut stream = test_stream.unwrap();
             stream.write(b"INIT-DIS-CONN");
-            sleep_condition!(0 == 0); // Wait for distirbutor to receive
             let mut tcp_distributor = TcpDistributor::new(stream, String::new());
             let conn_ret = tcp_distributor.attempt_connect();
 
@@ -46,8 +45,6 @@ impl DarkLightDistributor {
         self.setup_tcp_distributors();
 
         loop {
-            //sleep_condition!(self.tcp_distributors.len() == 0);
-
             for i in 0..self.tcp_distributors.len() {
                 if self.tcp_distributors[i].msg == String::from("INIT-DIS-VRFY") {
                     let conn_ret = self.tcp_distributors[i].attempt_connect();

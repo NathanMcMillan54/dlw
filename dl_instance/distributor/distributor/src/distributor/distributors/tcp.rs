@@ -86,7 +86,6 @@ impl ExternalDistributorRW for TcpDistributor {
             let mut write_ret = self.write(write.clone());
 
             while write_ret != STATUS_OK {
-                println!("currently on: {}", i);
                 write_ret = self.write(write.clone());
                 errors += 1;
             }
@@ -95,7 +94,6 @@ impl ExternalDistributorRW for TcpDistributor {
             read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
 
             while read_ret.1 != STATUS_OK || !read_ret.0.contains(env!("DIST_IDENT")) {
-                println!("cirrently on: {}", i);
                 read_ret = self.read();
                 read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
                 errors += 1;
@@ -116,7 +114,6 @@ impl ExternalDistributorRW for TcpDistributor {
             }
         }
 
-        println!("done: {:?}", self.info);
         // check magic num
 
         true
