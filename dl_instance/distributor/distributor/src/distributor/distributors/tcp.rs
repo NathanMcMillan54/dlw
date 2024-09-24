@@ -66,6 +66,7 @@ impl ExternalDistributorRW for TcpDistributor {
         /*if !unsafe { crate::DISTRIBUTOR.as_ref().unwrap().info.config.tcp_connections.contains(&self.stream.peer_addr().unwrap().ip().to_string()) } {
             return false;
         }*/
+        println!("here0!");
 
         self.stream.set_read_timeout(Some(Duration::from_millis(500)));
         let checks = [
@@ -82,37 +83,25 @@ impl ExternalDistributorRW for TcpDistributor {
 
         let mut errors = 0;
         for i in 0..checks.len() {
-            if errors == 9 {
-                return false;
-            }
-
-            let write = dlwp::cerpton::libcerpton_encode([s1, s2, s3, 0, 0, 0], format!("{} {}", env!("DIST_IDENT"), checks[i]));
+            let write = dlwp::cerpton::libcerpton_encode([s1, s2, s3, 0, 0, 0], format!("{} {}", checks[i], env!("DIST_IDENT")));
             let mut write_ret = self.write(write.clone());
 
-            while write_ret != STATUS_OK || errors > 9 {
+            while write_ret != STATUS_OK {
                 write_ret = self.write(write.clone());
                 errors += 1;
             }
 
-            if errors == 9 {
-                return false;
-            }
-
             let mut read_ret = self.read();
             read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
-            
-            while read_ret.1 != STATUS_OK || errors > 9 || !read_ret.0.contains(env!("DIST_IDENT")) {
+
+            while read_ret.1 != STATUS_OK || !read_ret.0.contains(env!("DIST_IDENT")) {
                 read_ret = self.read();
                 read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
                 errors += 1;
             }
 
-            if errors == 9 {
-                return false;
-            }
-
             if read_ret.1 == STATUS_OK {
-                read_ret.0 = read_ret.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
+                read_ret.0 = read_ret.0.replace(&format!(" {}", env!("DIST_IDENT")), "").replace("\0", "");
                 match i {
                     0 => self.info.version = read_ret.0,
                     1 => self.info.id = read_ret.0.parse().unwrap_or(0),
@@ -121,6 +110,8 @@ impl ExternalDistributorRW for TcpDistributor {
                     4 => self.info.magic_number = read_ret.0.parse().unwrap_or(0),
                     _ => {},
                 }
+            } else {
+                println!("errors");
             }
         }
 
@@ -154,17 +145,13 @@ impl ExternalDistributorRW for TcpDistributor {
             let mut read_ret = self.read();
             read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
             
-            while read_ret.1 != STATUS_OK || errors < 9 || !read_ret.0.contains(env!("DIST_IDENT")) {
+            while read_ret.1 != STATUS_OK || !read_ret.0.contains(env!("DIST_IDENT")) {
                 read_ret = self.read();
                 read_ret.0 = libcerpton_decode([s1, s2, s3, 0, 0, 0], read_ret.0);
                 errors += 1;
             }
 
-            read_ret.0 = read_ret.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
-
-            if errors < 9 {
-                return false;
-            }
+            read_ret.0 = read_ret.0.replace(&format!(" {}", env!("DIST_IDENT")), "").replace("\0", "");
 
             match i {
                 0 => {
@@ -173,7 +160,7 @@ impl ExternalDistributorRW for TcpDistributor {
                     }
                 },
                 1 => {
-                    if !read_ret.0.contains("DIST_ID") {
+                    if !read_ret.0.contains("GET_ID") {
                         return false;
                     }
                 },

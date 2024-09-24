@@ -25,7 +25,7 @@ pub trait VerifyServerRW {
 }
 
 /// Keeps track of verified distributor information
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct ExternalDistributorInfo {
     pub id: DId,
     pub version: String,
