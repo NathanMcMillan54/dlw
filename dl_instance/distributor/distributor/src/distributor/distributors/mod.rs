@@ -46,7 +46,7 @@ impl DarkLightDistributor {
         self.setup_tcp_distributors();
 
         loop {
-            sleep_condition!(self.tcp_distributors.len() == 0);
+            //sleep_condition!(self.tcp_distributors.len() == 0);
 
             for i in 0..self.tcp_distributors.len() {
                 if self.tcp_distributors[i].msg == String::from("INIT-DIS-VRFY") {
