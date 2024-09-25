@@ -18,6 +18,7 @@ impl DarkLightDistributor {
                 continue;
             }
 
+            println!("Connecting to {}...", self.info.config.tcp_connections[i].clone());
             let mut stream = test_stream.unwrap();
             stream.write(b"INIT-DIS-CONN");
             let mut tcp_distributor = TcpDistributor::new(stream, String::new());
@@ -27,10 +28,8 @@ impl DarkLightDistributor {
                 continue;
             }
 
-            sleep_condition!(1 == 1);
-            tcp_distributor.stream.write(b"INIT-DIS-VRFY");
+            println!("Verifying {}...", self.info.config.tcp_connections[i].clone());
             let verify_ret = tcp_distributor.verify_distributor();
-
             if verify_ret == false {
                 continue;
             } else {
@@ -46,17 +45,18 @@ impl DarkLightDistributor {
 
         loop {
             for i in 0..self.tcp_distributors.len() {
-                if self.tcp_distributors[i].msg == String::from("INIT-DIS-VRFY") {
-                    let conn_ret = self.tcp_distributors[i].attempt_connect();
-                    if conn_ret == false {
-                        self.tcp_distributors.remove(i);
-                        break;
-                    }
-                } else if self.tcp_distributors[i].msg == String::from("INIT-DIS-CONN") {
+                if self.tcp_distributors[i].msg == String::from("INIT-DIS-CONN") {
+                    println!("Verifying external distirbutor connection...");
                     let verify_ret = self.tcp_distributors[i].verify_distributor();
                     if verify_ret == false {
                         self.tcp_distributors.remove(i);
                         break;
+                    }
+
+                    println!("Connecting to verified distirbutor...");
+                    let conn_ret = self.tcp_distributors[i].attempt_connect();
+                    if conn_ret == false {
+                        self.tcp_distributors.remove(i);
                     }
                 }
             }

@@ -114,6 +114,7 @@ impl ExternalDistributorRW for TcpDistributor {
             }
         }
 
+        println!("done: {:?}", self.info);
         // check magic num
 
         true
