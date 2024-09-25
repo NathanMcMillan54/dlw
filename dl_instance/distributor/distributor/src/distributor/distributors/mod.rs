@@ -46,7 +46,6 @@ impl DarkLightDistributor {
 
     pub fn tcp_distributor_handler(&mut self) {
         self.setup_tcp_distributors();
-        self.tcp_distributors.push(TcpDistributor::new(TcpStream::connect("127.0.0.1:6000").unwrap(), String::new()));
 
         loop {
             for i in 0..self.tcp_distributors.len() {
