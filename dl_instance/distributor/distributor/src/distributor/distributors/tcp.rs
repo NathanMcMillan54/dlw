@@ -114,7 +114,6 @@ impl ExternalDistributorRW for TcpDistributor {
             }
         }
 
-        println!("done: {:?}", self.info);
         // check magic num
 
         true
@@ -122,8 +121,6 @@ impl ExternalDistributorRW for TcpDistributor {
 
     fn attempt_connect(&mut self) -> bool {
         self.stream.set_read_timeout(Some(Duration::from_millis(500)));
-        self.stream.write(DIST_INIT.as_bytes());
-        self.stream.flush();
 
         let s1 = VS1.parse::<i32>().unwrap();
         let s2 = VS2.parse::<i32>().unwrap();
