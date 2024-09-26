@@ -37,7 +37,7 @@ impl TcpDistributor {
 impl ExternalDistributorRW for TcpDistributor {
     fn write(&mut self, _inputs: String) -> dlwp::codes::Code {
         let encryption = current_encryption();
-        let input = (encryption.encode_function)(encryption.info, _inputs);
+        let input = (encryption.encode_function)(encryption.info, _inputs).replace("\0", "\\0");
 
         self.stream.write(input.as_bytes());
         self.stream.flush();
@@ -59,7 +59,7 @@ impl ExternalDistributorRW for TcpDistributor {
 
         let encryption = current_encryption();
 
-        return ((encryption.decode_function)(encryption.info, ret.unwrap()), STATUS_OK);
+        return ((encryption.decode_function)(encryption.info, ret.unwrap()).replace("\0", "").replace("\\0", "\0"), STATUS_OK);
     }
 
     fn verify_distributor(&mut self) -> bool {

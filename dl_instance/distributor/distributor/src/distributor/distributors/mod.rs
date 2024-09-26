@@ -2,7 +2,8 @@
 
 use std::{io::Write, net::TcpStream, thread::{sleep, spawn}, time::Duration};
 
-use lib_dldistributor::{external::ExternalDistributorRW, IDLE_SLEEP};
+use dlwp::{codes::{Code, READ_TIMEDOUT, STATUS_OK}, distributor::READ_AVAILABLE, message::{valid_message_string, ReceiveInfo, MSG_END, MSG_INIT}};
+use lib_dldistributor::{connections::PendingMessage, external::ExternalDistributorRW, IDLE_SLEEP};
 use tcp::TcpDistributor;
 
 use crate::DISTRIBUTOR;
@@ -44,6 +45,45 @@ impl DarkLightDistributor {
         }
     }
 
+    pub fn tcp_distributor_read(&mut self, tcp_distributor_index: usize) -> String {
+        let check_read = self.tcp_distributors[tcp_distributor_index].read();
+        if check_read.0.is_empty() && check_read.1 == STATUS_OK {
+            for wait in 0..400 {
+                if wait % 80 == 0 {
+                    self.tcp_distributors[tcp_distributor_index].write(format!("{} {} {} {}", MSG_INIT, READ_AVAILABLE, MSG_END, env!("DIST_IDENT")));
+                    sleep(IDLE_SLEEP);
+                }
+
+                let read = self.tcp_distributors[tcp_distributor_index].read();
+
+                if !read.0.is_empty() && check_read.1 == STATUS_OK {
+                    println!("got read: {}", read.0);
+                    return check_read.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
+                }
+            }
+        } else if valid_message_string(&check_read.0.replace(&format!(" {}", env!("DIST_IDENT")), ""), false) {
+            return check_read.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
+        }
+
+        String::new()
+    }
+
+    pub fn tcp_distributor_write(&mut self, tcp_distributor_index: usize, write: String) -> Code {
+        let mut read = self.tcp_distributors[tcp_distributor_index].read();
+
+        while !read.0.contains(READ_AVAILABLE) {
+            read = self.tcp_distributors[tcp_distributor_index].read();
+            sleep(IDLE_SLEEP);
+        }
+
+        return if read.0.contains(READ_AVAILABLE) {
+            println!("writing...");
+            self.tcp_distributors[tcp_distributor_index].write(format!("{} {}", write, env!("DIST_IDENT")))
+        } else {
+            READ_TIMEDOUT
+        };
+    }
+
     pub fn tcp_distributor_handler(&mut self) {
         self.setup_tcp_distributors();
 
@@ -78,6 +118,20 @@ impl DarkLightDistributor {
                         }
                     });
                     continue;
+                }
+
+                let read = self.tcp_distributor_read(i);
+
+                let ri = ReceiveInfo::get_from_message_string(read.clone());
+                if ri.rdid == self.info.id {
+                    self.pending_messages.insert(ri.rid, PendingMessage::new(true, self.info.id, read.clone()));
+                    continue;
+                } else {
+                    for j in 0..self.tcp_distributors.len() {
+                        if self.tcp_distributors[j].info.id == ri.rdid {
+                            self.tcp_distributor_write(j, read.clone());
+                        }
+                    }
                 }
                 
                 sleep(IDLE_SLEEP);
