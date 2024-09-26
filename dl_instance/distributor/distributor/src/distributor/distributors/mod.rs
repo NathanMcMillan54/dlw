@@ -47,6 +47,7 @@ impl DarkLightDistributor {
 
     pub fn tcp_distributor_read(&mut self, tcp_distributor_index: usize) -> String {
         let check_read = self.tcp_distributors[tcp_distributor_index].read();
+
         if check_read.0.is_empty() && check_read.1 == STATUS_OK {
             for wait in 0..400 {
                 if wait % 80 == 0 {
@@ -57,8 +58,8 @@ impl DarkLightDistributor {
                 let read = self.tcp_distributors[tcp_distributor_index].read();
 
                 if !read.0.is_empty() && check_read.1 == STATUS_OK {
-                    println!("got read: {}", read.0);
-                    return check_read.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
+                    println!("got read: {} getting turned into:", read.0);
+                    return read.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
                 }
             }
         } else if valid_message_string(&check_read.0.replace(&format!(" {}", env!("DIST_IDENT")), ""), false) {
@@ -122,8 +123,11 @@ impl DarkLightDistributor {
 
                 let read = self.tcp_distributor_read(i);
 
+                println!("read: {}", read);
                 let ri = ReceiveInfo::get_from_message_string(read.clone());
+                println!("ri: {:?}", ri);
                 if ri.rdid == self.info.id {
+                    println!("adding {} to local pending", ri.rdid);
                     self.local_pending_messages.insert(ri.rid, PendingMessage::new(true, self.info.id, read.clone()));
                     continue;
                 } else {

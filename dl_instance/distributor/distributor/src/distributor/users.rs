@@ -74,19 +74,24 @@ impl DarkLightDistributor {
         };
     }
 
-    fn tcp_user_write_pending(&self, id: &LId) {}
-
     pub fn tcp_user_handler(&mut self) {
         loop {
             //sleep_condition!(self.user_connections.tcp_connections.len() <= 1); // Loop delays then continues if there <= 1 users
 
             for (id, mut stream) in self.user_connections.tcp_connections.iter() {
-                if self.check_can_read(id) == false {
-                    self.tcp_user_write_pending(id);
-                    self.local_pending_messages.remove(id);
-                    continue;
-                } else {
-                    self.local_pending_messages.remove(id);
+                /*if self.local_pending_messages.contains_key(id) {
+                    if self.local_pending_messages[id].can_send == true {
+                        println!("i have a message: {}", self.local_pending_messages[id].message_str);
+                        self.tcp_user_write(stream, self.local_pending_messages[id].message_str.clone());
+                    }
+                }*/
+
+                if self.local_pending_messages.contains_key(id) {
+                    if self.local_pending_messages[id].message_str == String::new() {
+                        self.local_pending_messages.remove(id);
+                    } else {
+                        self.tcp_user_write(stream, self.local_pending_messages[id]);
+                    }
                 }
 
                 let read = self.tcp_user_read(stream);
@@ -96,8 +101,6 @@ impl DarkLightDistributor {
                     println!("empty read");
                     continue;
                 }
-
-                println!("read: {}", read);
 
                 let ri = ReceiveInfo::get_from_message_string(read.clone());
                 // Message might have been invalid
