@@ -46,7 +46,8 @@ pub struct DarkLightDistributor {
     pub info: DistributorInfo,
     pub dist_encrption: DistributorEncryption,
     pub user_connections: LocalConnections,
-    pub pending_messages: PendingMessages, // This is used to prevent conflicting data in threads
+    pub local_pending_messages: PendingMessages, // This is used to prevent conflicting data in threads
+    pub external_pending_messages: PendingMessages, // This holds messages received locally but can be sent to external distributors
     pub verify_server: SocketAddrV4,
     pub tcp_distributors: Vec<TcpDistributor>,
 }
@@ -69,7 +70,8 @@ impl DarkLightDistributor {
                 info: [0; 6],
             }, Duration::from_secs(24 * 3600), encrpytion::update_encryption),
             user_connections: LocalConnections::empty(),
-            pending_messages: HashMap::new(),
+            local_pending_messages: HashMap::new(),
+            external_pending_messages: HashMap::new(),
             verify_server: SocketAddrV4::from_str("0.0.0.0:0").unwrap(),
             tcp_distributors: vec![]
         };
@@ -134,7 +136,7 @@ impl DarkLightDistributor {
                         self.user_connections
                             .add_tcp_connection(id.parse().unwrap(), accept.0);
 
-                        self.pending_messages.insert(
+                        self.local_pending_messages.insert(
                             id.parse().unwrap(),
                             PendingMessage::new(false, 0, String::new()),
                         );

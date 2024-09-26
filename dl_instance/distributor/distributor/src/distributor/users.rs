@@ -18,8 +18,8 @@ use crate::DISTRIBUTOR;
 
 impl DarkLightDistributor {
     fn check_can_read(&self, id: &LId) -> bool {
-        return if self.pending_messages.contains_key(id) {
-            if self.pending_messages[id].message_str == String::new() { // For users just recently added
+        return if self.local_pending_messages.contains_key(id) {
+            if self.local_pending_messages[id].message_str == String::new() { // For users just recently added
                 sleep(Duration::from_micros(1000));
                 true
             } else {
@@ -78,23 +78,26 @@ impl DarkLightDistributor {
 
     pub fn tcp_user_handler(&mut self) {
         loop {
-            sleep_condition!(self.user_connections.tcp_connections.len() <= 1); // Loop delays then continues if there <= 1 users
+            //sleep_condition!(self.user_connections.tcp_connections.len() <= 1); // Loop delays then continues if there <= 1 users
 
             for (id, mut stream) in self.user_connections.tcp_connections.iter() {
                 if self.check_can_read(id) == false {
                     self.tcp_user_write_pending(id);
-                    self.pending_messages.remove(id);
+                    self.local_pending_messages.remove(id);
                     continue;
                 } else {
-                    self.pending_messages.remove(id);
+                    self.local_pending_messages.remove(id);
                 }
 
                 let read = self.tcp_user_read(stream);
 
                 // User sent nothing
                 if read.is_empty() {
+                    println!("empty read");
                     continue;
                 }
+
+                println!("read: {}", read);
 
                 let ri = ReceiveInfo::get_from_message_string(read.clone());
                 // Message might have been invalid
@@ -115,7 +118,8 @@ impl DarkLightDistributor {
                     }
                 } else {
                     // Message for external distributor
-                    self.pending_messages.insert(ri.rid, PendingMessage::new(true, ri.rdid, read));
+                    println!("external distributor: {} {}", ri.rdid, ri.rid);
+                    self.external_pending_messages.insert(ri.rdid as u64, PendingMessage::new(true, ri.rdid, read));
                 }
             }
         }
