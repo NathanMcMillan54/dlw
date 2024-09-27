@@ -58,7 +58,6 @@ impl DarkLightDistributor {
                 let read = self.tcp_distributors[tcp_distributor_index].read();
 
                 if !read.0.is_empty() && check_read.1 == STATUS_OK {
-                    println!("got read: {} getting turned into:", read.0);
                     return read.0.replace(&format!(" {}", env!("DIST_IDENT")), "");
                 }
             }
@@ -78,7 +77,6 @@ impl DarkLightDistributor {
         }
 
         return if read.0.contains(READ_AVAILABLE) {
-            println!("writing...");
             self.tcp_distributors[tcp_distributor_index].write(format!("{} {}", write, env!("DIST_IDENT")))
         } else {
             READ_TIMEDOUT
@@ -123,11 +121,8 @@ impl DarkLightDistributor {
 
                 let read = self.tcp_distributor_read(i);
 
-                println!("read: {}", read);
                 let ri = ReceiveInfo::get_from_message_string(read.clone());
-                println!("ri: {:?}", ri);
                 if ri.rdid == self.info.id {
-                    println!("adding {} to local pending", ri.rdid);
                     self.local_pending_messages.insert(ri.rid, PendingMessage::new(true, self.info.id, read.clone()));
                     continue;
                 } else {
@@ -137,7 +132,6 @@ impl DarkLightDistributor {
                         }
 
                         if self.external_pending_messages.contains_key(&(self.tcp_distributors[j].info.id as u64)) {
-                            println!("Writing local message to external distributor");
                             self.tcp_distributor_write(j, self.external_pending_messages[&(self.tcp_distributors[j].info.id as u64)].message_str.clone());
                             self.external_pending_messages.remove(&(self.tcp_distributors[j].info.id as u64));
                         }

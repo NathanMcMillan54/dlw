@@ -90,7 +90,8 @@ impl DarkLightDistributor {
                     if self.local_pending_messages[id].message_str == String::new() {
                         self.local_pending_messages.remove(id);
                     } else {
-                        self.tcp_user_write(stream, self.local_pending_messages[id]);
+                        self.tcp_user_write(stream, self.local_pending_messages[id].message_str.clone());
+                        self.local_pending_messages.remove(id);
                     }
                 }
 
@@ -98,7 +99,6 @@ impl DarkLightDistributor {
 
                 // User sent nothing
                 if read.is_empty() {
-                    println!("empty read");
                     continue;
                 }
 
@@ -121,7 +121,6 @@ impl DarkLightDistributor {
                     }
                 } else {
                     // Message for external distributor
-                    println!("external distributor: {} {}", ri.rdid, ri.rid);
                     self.external_pending_messages.insert(ri.rdid as u64, PendingMessage::new(true, ri.rdid, read));
                 }
             }
