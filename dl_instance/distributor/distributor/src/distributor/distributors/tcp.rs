@@ -67,7 +67,7 @@ impl ExternalDistributorRW for TcpDistributor {
             return false;
         }*/
 
-        self.stream.set_read_timeout(Some(Duration::from_millis(500)));
+        self.stream.set_read_timeout(Some(Duration::from_millis(50)));
         let checks = [
             "GET_VERSION",
             "GET_ID",
@@ -120,7 +120,7 @@ impl ExternalDistributorRW for TcpDistributor {
     }
 
     fn attempt_connect(&mut self) -> bool {
-        self.stream.set_read_timeout(Some(Duration::from_millis(500)));
+        self.stream.set_read_timeout(Some(Duration::from_millis(50)));
 
         let s1 = VS1.parse::<i32>().unwrap();
         let s2 = VS2.parse::<i32>().unwrap();
