@@ -45,6 +45,7 @@ impl DarkLightDistributor {
 
             let ret = stream.read(&mut buf);
             if ret.is_err() {
+                wait += 1;
                 continue; // Write proper error handler
             }
 

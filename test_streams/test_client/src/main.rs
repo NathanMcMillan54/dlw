@@ -15,7 +15,7 @@ fn main() {
         // Add the client/server's ID and the Distributor ID
         dlwp::stream::StreamType::Client {
             rid: 9711410197108107101,
-            rdid: 5,
+            rdid: 3,
             port: 5000,
         },
         false,
@@ -30,7 +30,7 @@ fn main() {
 
     while stream.running() {
         let utc = Utc::now();
-        let mut input = format!("Stuff2 {}:{}", utc.hour(), utc.minute());
+        let mut input = format!("Stuff1 {}:{}:{}", utc.hour(), utc.minute(), utc.second());
 
         stream.write(input, REQUEST_RESPONSE);
 
@@ -42,6 +42,6 @@ fn main() {
             );
         }
 
-        sleep(Duration::new(15, 0));
+        sleep(Duration::new(5, 0));
     }
 }

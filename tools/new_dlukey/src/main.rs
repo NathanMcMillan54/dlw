@@ -13,7 +13,7 @@ use dlwp::{
 fn main() {
     let mut stream = Stream::new(
         StreamType::Client {
-            rid: 505051114,
+            rid: 9711410197108107101,
             rdid: 3,
             port: 4998,
         },
@@ -28,7 +28,7 @@ fn main() {
 
     sleep(Duration::from_millis(100));
 
-    let mut wait = 0;
+    let mut wait = 1000;
     while stream.running() {
         if wait == 1000 {
             println!("Sending another request");
@@ -52,6 +52,6 @@ fn main() {
         }
 
         wait += 1;
-        sleep(Duration::from_micros(750));
+        sleep(Duration::from_millis(10));
     }
 }

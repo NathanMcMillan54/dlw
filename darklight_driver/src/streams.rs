@@ -319,6 +319,7 @@ impl StreamsHandler {
                 if ri.rid == local_user_id().unwrap() {
                     for i in 0..self.stream_info.len() {
                         if self.stream_info[i].port == ri.port {
+                            self.write_to_stream_file(ri.rid, ri.port, &read.0); // 28/9/2024 > not sure why this wasn't already written (going to deal with later)
                             let mut waiting = true;
                             let mut waited = 0;
 

@@ -111,6 +111,7 @@ impl DarkLightDistributor {
                             if conn_ret == false {
                                 DISTRIBUTOR.as_mut().unwrap().tcp_distributors[i].msg = String::from("rm");
                             } else {
+                                println!("Connected");
                                 DISTRIBUTOR.as_mut().unwrap().tcp_distributors[i].msg = String::new();
                             }
                             return;

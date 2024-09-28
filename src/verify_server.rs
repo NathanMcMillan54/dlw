@@ -215,7 +215,7 @@ fn handle_client(mut client: TcpStream) {
 
     if split.len() == 6 {
         verify_user_key(client, split);
-    } else if split.len() == 5 {
+    } else if split.len() == 4 {
         add_key(client, split);
     } else {
         client.write(b"INVALID");

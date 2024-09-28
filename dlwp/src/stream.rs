@@ -145,7 +145,7 @@ impl Stream {
 
         let ri = message.ti.into_ri(message.ri.instance_id, message.ri.port);
 
-        if self.connections.is_allowed(ri) {
+        if !self.connections.is_allowed(ri) {
             return false;
         }
 
