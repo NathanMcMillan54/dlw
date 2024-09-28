@@ -11,6 +11,10 @@ path = "src/verify_server.rs"
 name = "keyss"
 path = "src/keyss.rs"
 
+[[bin]]
+name = "recomends"
+path = "src/recomends.rs"
+
 [dependencies]
 dlwp = { path = "dlwp/", features = ["include_serde"] }
 fernet = "0.2.2"

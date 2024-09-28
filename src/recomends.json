@@ -1,0 +1,15 @@
+{
+    "dlwp_version": {
+        "minimum": "0.1.0-alpha",
+        "obsolete_after": [0, 0, 0],
+        "latest": "0.1.0-alpha"
+    },
+    "driver_version": {
+        "minimum": "0.1.0-alpha",
+        "obsolete_after": [0, 0, 0],
+        "latest": "0.1.0-alpha"
+    },
+    "user_encryption": [
+        "cerpton"
+    ]
+}
