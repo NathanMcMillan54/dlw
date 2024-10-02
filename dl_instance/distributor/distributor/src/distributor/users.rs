@@ -86,6 +86,7 @@ impl DarkLightDistributor {
                         self.tcp_user_write(stream, self.local_pending_messages[id].message_str.clone());
                     }
                 }*/
+                //println!("on user: {}", id);
 
                 if self.local_pending_messages.contains_key(id) {
                     if self.local_pending_messages[id].message_str == String::new() {
@@ -109,6 +110,7 @@ impl DarkLightDistributor {
                     continue;
                 }
 
+                // println!("read: {}", read);
                 if ri.rdid == self.info.id {
                     if !self.user_connections.connection_exists(&ri.rid) {
                         // Notify user that connection doesn't exist

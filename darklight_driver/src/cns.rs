@@ -71,12 +71,12 @@ pub fn cns_add(input: Vec<&str>) {
     let readable = is_human_readable_including(input[0].to_string(), vec!['-', '_']);
     let parseable = input[1].parse::<u16>().is_ok();
     let name = match input[2] {
-        "0" => format!("{}{}{}", "info.", input[3], ".org"),
-        "1" => format!("{}{}{}", "info.", input[3], ".com"),
-        "2" => format!("{}{}{}", "visu.", input[3], ".org"),
-        "3" => format!("{}{}{}", "visu.", input[3], ".com"),
-        "4" => format!("{}{}{}", "info.", input[3], ".prs"),
-        "5" => format!("{}{}{}", "visu.", input[3], ".prs"),
+        "0" => format!("{}{}{}", "info.", input[0], ".org"),
+        "1" => format!("{}{}{}", "info.", input[0], ".com"),
+        "2" => format!("{}{}{}", "visu.", input[0], ".org"),
+        "3" => format!("{}{}{}", "visu.", input[0], ".com"),
+        "4" => format!("{}{}{}", "info.", input[0], ".prs"),
+        "5" => format!("{}{}{}", "visu.", input[0], ".prs"),
         _ => {
             println!("Invalid option: {}, read (documentation)", input[3]);
             return;
@@ -115,9 +115,8 @@ pub fn cns_add(input: Vec<&str>) {
     let mut recv_second = false;
     let mut attempts = 0;
 
-    println!("sending...");
     while stream.running() {
-        sleep(Duration::from_millis(100));
+        sleep(Duration::from_millis(10));
         if send_first == false {
             println!("Sending first...");
             stream.write(
@@ -128,6 +127,11 @@ pub fn cns_add(input: Vec<&str>) {
                 REQUEST_RESPONSE,
             );
             send_first = true;
+
+            let read = stream.read();
+            if !read.is_empty() {
+                
+            }
             continue;
         }
 
@@ -136,12 +140,14 @@ pub fn cns_add(input: Vec<&str>) {
             if read.is_empty() {
                 attempts += 1;
 
-                if attempts > 400 {
+                if attempts > 40 {
+                    attempts = 0;
                     send_first = false;
                 }
 
                 continue;
             }
+
             let contents = contents_to_string(read[0].contents).replace("\0", "");
             if read[0].ti.code != REQUEST_CONNECTION.value()
                 && read[0].ti.code == REGULAR_RESPONSE.value()
@@ -164,7 +170,7 @@ pub fn cns_add(input: Vec<&str>) {
 
         if recv_first == true && recv_first == true && send_second == false {
             send_second = true;
-            println!("sending second");
+            println!("Sending second");
             stream.write(
                 format!(
                     "REQUEST_ADD1 {} {} {} {} {} {} {}",

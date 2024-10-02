@@ -157,7 +157,7 @@ pub fn cmd_input_thread() {
                             if STREAMS_HANDLER.stream_info[i].rid == rid
                                 && STREAMS_HANDLER.stream_info[i].port == port
                             {
-                                println!("removing...");
+                                println!("Removing...");
                                 STREAMS_HANDLER.remove_stream_file(rid, port);
                                 STREAMS_HANDLER.stream_info.remove(i);
                             }
@@ -179,15 +179,16 @@ pub fn cmd_input_thread() {
                         STREAMS_HANDLER.stream_info.clear();
                     }
 
-                    if inputs.len() != 3 {
-                        println!("Invalid arguments");
+                    if inputs.len() != 4 {
+                        println!("Invalid arguments {}", inputs.len());
                         continue;
                     }
 
                     let arg1 = Box::leak(inputs[1].to_string().into_boxed_str());
                     let arg2 = Box::leak(inputs[2].to_string().into_boxed_str());
+                    let arg3 = Box::leak(inputs[3].to_string().into_boxed_str());
                     spawn(move || {
-                        cns_add(vec![arg1, arg2]);
+                        cns_add(vec![arg1, arg2, arg3]);
                     });
                 }
                 _ => {
