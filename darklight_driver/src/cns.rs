@@ -130,7 +130,7 @@ pub fn cns_add(input: Vec<&str>) {
 
             let read = stream.read();
             if !read.is_empty() {
-                
+                println!("not empty: {:?}", read);
             }
             continue;
         }

@@ -228,7 +228,7 @@ impl DLIO for DLTCPIO {
 
         let read_ret = stream.read(&mut read);
 
-        if read_ret.is_err() {
+        if read_ret.is_err() || read == [0; 4096] {
             return (String::new(), READ_FAILED);
         }
 

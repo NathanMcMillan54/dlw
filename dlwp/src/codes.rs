@@ -73,6 +73,8 @@ pub const INVALID_DID: Code = Code::Error(301);
 pub const DISTRIBUTOR_NOT_FOUND: Code = Code::Error(302);
 /// Internal error indicating message is incomplete (missing identifiers)
 pub const MESSAGE_INCOMPLETE: Code = Code::Error(303);
+/// Internal error indicating that a stream file is either missing or could not be found
+pub const STREAM_FILE_NOT_FOUND: Code = Code::Error(304);
 
 pub const READ_TIMEDOUT: Code = Code::Status(400);
 pub const WRITE_TIMEDOUT: Code = Code::Status(401);

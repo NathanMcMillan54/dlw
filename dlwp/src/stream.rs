@@ -1,7 +1,6 @@
 use crate::{
     codes::{
-        Code, DISCONNECT as DISCONNECT_, REMOVE_CLIENT, REQUEST_CONNECTION, STATUS_OK,
-        UNKNOWN_STATUS,
+        Code, DISCONNECT as DISCONNECT_, REMOVE_CLIENT, REQUEST_CONNECTION, STATUS_OK, STREAM_FILE_NOT_FOUND, UNKNOWN_STATUS
     },
     connections::Connections,
     dlcmd::{send_dlcmd, CONNECT, DISCONNECT, SEND},
@@ -196,6 +195,20 @@ impl Stream {
         .exists()
     }
 
+    fn wait_for_stream_file(&self) -> Code {
+        let mut wait = 0;
+
+        while wait < 400 {
+            if self.stream_file_exists() {
+                return STATUS_OK;
+            }
+
+            wait += 1;
+        }
+
+        return STREAM_FILE_NOT_FOUND;
+    }
+
     pub fn add_encryption_info(&mut self, info: EncryptionInfo) {
         self.encryption = info;
     }
@@ -211,7 +224,10 @@ impl Stream {
     }
 
     pub fn _read(&self) -> Vec<String> {
-        sleep(Duration::from_micros(15));
+        if self.wait_for_stream_file() == STREAM_FILE_NOT_FOUND {
+            return vec![];
+        }
+
         let reader = BufReader::new(
             File::options()
                 .read(true)
@@ -226,6 +242,7 @@ impl Stream {
 
         for line in reader.lines() {
             if line.is_ok() {
+                println!("reading: {:?}", line);
                 ret.push(line.unwrap());
             }
         }
@@ -237,18 +254,20 @@ impl Stream {
         let mut ret = vec![];
         let strings = self._read();
 
-        for i in 0..strings.len() {
-            let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
-            //let received_message = Message::from_string(&strings[i].to_owned());
-            ret.push(received_message);
-        }
+        if !strings.is_empty() {
+            for i in 0..strings.len() {
+                let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
+                //let received_message = Message::from_string(&strings[i].to_owned());
+                ret.push(received_message);
+            }
 
-        File::create(format!(
-            "/tmp/darklight/connections/_dl_{}-{}",
-            self.stream_type.rid(),
-            self.stream_type.port()
-        ))
-        .unwrap();
+            File::create(format!(
+                "/tmp/darklight/connections/_dl_{}-{}",
+                self.stream_type.rid(),
+                self.stream_type.port()
+            ))
+            .unwrap();
+        }
 
         ret
     }
@@ -341,8 +360,8 @@ impl Stream {
         // Delay to ensure the stream has been created by now
         sleep(Duration::from_millis(100));
 
-        if self.stream_file_exists() == false {
-            return UNKNOWN_STATUS;
+        if self.wait_for_stream_file() == STREAM_FILE_NOT_FOUND {
+            return STREAM_FILE_NOT_FOUND;
         }
 
         // Request connection to the client/server

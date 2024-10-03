@@ -1,6 +1,7 @@
+use dlwp::cerpton::{libcerpton_decode, libcerpton_encode};
 use dlwp::codes::{READ_SUCCESS, WRITE_FAILED, WRITE_TIMEDOUT};
 use dlwp::config::DLConfig;
-use dlwp::distributor::{GET_DISTRIBUTOR, USER_INIT};
+use dlwp::distributor::{GET_DISTRIBUTOR, READ_AVAILABLE, USER_INIT};
 use dlwp::id::distributor_id;
 use dlwp::id::*;
 use dlwp::io::{DLSerialIO, DLIO, DLTCPIO};
@@ -312,6 +313,7 @@ impl StreamsHandler {
             let io_method = self.io_method.as_mut().unwrap();
             let mut read = io_method._read();
             read.0 = read.0.replace("\0", "");
+            println!("read: {}", read.0);
 
             if read.1 == READ_SUCCESS {
                 let ri = Message::get_ri_from_encoded(&read.0);
@@ -319,7 +321,9 @@ impl StreamsHandler {
                 if ri.rid == local_user_id().unwrap() {
                     for i in 0..self.stream_info.len() {
                         if self.stream_info[i].port == ri.port {
-                            self.write_to_stream_file(ri.rid, ri.port, &read.0); // 28/9/2024 > not sure why this wasn't already written (going to deal with later)
+                            let ti = Message::decode(&read.0, dlwp::encryption::EncryptionInfo { encode_function: libcerpton_encode, decode_function: libcerpton_decode, info: self.stream_info[i].info }).ti;
+                            println!("writing to stream file");
+                            self.write_to_stream_file(ti.tid, ri.port, &read.0); // 28/9/2024 > not sure why this wasn't already written (going to deal with later)
                             let mut waiting = true;
                             let mut waited = 0;
 
