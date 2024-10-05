@@ -1,4 +1,6 @@
+use dlwp::cerpton::{libcerpton_decode, libcerpton_encode};
 use dlwp::codes::{Code, REQUEST_RESPONSE, STATUS_OK};
+use dlwp::encryption::EncryptionInfo;
 use dlwp::message::ReceiveInfo;
 use dlwp::stream::{Stream, StreamType};
 use std::{thread::sleep, time::Duration};
@@ -8,6 +10,11 @@ const PORT: u16 = 5000;
 fn main() {
     let mut stream = Stream::new(StreamType::Server { port: PORT }, false);
 
+    stream.add_encryption_info(EncryptionInfo {
+        encode_function: libcerpton_encode,
+        decode_function: libcerpton_decode,
+        info: [2, 1, 2, 0, 0, 0]
+    });
     println!("starting");
     let ret = stream.start();
     println!("started: {:?}", ret);

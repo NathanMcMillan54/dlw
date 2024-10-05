@@ -242,7 +242,6 @@ impl Stream {
 
         for line in reader.lines() {
             if line.is_ok() {
-                println!("reading: {:?}", line);
                 ret.push(line.unwrap());
             }
         }
