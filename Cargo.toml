@@ -6,17 +6,27 @@ version = "0.1.0-alpha"
 [[bin]]
 name = "verify_server"
 path = "src/verify_server.rs"
+decsription = "Used by Distributors to verify a user"
 
 [[bin]]
 name = "keyss"
 path = "src/keyss.rs"
+decsription = "A server to request a new DarkLight user key"
 
 [[bin]]
 name = "recomends"
+decsription = "A server that sends recomended version numbers for DarkLight services"
 path = "src/recomends.rs"
+
+[[bin]]
+name = "cns"
+path = "src/cns.rs"
+decsription = "The Centralized Name Server, used to asociate human readable names with DarkLight Ids"
+required-features = ["cns_bin"]
 
 [dependencies]
 dlwp = { path = "dlwp/", features = ["include_serde"] }
+dlcns = { path = "tools/dlcns/", optional = true }
 fernet = "0.2.2"
 rand = "0.8.5"
 serde = { version = "1.0.188", features = ["serde_derive", "std"] }
@@ -35,3 +45,6 @@ members = [
     "tools/dlup",
     "tools/new_dlukey/",
 ]
+
+[features]
+cns_bin = ["dlwp/include_chrono", "dlcns"]

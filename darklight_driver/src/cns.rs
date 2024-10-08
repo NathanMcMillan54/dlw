@@ -128,10 +128,6 @@ pub fn cns_add(input: Vec<&str>) {
             );
             send_first = true;
 
-            let read = stream.read();
-            if !read.is_empty() {
-                println!("not empty: {:?}", read);
-            }
             continue;
         }
 
@@ -140,7 +136,7 @@ pub fn cns_add(input: Vec<&str>) {
             if read.is_empty() {
                 attempts += 1;
 
-                if attempts > 40 {
+                if attempts > 500 {
                     attempts = 0;
                     send_first = false;
                 }
@@ -158,10 +154,10 @@ pub fn cns_add(input: Vec<&str>) {
                         "Name request is allowed, {} names registered",
                         contents.replace("ALLOW_ADD0 ", "")
                     );
-                    sleep(Duration::from_millis(500));
+                    sleep(Duration::from_millis(100));
                 }
             } else if read[0].ti.code == INVALID_RR.value() {
-                println!("An error occured1: {}", contents);
+                println!("An error occured while sending first request: {}", contents);
                 send_first = false;
                 recv_first = false;
                 continue;
@@ -170,11 +166,10 @@ pub fn cns_add(input: Vec<&str>) {
 
         if recv_first == true && recv_first == true && send_second == false {
             send_second = true;
-            println!("Sending second");
             stream.write(
                 format!(
                     "REQUEST_ADD1 {} {} {} {} {} {} {}",
-                    setting[0], setting[1], setting[2], current_key, first_key, input[0], input[1]
+                    setting[0], setting[1], setting[2], current_key, first_key, libcerpton_encode(setting, name.clone()), input[1]
                 ),
                 REQUEST_RESPONSE,
             );
@@ -190,7 +185,6 @@ pub fn cns_add(input: Vec<&str>) {
                 && read[0].ti.code == REGULAR_RESPONSE.value()
             {
                 if contents.contains("Added name") {
-                    println!("receving second");
                     recv_second = true;
                     println!(
                         "Name: {} is now asociated with {}-{}",
@@ -200,7 +194,7 @@ pub fn cns_add(input: Vec<&str>) {
                     );
                 }
             } else if read[0].ti.code == INVALID_RR.value() {
-                println!("An error occured: {}", contents);
+                println!("An error occured while receiving response: {}", contents);
                 return;
             }
         }

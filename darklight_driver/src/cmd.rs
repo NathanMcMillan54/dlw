@@ -192,7 +192,7 @@ pub fn cmd_input_thread() {
                     });
                 }
                 _ => {
-                    println!("Invalid input: {:?}", inputs[0]);
+                    println!("Invalid input: {:?}, {:?}", inputs[0], inputs);
                 }
             }
 

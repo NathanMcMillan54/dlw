@@ -177,6 +177,7 @@ fn add_key(mut client: TcpStream, input: Vec<&str>) {
         return;
     }
 
+    // For now ferent keys are going to be used to validate users
     let fernet = Fernet::new(input[3]);
     if fernet.is_none() {
         client.write(b"INVALID");

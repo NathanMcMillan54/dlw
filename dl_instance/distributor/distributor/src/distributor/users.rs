@@ -110,7 +110,7 @@ impl DarkLightDistributor {
                     continue;
                 }
 
-                // println!("read: {}", read);
+                //println!("read: {}", read);
                 if ri.rdid == self.info.id {
                     if !self.user_connections.connection_exists(&ri.rid) {
                         // Notify user that connection doesn't exist
