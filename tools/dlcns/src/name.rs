@@ -53,4 +53,22 @@ impl NamesList {
         let list = serde_json::to_string_pretty(self).unwrap();
         file.write_fmt(format_args!("{}", list)).unwrap();
     }
+
+    /// For public list of owners (excludes ``Name`` information)
+    pub fn write_owners_only(&self, file: String) {
+        let mut owners = vec![];
+
+        for i in 0..self.list.len() {
+            owners.push(&self.list[i].owner);
+        }
+
+        let json_contents = serde_json::to_string(&owners);
+
+        if json_contents.is_err() {
+            return;
+        }
+
+        let mut file = File::options().write(true).open(file).unwrap();
+        file.write_fmt(format_args!("{}", json_contents.unwrap()));
+    }
 }

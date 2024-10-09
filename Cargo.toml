@@ -4,6 +4,11 @@ edition = "2021"
 version = "0.1.0-alpha"
 
 [[bin]]
+name = "darklight"
+path = "src/darklight.rs"
+decsription = "Official DarkLight website on DLW"
+
+[[bin]]
 name = "verify_server"
 path = "src/verify_server.rs"
 decsription = "Used by Distributors to verify a user"
@@ -47,4 +52,6 @@ members = [
 ]
 
 [features]
+info_dl = []
+visu_dl = []
 cns_bin = ["dlwp/include_chrono", "dlcns"]

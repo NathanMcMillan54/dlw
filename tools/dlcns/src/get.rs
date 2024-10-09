@@ -1,3 +1,5 @@
+use std::{thread::sleep, time::Duration};
+
 use dlwp::{
     cerpton::{libcerpton_decode, libcerpton_encode},
     codes::{
@@ -30,6 +32,7 @@ pub fn format_specific_id_request(did: DId, id: LId, port: Port) -> String {
 pub struct CNSGet {
     stream: Stream,
     pub received: Vec<Owner>,
+    pub timeout: Duration,
 }
 
 impl CNSGet {
@@ -52,14 +55,56 @@ impl CNSGet {
         return CNSGet {
             stream,
             received: vec![],
+            timeout: Duration::from_millis(5000)
         };
     }
 
-    /// Returns the owner of a name
-    pub fn get_owner_name(&mut self, name: String) -> Option<Owner> {
+    fn write_read(&mut self, write: String) -> String {
+        let mut waited = Duration::from_millis(0);
+        let mut read = vec![];
+        while read.is_empty() {
+            if waited >= self.timeout {
+                break;
+            }
+
+            self.stream
+                .write(write.clone(), REQUEST_RESPONSE);
+            read = self.stream.read();
+
+            if read.is_empty() == false {
+                if contents_to_string(read[0].contents)
+                    .replace("\0", "")
+                    .is_empty() || read[0].ti.code == REQUEST_CONNECTION.value()
+                {
+                    read.clear();
+                } else {
+                    break;
+                }
+            }
+
+            let delay = Duration::from_millis(self.timeout.as_millis() as u64 / 10);
+            sleep(delay);
+            waited += delay;
+        }
+
+        if read.is_empty() {
+            return String::new();
+        }
+
+        contents_to_string(read[0].contents).replace("\0", "")
+    }
+
+    /// Disconnects CNS, call after being used
+    pub fn disconnect(&mut self) {
+        self.stream.stop();
+    }
+
+    /// Returns the Id of a name
+    pub fn get_id(&mut self, name: String) -> Option<Owner> {
         if self.stream.running() == false {
             return None;
         }
+        sleep(Duration::from_millis(100));
 
         let mut owner = Owner {
             id: 0,
@@ -68,23 +113,12 @@ impl CNSGet {
             name: String::new(),
             name_type: 0,
         };
-        let mut read = vec![];
-        while read.is_empty() {
-            self.stream
-                .write(String::from(format_name_request(&name)), REQUEST_RESPONSE);
-            read = self.stream.read();
 
-            if read.is_empty() == false {
-                if contents_to_string(read[0].contents)
-                    .replace("\0", "")
-                    .is_empty()
-                {
-                    read.clear();
-                }
-            }
+        let response = self.write_read(format_name_request(&name));
+        if response.is_empty() {
+            return None;
         }
-
-        let response = contents_to_string(read[0].contents).replace("\0", "");
+        
         let split_response = response.split(" ").collect::<Vec<&str>>();
 
         if split_response.len() < 5 {
@@ -115,7 +149,44 @@ impl CNSGet {
     }
 
     /// Returns the name of an onwer
-    pub fn get_id(&mut self, id: LId, did: DId, port: Port) -> String {
-        unimplemented!()
+    pub fn get_name(&mut self, id: LId, did: DId, port: Port) -> Option<Owner> {
+        if self.stream.running() == false {
+            return None;
+        }
+        sleep(Duration::from_millis(100));
+
+        let mut owner = Owner {
+            id: 0,
+            did: 0,
+            port: 0,
+            name: String::new(),
+            name_type: 0,
+        };
+
+        let response = self.write_read(format_specific_id_request(did, id, port));
+
+        if response.is_empty() {
+            return None;
+        }
+
+        let split = response.split(" ").collect::<Vec<&str>>();
+
+        if split.len() != 2 {
+            return None;
+        }
+
+        let name_type = split[1].parse::<usize>();
+
+        if name_type.is_err() {
+            return None;
+        }
+
+        owner.id = id;
+        owner.did = did;
+        owner.port = port;
+        owner.name = split[0].to_string();
+        owner.name_type = name_type.unwrap();
+
+        return Some(owner);
     }
 }

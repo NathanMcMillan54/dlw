@@ -10,3 +10,4 @@ pub const CNS_ID: LId = 9711410197108107101;
 pub const CNS_PORT: Port = 4999;
 pub const CNS_DISTRIBUTOR: DId = 3;
 pub const OWNERS_LIST: &str = "owners_list.json";
+pub const PUBLIC_OWNERS_LIST: &str = "public_owners_list.json";

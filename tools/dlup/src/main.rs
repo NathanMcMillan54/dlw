@@ -8,6 +8,7 @@ use dlwp::stream::{Stream, StreamType};
 
 fn main() {
     // The DarkLight information servers should always be on id 1000 and distributor 3
+    // If this client receives anything, that should indicate that DarkLight services/servers are working
     let mut stream = Stream::new(
         StreamType::Client {
             rid: 1000,
@@ -31,7 +32,7 @@ fn main() {
         for r in read {
             let string = contents_to_string(r.contents);
 
-            if r.ti.code == REGULAR_RESPONSE.value() && string.is_empty() == false {
+            if r.ti.code == REGULAR_RESPONSE.value() || string.is_empty() == false {
                 println!("DarkLight is running");
                 stream.stop();
             } else {
