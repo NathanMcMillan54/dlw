@@ -19,17 +19,16 @@ use dlwp::{
 #[path = "cns/add.rs"]
 mod add;
 
+#[path = "cns/get.rs"]
+mod get;
+
 pub(crate) static mut NAMES_LIST: NamesList = NamesList::empty();
 
 pub fn handle_message(contents: String, ti: TransmitInfo) -> (String, Code) {
     let split = contents.split(" ").collect::<Vec<&str>>();
 
-    return if split[0].contains("GET_ID") {
-        (String::from(""), REGULAR_RESPONSE)
-    } else if split[0].contains("GET_NAME") {
-        (String::from(""), REGULAR_RESPONSE)
-    } else if split[0].contains("GET_ALL") {
-        (String::from(""), REGULAR_RESPONSE)
+    return if split[0].starts_with("GET_") {
+        (get::get_cns_info(split), REGULAR_RESPONSE)
     } else if split[0].contains("REQUEST_ADD") {
         unsafe { add::check_allowadd(contents, ti) }
     } else {
