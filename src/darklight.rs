@@ -7,5 +7,5 @@ const PORT: Port = 5000;
 const PORT: Port = 5001;
 
 fn main() {
-    println!("Darklight server");
+    println!("Darklight web server");
 }

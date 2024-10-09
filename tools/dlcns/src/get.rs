@@ -171,7 +171,7 @@ impl CNSGet {
 
         let split = response.split(" ").collect::<Vec<&str>>();
 
-        if split.len() != 2 {
+        if split.len() < 2 {
             return None;
         }
 
