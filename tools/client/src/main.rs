@@ -70,10 +70,23 @@ fn main() {
         connect_by_name()
     };
 
+    println!("Enter encryption setting (using Cerpton cipher)");
+    let mut setting = [0; 6];
+    for i in 0..6 {
+        let mut s = cmd_input();
+
+        while s.parse::<i32>().is_err() {
+            println!("Must be 32 bit integer");
+            s = cmd_input();
+        }
+
+        setting[i] = s.parse::<i32>().unwrap();
+    }
+
     stream.add_encryption_info(EncryptionInfo {
         encode_function: libcerpton_encode,
         decode_function: libcerpton_decode,
-        info: [2, 1, 2, 0, 0, 0]
+        info: setting
     });
     stream.start();
     sleep(Duration::from_millis(150));
@@ -99,6 +112,7 @@ fn main() {
             code_str = cmd_input();
         }
 
+        println!("Enter request:");
         let mut message = cmd_input();
         if message == String::from("!R!") {
             continue;

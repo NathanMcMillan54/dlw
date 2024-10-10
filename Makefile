@@ -22,11 +22,13 @@ build_tools:
 	@ cargo build -p dlcmd --release
 	@ cargo build -p new_dlukey --release
 	@ cargo build -p dlup --release
+	@ cargo build -p client --release
 
 move_tools:
 	sudo mv target/release/new_dlukey /sbin/new_dlukey
 	sudo mv target/release/dlcmd /sbin/dlcmd
 	sudo mv target/release/dlup /sbin/dlup
+	sudo mv target/release/client /sbin/dl_client
 
 driver:
 	@ DLU_KEY=$(DL_KEY) cargo build -p darklight_driver --release

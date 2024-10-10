@@ -6,6 +6,11 @@ after doing that they can be installed using ``make move_tools`` (sudo is requir
 
 ----
 
+### ``dl_client``
+
+``dl_client`` is an executable that allows you to connect to antoher client or server to send messages. When starting it
+you will be asked if you want to connect to a stream by Id or [name](cns/add.md#valid-names), then it's encryption info.
+
 ### ``dlcmd``
 
 ``dlcmd`` is used for sending "DarkLight commands" to ``darklight_drver``, it can be used to change the original 

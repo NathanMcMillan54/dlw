@@ -30,7 +30,7 @@ DarkLight instance.
 - ``test_streams/test_clinet/``: example DarkLight client, can be used for testing
 - ``test_stream/test_server/``: example DarkLight server, can be used for testing
 - ``src/`` Darklight [services](documentation/information_servers.md)
-- ``tools/client/`` an executable for interacting with servers
+- ``tools/client/`` an executable for interacting with clients and servers
 - ``tools/dlcmd/``: command that interacts with ``darklight_driver``, explained [here](documentation/cmd.md#dlcmd)
 - ``tools/dlcns/``: library for retrieving data from the [Centeralized Name Server](documentation/cns/)
 - ``tools/dlup/``: used for checking if DarkLight [is working](documentation/cmd.md#dlup)

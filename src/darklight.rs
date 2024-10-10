@@ -10,7 +10,7 @@ const PORT: Port = 5001;
 
 const HTML_FILES: [&str; 1] = ["main.html"];
 
-const TXT_FILE: [&str; 1] = ["main.txt"];
+const TXT_FILES: [&str; 1] = ["main.txt"];
 
 fn main() {
     println!("Darklight web server");
@@ -37,11 +37,11 @@ fn main() {
                 #[cfg(feature = "info_dl")]
                 let main = read_to_string("darklight-text/main.txt").unwrap();
 
-                stream.server_write(read.ti, main, FILE_RESPONSE);
+                stream.server_write(read.ti, main.replace("\n", "\\n"), FILE_RESPONSE);
                 continue;
             }
 
-            let contents = contents_to_string(read.contents).replace("\0", "");
+            let contents = contents_to_string(read.contents).replace("\0", "").replace(" ", "");
             if contents.contains("../") || contents.starts_with("/") {
                 continue;
             }
@@ -49,7 +49,7 @@ fn main() {
             if read.ti.code == REQUEST_FILE.value() {
                 if HTML_FILES.contains(&contents.as_str()) || TXT_FILES.contains(&contents.as_str()) {
                     let file = read_to_string(format!("darklight-text/{}", contents)).unwrap();
-                    stream.server_write(read.ti, file, FILE_RESPONSE);
+                    stream.server_write(read.ti, file.replace("\n", "\\n"), FILE_RESPONSE);
                 }
             }
         }
