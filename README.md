@@ -25,11 +25,12 @@ DarkLight instance.
 [docs](documentation/driver/main.md)
 - ``dl_instance/``: A library and tools for creating and running an [instance](documentation/instances.md)
     - ``dl_instance/distributor/*``: DarkLight [distributors](documentation/distributors.md)
-    - ``dl_instance/services/*`` DarkLight [services](documentation/information_servers.md)
 - ``dlwp/``: main library for interacting with DarkLight applications, see [docs](https://docs.rs/dlwp/latest/dlwp)
 - ``documentation/``: markdown files that explain how parts of DarkLight work and how to use them
 - ``test_streams/test_clinet/``: example DarkLight client, can be used for testing
 - ``test_stream/test_server/``: example DarkLight server, can be used for testing
+- ``src/`` Darklight [services](documentation/information_servers.md)
+- ``tools/client/`` an executable for interacting with servers
 - ``tools/dlcmd/``: command that interacts with ``darklight_driver``, explained [here](documentation/cmd.md#dlcmd)
 - ``tools/dlcns/``: library for retrieving data from the [Centeralized Name Server](documentation/cns/)
 - ``tools/dlup/``: used for checking if DarkLight [is working](documentation/cmd.md#dlup)

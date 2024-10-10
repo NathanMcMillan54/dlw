@@ -1,7 +1,7 @@
 use std::{io::{stdin, stdout, Write}, thread::{self, sleep}, time::Duration};
 
 use dlcns::get::CNSGet;
-use dlwp::{codes::Code, message::contents_to_string, stream::{Stream, StreamType}};
+use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::Code, encryption::EncryptionInfo, message::contents_to_string, stream::{Stream, StreamType}};
 
 fn cmd_input() -> String {
     print!("> ");
@@ -70,6 +70,11 @@ fn main() {
         connect_by_name()
     };
 
+    stream.add_encryption_info(EncryptionInfo {
+        encode_function: libcerpton_encode,
+        decode_function: libcerpton_decode,
+        info: [2, 1, 2, 0, 0, 0]
+    });
     stream.start();
     sleep(Duration::from_millis(150));
     println!("Started");

@@ -55,7 +55,7 @@ pub const CONNECTION_ACCEPTED: Code = Code::Response(200);
 pub const CONNECTION_DENIED: Code = Code::Response(201);
 /// Response for any type of request, should be sent after requesting a "regular" response
 pub const REGULAR_RESPONSE: Code = Code::Response(202);
-/// Responed with a chunk of a large piece of data, should coem after a chunk has been requested
+/// Responed with a chunk of a large piece of data, should come after a chunk has been requested
 pub const CHUNK_RESPONSE: Code = Code::Response(203);
 /// Response for a file that fits inside a ``Message`` or wether the file can be sent or not. If the file needs to be
 /// sent in chunks respond with the number of chunks that will need to be received

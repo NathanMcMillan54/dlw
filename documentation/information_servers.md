@@ -5,7 +5,7 @@ None of these are open source at the moment.
 
 #### Official DarkLight "Website" (text only)
 - Id, Did, Port: ``1000``, ``3``, ``5001``
-- CNS name: ``visu.darklight.org``
+- CNS name: ``info.darklight.org``
 - Usage: Updates and information on the DarkLight project
 
 #### Official DarkLight Website
