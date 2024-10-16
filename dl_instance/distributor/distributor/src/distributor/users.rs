@@ -32,21 +32,25 @@ impl DarkLightDistributor {
 }
 
 impl DarkLightDistributor {
-    fn tcp_user_read(&self, mut stream: &TcpStream) -> String {
+    fn tcp_user_read(&self, mut stream: &TcpStream) -> Option<String> {
         let mut buf = [0; 4096];
         let mut wait = 0;
 
         while wait < 400 {
             if wait % 80 == 0 || wait == 0 {
-                stream.write(format!("{}{}{}", MSG_INIT, READ_AVAILABLE, MSG_END).as_bytes());
-                stream.flush();
+                let write_err = io_err_check!(stream.write(format!("{}{}{}", MSG_INIT, READ_AVAILABLE, MSG_END).as_bytes()));
+                let flush_err = io_err_check!(stream.flush());
+
+                if write_err == true || flush_err == true {
+                    return None;
+                }
+
                 sleep(Duration::from_micros(100));
             }
 
-            let ret = stream.read(&mut buf);
-            if ret.is_err() {
-                wait += 1;
-                continue; // Write proper error handler
+            let read_err = io_err_check!(stream.read(&mut buf));
+            if read_err == true {
+                return None;
             }
 
             if buf != [0; 4096] {
@@ -62,17 +66,17 @@ impl DarkLightDistributor {
         if read_str.starts_with(MSG_INIT) && read_str.ends_with(MSG_END) {
             read_str = read_str.replace(MSG_INIT, "").replace(MSG_END, "");
         }
-        return read_str;
+        return Some(read_str);
     }
 
     fn tcp_user_write(&self, mut stream: &TcpStream, write: String) -> bool {
-        let ret = stream.write(format!("{}{}{}", MSG_INIT, write, MSG_END).as_bytes());
-        return if ret.is_ok() {
-            stream.flush();
-            true
-        } else {
+        let write_err = io_err_check!(stream.write(format!("{}{}{}", MSG_INIT, write, MSG_END).as_bytes()));
+        let flush_err = io_err_check!(stream.flush());
+        return if write_err == true || flush_err == true {
             false
-        };
+        } else {
+            true
+        }
     }
 
     pub fn tcp_user_handler(&mut self) {
@@ -86,26 +90,39 @@ impl DarkLightDistributor {
                         self.tcp_user_write(stream, self.local_pending_messages[id].message_str.clone());
                     }
                 }*/
-                //println!("on user: {}", id);
 
                 if self.local_pending_messages.contains_key(id) {
                     if self.local_pending_messages[id].message_str == String::new() {
                         self.local_pending_messages.remove(id);
+                    } else if self.local_pending_messages[id].message_str == String::from("rm") {
+                        continue;
                     } else {
                         self.tcp_user_write(stream, self.local_pending_messages[id].message_str.clone());
                         self.local_pending_messages.remove(id);
                     }
                 }
 
-                let read = self.tcp_user_read(stream);
+                let try_read = self.tcp_user_read(stream);
+
+                // User read failed
+                if try_read.is_none() {
+                    self.local_pending_messages.insert(*id, PendingMessage {
+                        can_send: false,
+                        did: 0,
+                        message_str: String::from("rm")
+                    });
+                    continue;
+                }
+
+                let read = try_read.unwrap();
 
                 // User sent nothing
-                if read.is_empty() {
+                if read == String::new() {
                     continue;
                 }
 
                 let ri = ReceiveInfo::get_from_message_string(read.clone());
-                // Message might have been invalid
+                // Message might have been invalid or was completley empty
                 if ri == ReceiveInfo::empty() {
                     continue;
                 }
@@ -118,13 +135,25 @@ impl DarkLightDistributor {
                         // Send immediatley
                         let ret = self
                             .tcp_user_write(&self.user_connections.tcp_connections[&ri.rid], read);
-                        // if ret == false, notify the user
+                        if ret == false {
+                            self.local_pending_messages.insert(*id, PendingMessage {
+                                can_send: false,
+                                did: 0,
+                                message_str: String::from("rm"),
+                            });
+                        }
                     } else {
                         // It is a serial connection
                     }
                 } else {
                     // Message for external distributor
                     self.external_pending_messages.insert(ri.rdid as u64, PendingMessage::new(true, ri.rdid, read));
+                }
+            }
+            
+            for (id, msg) in self.local_pending_messages.iter() {
+                if msg.can_send == false && msg.message_str == String::from("rm") { // Remove users
+                    self.user_connections.tcp_connections.remove(id);
                 }
             }
         }
