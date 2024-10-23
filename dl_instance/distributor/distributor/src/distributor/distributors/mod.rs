@@ -23,7 +23,12 @@ impl DarkLightDistributor {
 
             println!("Connecting to {}...", self.info.config.tcp_connections[i].clone());
             let mut stream = test_stream.unwrap();
-            stream.write(b"INIT-DIS-CONN");
+            let write_err = io_err_check!(stream.write(b"INIT-DIS-CONN"));
+            if write_err == true {
+                println!("Failed to write inital connect message");
+                continue;
+            }
+
             let mut tcp_distributor = TcpDistributor::new(stream, String::new());
             let conn_ret = tcp_distributor.attempt_connect();
 

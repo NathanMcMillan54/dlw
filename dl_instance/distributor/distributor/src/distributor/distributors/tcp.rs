@@ -1,4 +1,4 @@
-use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::{INVALID_RR, STATUS_OK}, distributor::DIST_INIT};
+use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::{INVALID_RR, READ_FAILED, STATUS_OK, WRITE_FAILED}, distributor::DIST_INIT};
 use lib_dldistributor::external::{ExternalDistributorInfo, ExternalDistributorRW};
 use std::{borrow::Borrow, io::{Read, Write}, net::TcpStream, time::Duration};
 
@@ -39,17 +39,24 @@ impl ExternalDistributorRW for TcpDistributor {
         let encryption = current_encryption();
         let input = (encryption.encode_function)(encryption.info, _inputs).replace("\0", "\\0");
 
-        self.stream.write(input.as_bytes());
-        self.stream.flush();
+        let write_err = io_err_check!(self.stream.write(input.as_bytes()));
+        let flush_err = io_err_check!(self.stream.flush());
 
-        // TODO: depending on what write or flush returns give a proper ``Code``
-        STATUS_OK
+        return if write_err == true || flush_err == true {
+            WRITE_FAILED
+        } else {
+            STATUS_OK
+        };
     }
 
     fn read(&mut self) -> (String, dlwp::codes::Code) {
         let mut buf = [0; 4096];
 
-        self.stream.read(&mut buf);
+        let read_err = io_err_check!(self.stream.read(&mut buf));
+
+        if read_err == true {
+            return (String::new(), READ_FAILED);
+        }
 
         let ret = String::from_utf8(buf.to_vec());
         
