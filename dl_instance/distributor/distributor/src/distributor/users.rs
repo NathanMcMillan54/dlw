@@ -104,6 +104,7 @@ impl DarkLightDistributor {
 
                 let try_read = self.tcp_user_read(stream);
 
+                println!("read: {:?}", try_read);
                 // User read failed
                 if try_read.is_none() {
                     self.local_pending_messages.insert(*id, PendingMessage {
@@ -124,10 +125,10 @@ impl DarkLightDistributor {
                 let ri = ReceiveInfo::get_from_message_string(read.clone());
                 // Message might have been invalid or was completley empty
                 if ri == ReceiveInfo::empty() {
+                    println!("Failed to parse ri: {}", read);
                     continue;
                 }
 
-                //println!("read: {}", read);
                 if ri.rdid == self.info.id {
                     if !self.user_connections.connection_exists(&ri.rid) {
                         // Notify user that connection doesn't exist
@@ -147,6 +148,7 @@ impl DarkLightDistributor {
                     }
                 } else {
                     // Message for external distributor
+                    println!("For external distributor");
                     self.external_pending_messages.insert(ri.rdid as u64, PendingMessage::new(true, ri.rdid, read));
                 }
             }

@@ -1,3 +1,4 @@
+// All of this might be unnecessary
 use crate::codes::{
     Code, LENGTH_EXCEEDED, READ_FAILED, READ_SUCCESS, READ_TIMEDOUT, STATUS_OK, UNKNOWN_STATUS,
     WRITE_FAILED, WRITE_SUCCESS,
@@ -128,8 +129,6 @@ impl DLIO for DLSerialIO {
             sleep(Duration::from_millis(64));
         }
 
-        read = read.replace(SN_MSG_INIT, "").replace(MSG_END, "");
-
         return (read, READ_SUCCESS);
     }
 
@@ -232,8 +231,7 @@ impl DLIO for DLTCPIO {
             return (String::new(), READ_FAILED);
         }
 
-        let mut read = String::from_utf8(read.to_vec()).unwrap();
-        read = read.replace(MSG_INIT, "").replace(MSG_END, "");
+        let read = String::from_utf8(read.to_vec()).unwrap();
 
         return (read, READ_SUCCESS);
     }

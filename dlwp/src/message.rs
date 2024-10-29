@@ -104,6 +104,35 @@ pub fn valid_message_string(string: &String, encrypted: bool) -> bool {
     true
 }
 
+/// Adds and removes characters before being sent to a distributor or driver, this will replace all occurences of ``\0`` to ``\\0``
+#[inline]
+pub fn fmt_message_send(msg: &String) -> String {
+    format!("{}{}{}", MSG_INIT, msg.replace("\0", ""), MSG_END)
+}
+
+/// Adds and removes characters from sending, this will replace all occurrences of ``\\0`` to ``\0``
+#[inline]
+pub fn fmt_message_recv(recv: &String) -> String {
+    let split_first = recv.split(MSG_INIT).collect::<Vec<&str>>();
+    if split_first.len() != 2 {
+        return recv.clone();
+    }
+
+    let split_second = split_first[1].split(MSG_END).collect::<Vec<&str>>();
+    split_second[0].replace("\0", "")
+}
+
+/// Calls ``fmt_message_recv(recv)`` but removes any strings that might have been added by the sender
+#[inline]
+pub fn fmt_message_recv_rm(recv: String, remove: Vec<&str>) -> String {
+    let mut fmt_recv = recv;
+    for i in 0..remove.len() {
+        fmt_recv = fmt_recv.replace(remove[i], "");
+    }
+
+    fmt_message_recv(&fmt_recv)
+}
+
 /// Struct containing information about the receiver
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ReceiveInfo {

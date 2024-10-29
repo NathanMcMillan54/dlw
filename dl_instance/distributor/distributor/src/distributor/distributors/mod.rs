@@ -138,6 +138,7 @@ impl DarkLightDistributor {
                         }
 
                         if self.external_pending_messages.contains_key(&(self.tcp_distributors[j].info.id as u64)) {
+                            println!("writing to external distributor");
                             self.tcp_distributor_write(j, self.external_pending_messages[&(self.tcp_distributors[j].info.id as u64)].message_str.clone());
                             self.external_pending_messages.remove(&(self.tcp_distributors[j].info.id as u64));
                         }

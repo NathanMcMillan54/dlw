@@ -5,7 +5,7 @@ use dlwp::distributor::{GET_DISTRIBUTOR, READ_AVAILABLE, USER_INIT};
 use dlwp::id::distributor_id;
 use dlwp::id::*;
 use dlwp::io::{DLSerialIO, DLIO, DLTCPIO};
-use dlwp::message::Message;
+use dlwp::message::{fmt_message_send, fmt_message_recv_rm, fmt_message_recv, Message};
 use dlwp::serialport::posix::TTYPort;
 use std::fmt::{Debug, Formatter};
 use std::fs::{remove_file, File};
@@ -302,18 +302,20 @@ impl StreamsHandler {
                         return;
                     } else {
                         let io_method = self.io_method.as_mut().unwrap();
-                        io_method._write(format!(
+                        /*io_method._write(format!(
                             "\\z {} \\q",
                             self.stream_info[i].pending.remove(0).replace("\0", "")
-                        ));
+                        ));*/
+
+                        println!("sending");
+                        io_method._write(fmt_message_send(&self.stream_info[i].pending.remove(0)));
                     }
                 }
             }
 
             let io_method = self.io_method.as_mut().unwrap();
             let mut read = io_method._read();
-            read.0 = read.0.replace("\0", "");
-            //println!("read: {}", read.0);
+            read.0 = fmt_message_recv(&read.0);
 
             if read.1 == READ_SUCCESS {
                 let ri = Message::get_ri_from_encoded(&read.0);
