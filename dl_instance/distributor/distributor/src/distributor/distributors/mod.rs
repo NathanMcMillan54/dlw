@@ -129,18 +129,15 @@ impl DarkLightDistributor {
 
                 let ri = ReceiveInfo::get_from_message_string(read.clone());
                 if ri.rdid == self.info.id {
-                    println!("for a local user");
                     self.local_pending_messages.insert(ri.rid, PendingMessage::new(true, self.info.id, read.clone()));
                     continue;
                 } else {
                     for j in 0..self.tcp_distributors.len() {
-                        println!("indexing");
                         if self.tcp_distributors[j].info.id == ri.rdid {
                             self.tcp_distributor_write(j, read.clone());
                         }
 
                         if self.external_pending_messages.contains_key(&(self.tcp_distributors[j].info.id as u64)) {
-                            println!("writing to external distributor");
                             self.tcp_distributor_write(j, self.external_pending_messages[&(self.tcp_distributors[j].info.id as u64)].message_str.clone());
                             self.external_pending_messages.remove(&(self.tcp_distributors[j].info.id as u64));
                         }
