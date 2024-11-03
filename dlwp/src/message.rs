@@ -114,7 +114,7 @@ pub fn fmt_message_send(msg: &String) -> String {
 #[inline]
 pub fn fmt_message_recv(recv: &String) -> String {
     let split_first = recv.split(MSG_INIT).collect::<Vec<&str>>();
-    if split_first.len() != 2 {
+    if split_first.len() < 2 {
         return recv.clone();
     }
 

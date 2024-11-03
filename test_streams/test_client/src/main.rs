@@ -15,7 +15,7 @@ fn main() {
         // Add the client/server's ID and the Distributor ID
         dlwp::stream::StreamType::Client {
             rid: 9711410197108107101,
-            rdid: 4,
+            rdid: 3,
             port: 5000,
         },
         false,

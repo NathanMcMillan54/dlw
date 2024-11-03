@@ -129,10 +129,12 @@ impl DarkLightDistributor {
 
                 let ri = ReceiveInfo::get_from_message_string(read.clone());
                 if ri.rdid == self.info.id {
+                    println!("for a local user");
                     self.local_pending_messages.insert(ri.rid, PendingMessage::new(true, self.info.id, read.clone()));
                     continue;
                 } else {
                     for j in 0..self.tcp_distributors.len() {
+                        println!("indexing");
                         if self.tcp_distributors[j].info.id == ri.rdid {
                             self.tcp_distributor_write(j, read.clone());
                         }
