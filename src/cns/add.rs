@@ -20,7 +20,7 @@ unsafe fn add0(split: Vec<&str>) -> (String, Code) {
         if encoder.setting_good() {
             for i in 0..NAMES_LIST.list.len() {
                 let mut dates = vec![];
-                
+
                 if NAMES_LIST.list[i].current_dlu_key
                     == libcerpton_decode(
                         [
@@ -72,24 +72,25 @@ unsafe fn add0(split: Vec<&str>) -> (String, Code) {
                 {
                     dates.push(NAMES_LIST.list[i].date.to_vec());
                 } /*else {
-			println!("already used date");
-                    return (String::from("INVALID"), REGULAR_RESPONSE);
-                }*/
+                  println!("already used date");
+                          return (String::from("INVALID"), REGULAR_RESPONSE);
+                      }*/
 
                 return match dates.len() {
-                    0 => {
-                        (String::from("ALLOW_ADD0 0"), REGULAR_RESPONSE)
-                    },
+                    0 => (String::from("ALLOW_ADD0 0"), REGULAR_RESPONSE),
                     _ => {
                         let utc = Utc::now();
 
-                        if dates.last().unwrap()[1] as u32 != utc.month() || dates.last().unwrap()[1] as u32 != utc.month() && dates.last().unwrap()[2] != utc.year() {
+                        if dates.last().unwrap()[1] as u32 != utc.month()
+                            || dates.last().unwrap()[1] as u32 != utc.month()
+                                && dates.last().unwrap()[2] != utc.year()
+                        {
                             (format!("ALLOW_ADD0 {}", dates.len()), REGULAR_RESPONSE)
                         } else {
                             (String::from("Recently registered a name"), REGULAR_RESPONSE)
                         }
                     }
-                }
+                };
             }
 
             return (String::from("ALLOW_ADD0 0"), REGULAR_RESPONSE);
@@ -110,7 +111,10 @@ unsafe fn add1(split: Vec<&str>, ti: TransmitInfo) -> (String, Code) {
     let port = split[7].parse::<u16>();
 
     if s1.is_err() || s2.is_err() || s3.is_err() || port.is_err() {
-        println!("Error parsing nums {:?} {:?} {:?} {:?}", split[1], split[2], split[3], port);
+        println!(
+            "Error parsing nums {:?} {:?} {:?} {:?}",
+            split[1], split[2], split[3], port
+        );
         return (String::from("INVALID"), INVALID_RR);
     }
 
@@ -118,9 +122,39 @@ unsafe fn add1(split: Vec<&str>, ti: TransmitInfo) -> (String, Code) {
     encoder.set_alphabet();
 
     if encoder.setting_good() {
-        let current_key = libcerpton_decode([s1.clone().unwrap(), s2.clone().unwrap(), s3.clone().unwrap(), 0, 0, 0], split[4].to_string());
-        let og_key = libcerpton_decode([s1.clone().unwrap(), s2.clone().unwrap(), s3.clone().unwrap(), 0, 0, 0], split[5].to_string());
-        let name = libcerpton_decode([s1.clone().unwrap(), s2.clone().unwrap(), s3.clone().unwrap(), 0, 0, 0], split[6].to_string());
+        let current_key = libcerpton_decode(
+            [
+                s1.clone().unwrap(),
+                s2.clone().unwrap(),
+                s3.clone().unwrap(),
+                0,
+                0,
+                0,
+            ],
+            split[4].to_string(),
+        );
+        let og_key = libcerpton_decode(
+            [
+                s1.clone().unwrap(),
+                s2.clone().unwrap(),
+                s3.clone().unwrap(),
+                0,
+                0,
+                0,
+            ],
+            split[5].to_string(),
+        );
+        let name = libcerpton_decode(
+            [
+                s1.clone().unwrap(),
+                s2.clone().unwrap(),
+                s3.clone().unwrap(),
+                0,
+                0,
+                0,
+            ],
+            split[6].to_string(),
+        );
 
         let utc = Utc::now();
 
@@ -130,7 +164,12 @@ unsafe fn add1(split: Vec<&str>, ti: TransmitInfo) -> (String, Code) {
             }
         }
 
-        if !name.starts_with("info.") && !name.starts_with("visu.") && !name.ends_with(".org") && !name.ends_with(".com") && !name.ends_with(".prs") {
+        if !name.starts_with("info.")
+            && !name.starts_with("visu.")
+            && !name.ends_with(".org")
+            && !name.ends_with(".com")
+            && !name.ends_with(".prs")
+        {
             return (String::from("Name is invalid"), REGULAR_RESPONSE);
         }
 

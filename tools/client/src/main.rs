@@ -1,7 +1,17 @@
-use std::{io::{stdin, stdout, Write}, thread::{self, sleep}, time::Duration};
+use std::{
+    io::{stdin, stdout, Write},
+    thread::{self, sleep},
+    time::Duration,
+};
 
 use dlcns::get::CNSGet;
-use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::Code, encryption::EncryptionInfo, message::contents_to_string, stream::{Stream, StreamType}};
+use dlwp::{
+    cerpton::{libcerpton_decode, libcerpton_encode},
+    codes::Code,
+    encryption::EncryptionInfo,
+    message::contents_to_string,
+    stream::{Stream, StreamType},
+};
 
 fn cmd_input() -> String {
     print!("> ");
@@ -19,7 +29,7 @@ fn connect_by_id() -> Stream {
     let mut id = 0;
     let mut did = 0;
     let mut port = 0;
-    
+
     for i in 0..3 {
         println!("Enter stream {}\n", parts[i]);
 
@@ -38,7 +48,14 @@ fn connect_by_id() -> Stream {
         }
     }
 
-    Stream::new(StreamType::Client { rid: id, rdid: did, port: port }, false)
+    Stream::new(
+        StreamType::Client {
+            rid: id,
+            rdid: did,
+            port: port,
+        },
+        false,
+    )
 }
 
 fn connect_by_name() -> Stream {
@@ -49,11 +66,21 @@ fn connect_by_name() -> Stream {
     let cns_name = cns_get.get_id(name.clone());
 
     if cns_name.is_none() {
-        panic!("Failed to find \"{}\", the name could not be found or does not exist", name);
+        panic!(
+            "Failed to find \"{}\", the name could not be found or does not exist",
+            name
+        );
     }
 
     let owner = cns_name.unwrap();
-    Stream::new(StreamType::Client { rid: owner.id, rdid: owner.did, port: owner.port }, false)
+    Stream::new(
+        StreamType::Client {
+            rid: owner.id,
+            rdid: owner.did,
+            port: owner.port,
+        },
+        false,
+    )
 }
 
 fn main() {
@@ -86,7 +113,7 @@ fn main() {
     stream.add_encryption_info(EncryptionInfo {
         encode_function: libcerpton_encode,
         decode_function: libcerpton_decode,
-        info: setting
+        info: setting,
     });
     stream.start();
     sleep(Duration::from_millis(150));

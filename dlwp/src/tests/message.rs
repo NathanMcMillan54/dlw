@@ -68,12 +68,15 @@ fn test_string_message_conversions() {
 
 #[test]
 fn get_ri_from_message() {
-    let message_str = String::from_str("123345568 3 0 5000 \\|\\ ZZ5ZZZZZcZZHZ5ZЩь Z С Н Z Н \\|\\ 人T,66Н НZ74ь").unwrap();
+    let message_str = String::from_str(
+        "123345568 3 0 5000 \\|\\ ZZ5ZZZZZcZZHZ5ZЩь Z С Н Z Н \\|\\ 人T,66Н НZ74ь",
+    )
+    .unwrap();
     let ri = ReceiveInfo {
         rid: 123345568,
         rdid: 3,
         instance_id: 0,
-        port: 5000
+        port: 5000,
     };
 
     assert_eq!(ri, ReceiveInfo::get_from_message_string(message_str));

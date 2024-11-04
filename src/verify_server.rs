@@ -12,7 +12,14 @@ extern crate dlwp;
 extern crate serde;
 
 use std::{
-    fs::{read_to_string, File}, io::{Read, Write}, net::{Shutdown, TcpListener, TcpStream}, panic::{set_hook, PanicInfo}, path::Path, process::exit, thread::{self, sleep}, time::Duration
+    fs::{read_to_string, File},
+    io::{Read, Write},
+    net::{Shutdown, TcpListener, TcpStream},
+    panic::{set_hook, PanicInfo},
+    path::Path,
+    process::exit,
+    thread::{self, sleep},
+    time::Duration,
 };
 
 use dlwp::{
@@ -21,7 +28,10 @@ use dlwp::{
 };
 use fernet::Fernet;
 use rand::{thread_rng, Rng};
-use signal_hook::{consts::{SIGINT, SIGTERM}, iterator::Signals};
+use signal_hook::{
+    consts::{SIGINT, SIGTERM},
+    iterator::Signals,
+};
 
 // This should be a proper database someday
 const USER_KEYS_FILE: &str = "user_keys.json";
@@ -101,23 +111,18 @@ struct DistributorKey {
 
 impl DistributorKey {
     pub fn new(key: String, id: u64) -> Self {
-        return DistributorKey {
-            key,
-            id,
-        }
+        return DistributorKey { key, id };
     }
 }
 
 #[derive(Deserialize, Serialize)]
 struct DistirbutorKeys {
-    keys: Vec<DistributorKey>
+    keys: Vec<DistributorKey>,
 }
 
 impl DistirbutorKeys {
     pub const fn empty() -> Self {
-        return DistirbutorKeys {
-            keys: vec![],
-        };
+        return DistirbutorKeys { keys: vec![] };
     }
 }
 
@@ -184,7 +189,9 @@ fn add_key(mut client: TcpStream, input: Vec<&str>) {
         client.shutdown(Shutdown::Both);
     }
 
-    unsafe { USER_KEYS.unused_keys.push(input[3].to_string()); }
+    unsafe {
+        USER_KEYS.unused_keys.push(input[3].to_string());
+    }
     client.write(b"VALID");
     client.flush();
     client.shutdown(Shutdown::Both);
@@ -227,8 +234,22 @@ fn handle_client(mut client: TcpStream) {
 // Save all information before termination
 fn panic_handler(info: &PanicInfo) {
     unsafe {
-        File::options().write(true).open(USER_KEYS_FILE).unwrap().write_fmt(format_args!("{}", serde_json::to_string_pretty(&USER_KEYS).unwrap()));
-        File::options().write(true).open(DISTRIBUTOR_KEYS_FILE).unwrap().write_fmt(format_args!("{}", serde_json::to_string_pretty(&DISTRIBUTOR_KEYS).unwrap()));
+        File::options()
+            .write(true)
+            .open(USER_KEYS_FILE)
+            .unwrap()
+            .write_fmt(format_args!(
+                "{}",
+                serde_json::to_string_pretty(&USER_KEYS).unwrap()
+            ));
+        File::options()
+            .write(true)
+            .open(DISTRIBUTOR_KEYS_FILE)
+            .unwrap()
+            .write_fmt(format_args!(
+                "{}",
+                serde_json::to_string_pretty(&DISTRIBUTOR_KEYS).unwrap()
+            ));
     }
 
     println!("{:?}", info);
@@ -239,7 +260,9 @@ fn setup() {
     if Path::new(USER_KEYS_FILE).exists() {
         let file_contents = read_to_string(USER_KEYS_FILE).unwrap();
         let user_keys: UserKeys = serde_json::from_str(&file_contents).unwrap();
-        unsafe { USER_KEYS = user_keys; }
+        unsafe {
+            USER_KEYS = user_keys;
+        }
     } else {
         File::create(USER_KEYS_FILE).unwrap();
     }
@@ -247,7 +270,9 @@ fn setup() {
     if Path::new(DISTRIBUTOR_KEYS_FILE).exists() {
         let file_contents = read_to_string(DISTRIBUTOR_KEYS_FILE).unwrap();
         let distributor_keys = serde_json::from_str(&file_contents).unwrap();
-        unsafe { DISTRIBUTOR_KEYS = distributor_keys; }
+        unsafe {
+            DISTRIBUTOR_KEYS = distributor_keys;
+        }
     } else {
         File::create(DISTRIBUTOR_KEYS_FILE).unwrap();
     }

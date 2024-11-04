@@ -1,13 +1,28 @@
 // This is the "New key server" that is described in ``documentation/information_servers.md``
-// 
+//
 
-use std::{io::{Read, Write}, net::TcpStream, thread::sleep, time::Duration};
+use std::{
+    io::{Read, Write},
+    net::TcpStream,
+    thread::sleep,
+    time::Duration,
+};
 
-use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::REGULAR_RESPONSE, encryption::EncryptionInfo, message::TransmitInfo, stream::{Stream, StreamType}};
+use dlwp::{
+    cerpton::{libcerpton_decode, libcerpton_encode},
+    codes::REGULAR_RESPONSE,
+    encryption::EncryptionInfo,
+    message::TransmitInfo,
+    stream::{Stream, StreamType},
+};
 use fernet::Fernet;
 use rand::{thread_rng, Rng};
 
-const REQUEST_KEY: [&str; 3] = [env!("REQUEST_KEY1"), env!("REQUEST_KEY2"), env!("REQUEST_KEY3")];
+const REQUEST_KEY: [&str; 3] = [
+    env!("REQUEST_KEY1"),
+    env!("REQUEST_KEY2"),
+    env!("REQUEST_KEY3"),
+];
 const SETTING: [&str; 3] = [env!("S1"), env!("S2"), env!("S3")];
 
 #[cfg(not(debug_assertions))]
@@ -29,7 +44,7 @@ fn key() -> String {
 
 fn main() {
     let mut stream = Stream::new(StreamType::Server { port: 4998 }, false);
-    
+
     stream.add_encryption_info(EncryptionInfo {
         info: [2, 1, 2, 0, 0, 0],
         encode_function: libcerpton_encode,
@@ -48,7 +63,20 @@ fn main() {
             // TODO: Properly check that the client did not recently request a new key
             let mut verify_server = TcpStream::connect(VERIFY_SERVER).unwrap();
             let new_key = key();
-            let write = libcerpton_encode([SETTING[0].parse().unwrap(), SETTING[1].parse().unwrap(), SETTING[2].parse().unwrap(), 0, 0, 0], format!("{} {} {} {}", REQUEST_KEY[0], REQUEST_KEY[1], REQUEST_KEY[2], new_key));
+            let write = libcerpton_encode(
+                [
+                    SETTING[0].parse().unwrap(),
+                    SETTING[1].parse().unwrap(),
+                    SETTING[2].parse().unwrap(),
+                    0,
+                    0,
+                    0,
+                ],
+                format!(
+                    "{} {} {} {}",
+                    REQUEST_KEY[0], REQUEST_KEY[1], REQUEST_KEY[2], new_key
+                ),
+            );
             verify_server.write(write.as_bytes());
             verify_server.flush();
 

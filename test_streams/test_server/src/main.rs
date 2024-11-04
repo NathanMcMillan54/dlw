@@ -13,7 +13,7 @@ fn main() {
     stream.add_encryption_info(EncryptionInfo {
         encode_function: libcerpton_encode,
         decode_function: libcerpton_decode,
-        info: [2, 1, 2, 0, 0, 0]
+        info: [2, 1, 2, 0, 0, 0],
     });
     println!("starting");
     let ret = stream.start();

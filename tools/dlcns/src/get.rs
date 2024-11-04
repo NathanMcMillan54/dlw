@@ -55,7 +55,7 @@ impl CNSGet {
         return CNSGet {
             stream,
             received: vec![],
-            timeout: Duration::from_millis(5000)
+            timeout: Duration::from_millis(5000),
         };
     }
 
@@ -67,14 +67,14 @@ impl CNSGet {
                 break;
             }
 
-            self.stream
-                .write(write.clone(), REQUEST_RESPONSE);
+            self.stream.write(write.clone(), REQUEST_RESPONSE);
             read = self.stream.read();
 
             if read.is_empty() == false {
                 if contents_to_string(read[0].contents)
                     .replace("\0", "")
-                    .is_empty() || read[0].ti.code == REQUEST_CONNECTION.value()
+                    .is_empty()
+                    || read[0].ti.code == REQUEST_CONNECTION.value()
                 {
                     read.clear();
                 } else {
@@ -118,7 +118,7 @@ impl CNSGet {
         if response.is_empty() {
             return None;
         }
-        
+
         let split_response = response.split(" ").collect::<Vec<&str>>();
 
         if split_response.len() < 5 {

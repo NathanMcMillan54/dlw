@@ -1,6 +1,13 @@
 use std::fs::read_to_string;
 
-use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::{FILE_RESPONSE, REQUEST_CONNECTION, REQUEST_FILE}, encryption::EncryptionInfo, id::Port, message::contents_to_string, stream::Stream};
+use dlwp::{
+    cerpton::{libcerpton_decode, libcerpton_encode},
+    codes::{FILE_RESPONSE, REQUEST_CONNECTION, REQUEST_FILE},
+    encryption::EncryptionInfo,
+    id::Port,
+    message::contents_to_string,
+    stream::Stream,
+};
 
 #[cfg(feature = "visu_dl")]
 const PORT: Port = 5000;
@@ -41,13 +48,16 @@ fn main() {
                 continue;
             }
 
-            let contents = contents_to_string(read.contents).replace("\0", "").replace(" ", "");
+            let contents = contents_to_string(read.contents)
+                .replace("\0", "")
+                .replace(" ", "");
             if contents.contains("../") || contents.starts_with("/") {
                 continue;
             }
 
             if read.ti.code == REQUEST_FILE.value() {
-                if HTML_FILES.contains(&contents.as_str()) || TXT_FILES.contains(&contents.as_str()) {
+                if HTML_FILES.contains(&contents.as_str()) || TXT_FILES.contains(&contents.as_str())
+                {
                     let file = read_to_string(format!("darklight-text/{}", contents)).unwrap();
                     stream.server_write(read.ti, file.replace("\n", "\\n"), FILE_RESPONSE);
                 }

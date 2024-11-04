@@ -1,6 +1,6 @@
 use crate::id::DId;
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Deserialize, Serialize, Clone, Copy)]
 pub struct DLConfig {
     /// Using TCP for communication
     pub tcp: bool,

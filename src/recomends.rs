@@ -1,8 +1,13 @@
 use std::{fs::read_to_string, thread::sleep, time::Duration};
 
-use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::REGULAR_RESPONSE, encryption::EncryptionInfo, stream::{Stream, StreamType}};
-use serde::{Deserialize, Serialize};
 use dlwp::serde_json;
+use dlwp::{
+    cerpton::{libcerpton_decode, libcerpton_encode},
+    codes::REGULAR_RESPONSE,
+    encryption::EncryptionInfo,
+    stream::{Stream, StreamType},
+};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
 struct Version {
@@ -27,7 +32,8 @@ fn main() {
     });
 
     let current_file = read_to_string("recomendations.json").unwrap();
-    let verify_file_valid: Result<Recomendations, serde_json::Error> = serde_json::from_str(&current_file);
+    let verify_file_valid: Result<Recomendations, serde_json::Error> =
+        serde_json::from_str(&current_file);
 
     if verify_file_valid.is_err() {
         panic!("Recomendations file is not valid json");

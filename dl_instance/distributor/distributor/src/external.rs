@@ -83,7 +83,7 @@ pub trait ExternalDistributorRW {
         unimplemented!()
     }
 
-    ///  Call this early when the distributor is being setup, if the external distributor connects properly, send 
+    ///  Call this early when the distributor is being setup, if the external distributor connects properly, send
     /// "DIST_INIT" and start ``self.verify_distributor``
     fn attempt_connect(&mut self) -> bool {
         unimplemented!()

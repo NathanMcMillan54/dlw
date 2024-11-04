@@ -20,18 +20,31 @@ pub fn get_cns_info(inputs: Vec<&str>) -> String {
             match inputs[0] {
                 "GET_ID" => {
                     if &NAMES_LIST.list[i].owner.name == inputs[1] {
-                        return format!("{} {} {} {} {}", NAMES_LIST.list[i].owner.id, NAMES_LIST.list[i].owner.did, NAMES_LIST.list[i].owner.port, NAMES_LIST.list[i].owner.name, NAMES_LIST.list[i].owner.name_type)
+                        return format!(
+                            "{} {} {} {} {}",
+                            NAMES_LIST.list[i].owner.id,
+                            NAMES_LIST.list[i].owner.did,
+                            NAMES_LIST.list[i].owner.port,
+                            NAMES_LIST.list[i].owner.name,
+                            NAMES_LIST.list[i].owner.name_type
+                        );
                     }
-                },
+                }
                 "GET_ALL_NAMES" => {
                     // TODO: Implement large file reading
-                },
+                }
                 "GET_NAME" => {
-                    if NAMES_LIST.list[i].owner.did == location[0] as u32 && NAMES_LIST.list[i].owner.id == location[1] as u64 && NAMES_LIST.list[i].owner.port == location[2] as u16 {
-                        return format!("{} {}", NAMES_LIST.list[i].owner.name, NAMES_LIST.list[i].owner.name_type);
+                    if NAMES_LIST.list[i].owner.did == location[0] as u32
+                        && NAMES_LIST.list[i].owner.id == location[1] as u64
+                        && NAMES_LIST.list[i].owner.port == location[2] as u16
+                    {
+                        return format!(
+                            "{} {}",
+                            NAMES_LIST.list[i].owner.name, NAMES_LIST.list[i].owner.name_type
+                        );
                     }
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
     }

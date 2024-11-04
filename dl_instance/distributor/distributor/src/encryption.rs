@@ -1,6 +1,9 @@
 use std::time::Duration;
 
-use dlwp::{chrono::{DateTime, NaiveTime, Timelike, Utc}, encryption::EncryptionInfo};
+use dlwp::{
+    chrono::{DateTime, NaiveTime, Timelike, Utc},
+    encryption::EncryptionInfo,
+};
 
 /// Holds encryption info for the distributor that can be updated regularly
 pub struct DistributorEncryption {
@@ -12,14 +15,18 @@ pub struct DistributorEncryption {
 
 impl DistributorEncryption {
     /// ``update_interval`` should be larger than 1 second
-    pub fn new(info: EncryptionInfo, update_interval: Duration, update_fn: fn(EncryptionInfo) -> EncryptionInfo) -> Self {
+    pub fn new(
+        info: EncryptionInfo,
+        update_interval: Duration,
+        update_fn: fn(EncryptionInfo) -> EncryptionInfo,
+    ) -> Self {
         let time = Utc::now().time();
 
         return DistributorEncryption {
             info,
             update_interval,
             last_update: time,
-            update_fn
+            update_fn,
         };
     }
 

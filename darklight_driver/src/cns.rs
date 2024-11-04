@@ -169,7 +169,13 @@ pub fn cns_add(input: Vec<&str>) {
             stream.write(
                 format!(
                     "REQUEST_ADD1 {} {} {} {} {} {} {}",
-                    setting[0], setting[1], setting[2], current_key, first_key, libcerpton_encode(setting, name.clone()), input[1]
+                    setting[0],
+                    setting[1],
+                    setting[2],
+                    current_key,
+                    first_key,
+                    libcerpton_encode(setting, name.clone()),
+                    input[1]
                 ),
                 REQUEST_RESPONSE,
             );
