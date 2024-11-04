@@ -17,6 +17,8 @@ use std::{
     time::Duration,
 };
 
+use super::file::StreamFile;
+
 #[allow(improper_ctypes_definitions)]
 fn empty_encryption_function(_i: [i32; 6], s: String) -> String {
     s
@@ -100,6 +102,7 @@ pub struct Stream {
     pub encryption: EncryptionInfo,
     /// Store sent and received messages
     pub history: bool,
+    pub file: StreamFile,
     // For servers
     connections: Connections,
     instance_id: InstanceID,
@@ -114,6 +117,7 @@ impl Stream {
             stream_type,
             encryption: EMPTY_ENCRYPTIONIFNO,
             history,
+            file: StreamFile::default(),
             connections: Connections::empty(),
             instance_id: 0,
             received_messages: vec![],
@@ -390,6 +394,12 @@ impl Stream {
     /// Starts the ``Stream``. If ``self.stream_type`` is ``Client`` it will try to connect to server/client, if it is
     /// ``Server`` it will allow connections on the port used in ``Server``.
     pub fn start(&mut self) -> Code {
+        let id = self.stream_type.rid();
+        self.file.id = id;
+        self.file.did = self.stream_type.rdid();
+        self.file.port = self.stream_type.port();
+        self.file.encryption_info = self.encryption.info;
+
         let ret = if self.stream_type.is_client() {
             self._client_start()
         } else {

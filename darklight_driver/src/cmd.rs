@@ -1,7 +1,8 @@
 use crate::cns::cns_add;
 use crate::driver::DarkLightDriver;
-use crate::streams::{Stream, StreamInfo, StreamsHandler};
+use crate::streams::{StreamInfo, StreamsHandler};
 use dlwp::id::local_user_id;
+use dlwp::stream::file::StreamFile;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::thread::{sleep, spawn};
@@ -87,7 +88,7 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
                         println!("If this stream is on a different distributor, see issue #(n)");
                         return;
                     } else {
-                        driver.streams_handler.stream_info.insert(stream_info, Stream::new([day, week, month, 0, 0, 0]));
+                        driver.streams_handler.stream_info.insert(stream_info, StreamFile::new(rid, port, rdid, [day, week, month, 0, 0, 0]));
                     }
 
                     println!("Added {}-{} to stream handler", rid, port);
@@ -122,25 +123,6 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
 
                     let stream = driver.streams_handler.stream_info.get_mut(&stream_info).unwrap();
                     stream.pending.push(message_str);
-
-/*                     for j in 0..driver.streams_handler.stream_info.len() {
-                        if driver.streams_handler.stream_info[j].rid == rid
-                            && driver.streams_handler.stream_info[j].rdid == rdid
-                            && driver.streams_handler.stream_info[j].instance_id == instance_id
-                        {
-                            driver.streams_handler.stream_info[j]
-                                .pending
-                                .push(message_str.clone());
-                            driver.streams_handler.remove_stream_file(
-                                driver.streams_handler.stream_info[j].rid,
-                                driver.streams_handler.stream_info[j].port,
-                            );
-                            driver.streams_handler.create_stream_file(
-                                driver.streams_handler.stream_info[j].rid,
-                                driver.streams_handler.stream_info[j].port,
-                            );
-                        }
-                    }*/
                 }
                 "DISCONNECT" => {
                     println!("disconnect arguments: {:?}", inputs);
@@ -163,8 +145,8 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
                     sleep(Duration::from_millis(700));
 
                     if driver.streams_handler.stream_info.contains_key(&stream_info) {
-                        stream_info.remove_file();
-                        driver.streams_handler.stream_info.remove(&stream_info).expect("Failed to remove");
+                        let stream = driver.streams_handler.stream_info.remove(&stream_info).expect("Failed to remove");
+                        stream.remove();
                     }
                 }
                 "REQUEST-ADD-NAME" => {
@@ -172,7 +154,7 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
                     println!("Shutting down all streams...");
 
                     for (info, stream) in driver.streams_handler.stream_info.iter() {
-                        info.remove_file();
+                        stream.remove();
                     }
                     driver.streams_handler.stream_info.clear();
 
