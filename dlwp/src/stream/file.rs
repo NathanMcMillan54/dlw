@@ -2,13 +2,13 @@ use std::{fs::{read_to_string, remove_file, File}, io::Write, path::Path};
 
 use crate::id::{DId, LId, Port};
 
-#[derive(Deserialize, Serialize, Default)]
+#[derive(Deserialize, Serialize, Default, Clone)]
 pub struct ReceivedMessage {
     pub recv_time: [u8; 3],
     pub message: String,
 }
 
-#[derive(Deserialize, Serialize, Default)]
+#[derive(Deserialize, Serialize, Default, Clone)]
 pub struct StreamFile {
     pub id: LId,
     pub port: Port,

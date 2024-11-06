@@ -6,12 +6,12 @@ use std::{
     net::TcpStream,
     path::Path,
     process::exit,
-    thread,
+    thread::{self, sleep},
     time::Duration,
 };
 
 use dlwp::{config::DLConfig, serialport::posix::TTYPort};
-use driver::{DarkLightDriver, Test};
+use driver::DarkLightDriver;
 use streams::StreamsHandler;
 
 pub(crate) mod cmd;
@@ -68,6 +68,12 @@ fn files_setup() -> bool {
 
     create_dir("/tmp/darklight/").unwrap();
     create_dir("/tmp/darklight/connections/").unwrap();
+    File::options()
+        .read(true)
+        .write(true)
+        .create(true)
+        .open("/tmp/darklight/cmd_input")
+        .unwrap();
 
     return true;
 }
@@ -113,10 +119,7 @@ fn main() {
         panic!("\"closed\" and \"serial\" or \"tcp\" are set to true when only one should be");
     }
 
-    let mut darklight_driver = DarkLightDriver::new(
-        StreamsHandler::new(),
-        config,
-    );
+    let mut darklight_driver = DarkLightDriver::new(StreamsHandler::new(), config);
 
     if config.serial == true {
         let settings = dlwp::serialport::SerialPortSettings {
@@ -136,7 +139,11 @@ fn main() {
         darklight_driver.tcp_stream = Some(tcp_stream);
     }
 
+    darklight_driver.connect_to_distributor();
+
     loop {
-        thread::sleep(Duration::from_millis(1500));
+        cmd::check_cmd_input(&mut darklight_driver);
+
+        sleep(Duration::from_millis(10));
     }
 }

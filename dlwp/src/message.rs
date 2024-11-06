@@ -208,6 +208,34 @@ impl TransmitInfo {
             port,
         }
     }
+
+    pub fn get_from_message_string(message: String) -> Self {
+        let msg_split = split_from_info(&message);
+
+        if msg_split.len() != 3 && msg_split.len() != 2 {
+            return TransmitInfo::empty();
+        }
+
+        let info_split = msg_split[1].split(' ').collect::<Vec<&str>>();
+
+        if info_split.len() != 4 {
+            return TransmitInfo::empty();
+        }
+
+        let tid = info_split[0].parse::<u64>();
+        let code = info_split[1].parse::<u16>();
+        let tdid = info_split[2].parse::<u32>();
+
+        if tid.is_err() || code.is_err() || tdid.is_err() {
+            return TransmitInfo::empty();
+        } else {
+            return TransmitInfo {
+                tid: tid.unwrap(),
+                code: code.unwrap(),
+                tdid: tdid.unwrap(),
+            };
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -375,7 +403,7 @@ impl Message {
             };
         }
 
-        ret_message.contents = string_to_contents(contents.to_owned());
+        ret_message.contents = string_to_contents(contents.to_owned().replace("\0", "\\0"));
 
         ret_message
     }

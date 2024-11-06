@@ -277,10 +277,11 @@ impl Stream {
     }
 
     /// Writes a ``Message`` to the stream (client)
-    pub fn write_message(&self, message: Message) {
+    pub fn write_message(&mut self, message: Message) {
         let encoded = message.encode(self.encryption);
 
-        send_dlcmd(SEND, encoded.split(" ").collect::<Vec<&str>>());
+        self.file.pending.push(encoded.replace("\0", ""));
+        self.file.write();
     }
 
     /// When a server receives a message, it should use the transmit info to respond by calling this function
@@ -299,7 +300,7 @@ impl Stream {
     }
 
     // Write a ``String`` to a client
-    pub fn write(&self, write: String, code: Code) {
+    pub fn write(&mut self, write: String, code: Code) {
         if self.stream_type.is_client() {
             self.write_message(Message {
                 ri: ReceiveInfo {
@@ -316,7 +317,7 @@ impl Stream {
                 day: self.encryption.info[0],
                 week: self.encryption.info[1],
                 month: self.encryption.info[2],
-                contents: string_to_contents(write),
+                contents: string_to_contents(write.replace("\0", "\\0")),
             });
         }
     }
@@ -347,6 +348,7 @@ impl Stream {
     fn _client_start(&mut self) -> Code {
         let decode_info = self.encryption.info;
 
+        println!("sending");
         // Create a stream
         send_dlcmd(
             CONNECT,
