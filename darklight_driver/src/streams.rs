@@ -27,7 +27,7 @@ impl StreamsHandler {
         };
     }
 
-    pub fn handle_local_streams(&mut self) {
+    pub fn read_local_streams(&mut self) {
         for (stream, file) in self.streams.iter_mut() {
             file.read_and_set();
         }
@@ -40,5 +40,7 @@ impl StreamsHandler {
             .unwrap()
             .received
             .push(message);
+
+        self.streams[&streaminfo].write();
     }
 }

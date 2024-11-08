@@ -143,6 +143,8 @@ fn main() {
 
     loop {
         cmd::check_cmd_input(&mut darklight_driver);
+        darklight_driver.streams_handler.read_local_streams();
+        darklight_driver.send_to_distributor();
 
         sleep(Duration::from_millis(10));
     }

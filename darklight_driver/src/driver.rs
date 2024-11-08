@@ -13,7 +13,7 @@ use dlwp::{
 use std::{
     borrow::{Borrow, BorrowMut},
     io::{Read, Write},
-    net::TcpStream,
+    net::TcpStream, thread::sleep, time::Duration,
 };
 
 pub struct DarkLightDriver {
@@ -235,6 +235,7 @@ pub fn wait_for_distributor<R: Read>(mut stream: &mut R) -> Option<String> {
 
     while read_bytes == [0; 4096] {
         read_bytes = read(stream);
+        sleep(Duration::from_micros(500));
     }
 
     let read_str = contents_to_string(read_bytes);

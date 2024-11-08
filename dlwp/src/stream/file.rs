@@ -1,11 +1,17 @@
 use std::{fs::{read_to_string, remove_file, File}, io::Write, path::Path};
 
-use crate::id::{DId, LId, Port};
+use crate::{id::{DId, LId, Port}, message::Message};
 
 #[derive(Deserialize, Serialize, Default, Clone)]
 pub struct ReceivedMessage {
     pub recv_time: [u8; 3],
     pub message: String,
+}
+
+/// Used by ``Stream``
+pub struct ReadMessage {
+    pub recv_time: [u8; 3],
+    pub message: Message,
 }
 
 #[derive(Deserialize, Serialize, Default, Clone)]
@@ -20,7 +26,7 @@ pub struct StreamFile {
 
 impl StreamFile {
     pub fn new(id: LId, port: Port, did: DId, info: [i32; 6]) -> Self {
-        return StreamFile {
+        let file = StreamFile {
             id,
             port,
             did,
@@ -28,6 +34,9 @@ impl StreamFile {
             received: vec![],
             pending: vec![],
         };
+
+        file.create();
+        return file;
     }
 
     pub fn exists(&self) -> bool {
@@ -35,7 +44,7 @@ impl StreamFile {
     }
 
     pub fn create(&self) {
-        File::options().read(true).write(true).create(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).expect("Failed to create file");
+        File::options().read(true).write(true).create(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).expect("Failed to create file").write_fmt(format_args!("{}", serde_json::to_string(&self).expect("Failed to parse"))).expect("Failed to write to stream file");
     }
 
     pub fn remove(&self) {
@@ -47,9 +56,15 @@ impl StreamFile {
         ret
     }
 
-    pub fn read_and_set(&mut self) {
+    pub fn read_and_parse(&self) -> StreamFile {
         let current_contents = self.read();
         let contents_json: StreamFile = serde_json::from_str(&current_contents).expect("Failed to parse stream file");
+
+        return contents_json;
+    }
+
+    pub fn read_and_set(&mut self) {
+        let contents_json = self.read_and_parse();
 
         self.received = contents_json.received;
         self.pending = contents_json.pending;

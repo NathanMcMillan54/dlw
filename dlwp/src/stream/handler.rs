@@ -17,7 +17,7 @@ use std::{
     time::Duration,
 };
 
-use super::file::StreamFile;
+use super::file::{ReadMessage, ReceivedMessage, StreamFile};
 
 #[allow(improper_ctypes_definitions)]
 fn empty_encryption_function(_i: [i32; 6], s: String) -> String {
@@ -228,49 +228,53 @@ impl Stream {
         self.sent_messages.clear();
     }
 
-    pub fn _read(&self) -> Vec<String> {
+    pub fn _read(&mut self) -> Vec<ReceivedMessage> {
         if self.wait_for_stream_file() == STREAM_FILE_NOT_FOUND {
             return vec![];
         }
 
-        let reader = BufReader::new(
-            File::options()
-                .read(true)
-                .open(&format!(
-                    "/tmp/darklight/connections/_dl_{}-{}",
-                    self.stream_type.rid(),
-                    self.stream_type.port()
-                ))
-                .unwrap(),
-        );
-        let mut ret = vec![];
+        self.file.read_and_set();
 
-        for line in reader.lines() {
-            if line.is_ok() {
-                ret.push(line.unwrap());
+        self.file.received.clone()
+    }
+
+    pub fn read(&mut self) -> Vec<Message> {
+        let mut ret = vec![];
+        let received_messages = self._read();
+        if received_messages.is_empty() {
+            return ret;
+        }
+
+        for i in 0..received_messages.len() {
+            let message = Message::decode(&received_messages[i].message, self.encryption);
+            if message == Message::empty() {
+                continue;
             }
+
+            ret.push(message);
         }
 
         ret
     }
 
-    pub fn read(&mut self) -> Vec<Message> {
+    // Returns all messages with the time they were received (hour, minute, second)
+    pub fn read_with_timestamp(&mut self) -> Vec<ReadMessage> {
         let mut ret = vec![];
-        let strings = self._read();
+        let received_messages = self._read();
+        if received_messages.is_empty() {
+            return ret;
+        }
 
-        if !strings.is_empty() {
-            for i in 0..strings.len() {
-                let received_message = Message::decode(&strings[i].to_owned(), self.encryption);
-                //let received_message = Message::from_string(&strings[i].to_owned());
-                ret.push(received_message);
+        for i in 0..received_messages.len() {
+            let message = Message::decode(&received_messages[i].message, self.encryption);
+            if message == Message::empty() {
+                continue;
             }
 
-            File::create(format!(
-                "/tmp/darklight/connections/_dl_{}-{}",
-                self.stream_type.rid(),
-                self.stream_type.port()
-            ))
-            .unwrap();
+            ret.push(ReadMessage {
+                recv_time: received_messages[i].recv_time,
+                message
+            });
         }
 
         ret
