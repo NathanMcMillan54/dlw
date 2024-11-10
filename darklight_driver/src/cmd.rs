@@ -1,7 +1,7 @@
 use crate::cns::cns_add;
 use crate::driver::DarkLightDriver;
 use crate::streams::{StreamInfo, StreamsHandler};
-use dlwp::id::local_user_id;
+use dlwp::id::{local_user_id, DId, LId, Port};
 use dlwp::stream::file::StreamFile;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read, Write};
@@ -154,6 +154,32 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
                         .expect("Failed to remove");
                     stream.remove();
                 }
+            }
+            "CLR_RECV" => {
+                println!("here!");
+                let did = inputs[1].parse::<DId>();
+                let id_parse = inputs[2].parse::<LId>();
+                let port = inputs[3].parse::<Port>();
+
+                if did.is_err() || id_parse.is_err() || port.is_err() {
+                    println!("Failed to parse arguments: {:?}", inputs);
+                }
+                let id = id_parse.unwrap();
+
+                let streaminfo = StreamInfo {
+                    id: id,
+                    port: port.unwrap(),
+                    did: did.unwrap(),
+                    local: id == local_user_id().unwrap()
+                };
+
+                if !driver.streams_handler.streams.contains_key(&streaminfo) {
+                    println!("Stream: {:?} does not exist", streaminfo);
+                }
+
+                println!("cleared");
+                driver.streams_handler.streams.get_mut(&streaminfo).unwrap().received.clear();
+                driver.streams_handler.streams.get_mut(&streaminfo).unwrap().write_received();
             }
             "REQUEST-ADD-NAME" => {
                 println!("Requested to add a name");

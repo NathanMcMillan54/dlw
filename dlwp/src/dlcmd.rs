@@ -2,6 +2,8 @@ use std::fs::File;
 use std::io::{Seek, SeekFrom, Write};
 
 pub(crate) const SEND: &str = "SEND";
+pub(crate) const CLEAR_RECV: &str = "CLR_RECV";
+pub(crate) const CLEAR_PENDING: &str = "CLR_PNDNG";
 pub(crate) const CONNECT: &str = "CONNECT";
 pub(crate) const DISCONNECT: &str = "DISCONNECT";
 
