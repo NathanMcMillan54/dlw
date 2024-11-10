@@ -70,13 +70,32 @@ impl StreamFile {
         self.pending = contents_json.pending;
     }
 
+    pub fn write_pending(&self) {
+        let mut current_json = self.read_and_parse();
+        self.remove();
+        self.create();
+        current_json.pending = self.pending.clone();
+
+        let mut file = File::options().write(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).unwrap();
+
+        file.write_fmt(format_args!("{}", serde_json::to_string_pretty(&current_json).unwrap())).unwrap();
+        file.flush().unwrap();
+    }
+
+    pub fn write_received(&self) {
+        let mut current_json = self.read_and_parse();
+        self.remove();
+        self.create();
+        current_json.received = self.received.clone();
+
+        let mut file = File::options().write(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).unwrap();
+
+        file.write_fmt(format_args!("{}", serde_json::to_string_pretty(&current_json).unwrap())).unwrap();
+        file.flush().unwrap();
+    }
+
     pub fn write(&self) {
-        let self_json = serde_json::to_string(self).unwrap();
-
-        if self.exists() == false {
-            self.create();
-        }
-
-        File::options().write(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).expect("Failed to open stream file").write_fmt(format_args!("{}", self_json)).expect("Failed to write to stream file");
+        self.write_pending();
+        self.write_received();
     }
 }

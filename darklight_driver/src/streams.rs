@@ -41,6 +41,6 @@ impl StreamsHandler {
             .received
             .push(message);
 
-        self.streams[&streaminfo].write();
+        self.streams[&streaminfo].write_received();
     }
 }

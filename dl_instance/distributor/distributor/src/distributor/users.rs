@@ -104,7 +104,6 @@ impl DarkLightDistributor {
 
                 let try_read = self.tcp_user_read(stream);
 
-                println!("read: {:?}", try_read);
                 // User read failed
                 if try_read.is_none() {
                     self.local_pending_messages.insert(*id, PendingMessage {

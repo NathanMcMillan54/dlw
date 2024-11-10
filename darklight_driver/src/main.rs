@@ -145,6 +145,7 @@ fn main() {
         cmd::check_cmd_input(&mut darklight_driver);
         darklight_driver.streams_handler.read_local_streams();
         darklight_driver.send_to_distributor();
+        darklight_driver.read_from_distributor();
 
         sleep(Duration::from_millis(10));
     }

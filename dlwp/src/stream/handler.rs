@@ -203,8 +203,9 @@ impl Stream {
     fn wait_for_stream_file(&self) -> Code {
         let mut wait = 0;
 
+
         while wait < 400 {
-            if self.stream_file_exists() {
+            if self.file.exists() {
                 return STATUS_OK;
             }
 
@@ -234,8 +235,14 @@ impl Stream {
         }
 
         self.file.read_and_set();
+        let received = self.file.received.clone();
 
-        self.file.received.clone()
+        while self.file.received.is_empty() {
+            self.file.received.clear();
+            self.file.write_received();
+            self.file.read_and_set();
+        }
+        received
     }
 
     pub fn read(&mut self) -> Vec<Message> {
@@ -248,6 +255,7 @@ impl Stream {
         for i in 0..received_messages.len() {
             let message = Message::decode(&received_messages[i].message, self.encryption);
             if message == Message::empty() {
+                println!("failed to decode");
                 continue;
             }
 
@@ -285,7 +293,7 @@ impl Stream {
         let encoded = message.encode(self.encryption);
 
         self.file.pending.push(encoded.replace("\0", ""));
-        self.file.write();
+        self.file.write_pending();
     }
 
     /// When a server receives a message, it should use the transmit info to respond by calling this function

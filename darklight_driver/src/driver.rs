@@ -6,7 +6,7 @@ use dlwp::{
     distributor::{GET_DISTRIBUTOR, READ_AVAILABLE, USER_INIT},
     encryption::EncryptionInfo,
     id::{local_user_id, DId},
-    message::{contents_to_string, Message, ReceiveInfo},
+    message::{contents_to_string, fmt_message_recv, Message, ReceiveInfo},
     serialport::posix::TTYPort,
     stream::file::ReceivedMessage,
 };
@@ -196,6 +196,7 @@ impl DarkLightDriver {
                     .unwrap()
                     .pending
                     .remove(0);
+                self.streams_handler.streams[&streaminfo].write_pending();
             } else {
                 self.handle_new_message(&distributor_read.unwrap());
             }
@@ -218,6 +219,26 @@ impl DarkLightDriver {
                     .unwrap()
                     .pending
                     .remove(0);
+                self.streams_handler.streams[&streaminfo].write_pending();
+            }
+        }
+    }
+
+    pub fn read_from_distributor(&mut self) {
+        for _ in 0..self.streams_handler.streams.len() {
+            let mut waiting_for_message = true;
+
+            while waiting_for_message {
+                let dist_read = fmt_message_recv(&self.read());
+
+                if dist_read.is_empty() {
+                    continue;
+                }
+
+                if ReceiveInfo::get_from_message_string(dist_read.clone()) != ReceiveInfo::empty() {
+                    self.handle_new_message(&dist_read);
+                    waiting_for_message = false;
+                }
             }
         }
     }
