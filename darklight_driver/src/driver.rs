@@ -227,8 +227,10 @@ impl DarkLightDriver {
     pub fn read_from_distributor(&mut self) {
         for _ in 0..self.streams_handler.streams.len() {
             let mut waiting_for_message = true;
+            let mut wait = 0;
 
-            while waiting_for_message {
+            while waiting_for_message && wait < 400 {
+                wait += 1;
                 let dist_read = fmt_message_recv(&self.read());
 
                 if dist_read.is_empty() {
@@ -238,7 +240,11 @@ impl DarkLightDriver {
                 if ReceiveInfo::get_from_message_string(dist_read.clone()) != ReceiveInfo::empty() {
                     self.handle_new_message(&dist_read);
                     waiting_for_message = false;
+                } else if dist_read.contains(READ_AVAILABLE) {
+                    waiting_for_message = false;
                 }
+
+                sleep(Duration::from_micros(150));
             }
         }
     }

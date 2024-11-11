@@ -1,4 +1,4 @@
-use std::{fs::{read_to_string, remove_file, File}, io::Write, path::Path};
+use std::{fs::{read_to_string, remove_file, File}, io::Write, path::Path, thread::sleep, time::Duration};
 
 use crate::{id::{DId, LId, Port}, message::Message};
 
@@ -43,6 +43,13 @@ impl StreamFile {
         return Path::exists(Path::new(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)));
     }
 
+    pub fn wait_for_file(&self) {
+        while self.exists() == false {
+            sleep(Duration::from_micros(100));
+        }
+        sleep(Duration::from_micros(200));
+    }
+
     pub fn create(&self) {
         File::options().read(true).write(true).create(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).expect("Failed to create file").write_fmt(format_args!("{}", serde_json::to_string(&self).expect("Failed to parse"))).expect("Failed to write to stream file");
     }
@@ -52,6 +59,7 @@ impl StreamFile {
     }
 
     pub fn read(&self) -> String {
+        self.wait_for_file();
         let ret = read_to_string(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).expect("Failed to read stream file");
         ret
     }
@@ -71,6 +79,7 @@ impl StreamFile {
     }
 
     pub fn write_pending(&self) {
+        self.wait_for_file();
         let mut current_json = self.read_and_parse();
         self.remove();
         self.create();
@@ -83,6 +92,7 @@ impl StreamFile {
     }
 
     pub fn write_received(&self) {
+        self.wait_for_file();
         let mut current_json = self.read_and_parse();
         self.remove();
         self.create();
