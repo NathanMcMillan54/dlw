@@ -152,7 +152,7 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
                         .streams
                         .remove(&stream_info)
                         .expect("Failed to remove");
-                    stream.remove();
+                    stream.remove_all();
                 }
             }
             "CLR_RECV" => {
@@ -186,7 +186,7 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
                 println!("Shutting down all streams...");
 
                 for (info, stream) in driver.streams_handler.streams.iter() {
-                    stream.remove();
+                    stream.remove_all();
                 }
                 driver.streams_handler.streams.clear();
 

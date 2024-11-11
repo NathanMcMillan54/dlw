@@ -200,12 +200,12 @@ impl Stream {
         .exists()
     }
 
-    fn wait_for_stream_file(&self) -> Code {
+    fn wait_for_stream_file(&self, pr: &str) -> Code {
         let mut wait = 0;
 
 
         while wait < 400 {
-            if self.file.exists() {
+            if self.file.exists(pr) {
                 return STATUS_OK;
             }
 
@@ -230,17 +230,19 @@ impl Stream {
     }
 
     pub fn _read(&mut self) -> Vec<ReceivedMessage> {
-        if self.wait_for_stream_file() == STREAM_FILE_NOT_FOUND {
+        println!("waiting for stream file");
+        if self.wait_for_stream_file("R") == STREAM_FILE_NOT_FOUND {
             return vec![];
         }
+        println!("done waiting");
 
-        self.file.read_and_set();
+        self.file.read_recieved();
         let received = self.file.received.clone();
 
-        while self.file.received.is_empty() {
+        while self.file.received.is_empty() == false {
             self.file.received.clear();
             self.file.write_received();
-            self.file.read_and_set();
+            self.file.read_recieved();
         }
         received
     }
@@ -292,6 +294,7 @@ impl Stream {
     pub fn write_message(&mut self, message: Message) {
         let encoded = message.encode(self.encryption);
 
+        self.file.read_pending();
         self.file.pending.push(encoded.replace("\0", ""));
         self.file.write_pending();
     }
@@ -378,7 +381,7 @@ impl Stream {
         // Delay to ensure the stream has been created by now
         sleep(Duration::from_millis(100));
 
-        if self.wait_for_stream_file() == STREAM_FILE_NOT_FOUND {
+        if self.wait_for_stream_file("P") == STREAM_FILE_NOT_FOUND {
             return STREAM_FILE_NOT_FOUND;
         }
 

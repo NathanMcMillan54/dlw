@@ -34,11 +34,12 @@ fn main() {
 
         stream.write(input, REQUEST_RESPONSE);
 
-        let read = stream.read();
+        let read = stream.read_with_timestamp();
         for i in 0..read.len() {
             println!(
-                "Read: {}",
-                contents_to_string(read[i].contents).replace("\0", "")
+                "Read: {} At: {:?}",
+                contents_to_string(read[i].message.contents).replace("\0", ""),
+                read[i].recv_time
             );
         }
 

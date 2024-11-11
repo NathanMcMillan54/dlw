@@ -29,7 +29,7 @@ impl StreamsHandler {
 
     pub fn read_local_streams(&mut self) {
         for (stream, file) in self.streams.iter_mut() {
-            file.read_and_set();
+            file.read_pending();
         }
     }
 

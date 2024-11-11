@@ -39,68 +39,83 @@ impl StreamFile {
         return file;
     }
 
-    pub fn exists(&self) -> bool {
-        return Path::exists(Path::new(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)));
+    fn path(&self) -> String {
+        format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)
     }
 
-    pub fn wait_for_file(&self) {
-        while self.exists() == false {
+    pub fn exists(&self, pr: &str) -> bool {
+        return Path::exists(Path::new(&format!("/tmp/darklight/connections/_dl-{}-{}{}", self.id, self.port, pr)));
+    }
+
+    pub fn wait_for_file(&self, pr: &str) {
+        while self.exists(pr) == false {
             sleep(Duration::from_micros(100));
         }
         sleep(Duration::from_micros(200));
     }
 
     pub fn create(&self) {
-        File::options().read(true).write(true).create(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).expect("Failed to create file").write_fmt(format_args!("{}", serde_json::to_string(&self).expect("Failed to parse"))).expect("Failed to write to stream file");
+        self.create_pending();
+        self.create_recieved();
     }
 
-    pub fn remove(&self) {
-        remove_file(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).expect("Failed to remove stream file");
+    pub fn create_pending(&self) {
+        File::options().read(true).write(true).create(true).open(&format!("{}P", self.path())).expect("Failed to create file").write_fmt(format_args!("{}", serde_json::to_string(&self.pending).expect("Failed to parse"))).expect("Failed to write to stream file");
     }
 
-    pub fn read(&self) -> String {
-        self.wait_for_file();
-        let ret = read_to_string(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).expect("Failed to read stream file");
-        ret
+    pub fn create_recieved(&self) {
+        File::options().read(true).write(true).create(true).open(&format!("{}R", self.path())).expect("Failed to create file").write_fmt(format_args!("{}", serde_json::to_string(&self.received).expect("Failed to parse"))).expect("Failed to write to stream file");
     }
 
-    pub fn read_and_parse(&self) -> StreamFile {
-        let current_contents = self.read();
-        let contents_json: StreamFile = serde_json::from_str(&current_contents).expect("Failed to parse stream file");
-
-        return contents_json;
+    pub fn remove_pending(&self) {
+        remove_file(&format!("{}P", self.path())).expect("Failed to remove stream file");
     }
 
-    pub fn read_and_set(&mut self) {
-        let contents_json = self.read_and_parse();
+    pub fn remove_recieved(&self) {
+        remove_file(&format!("{}R", self.path())).expect("Failed to remove stream file");
+    }
 
-        self.received = contents_json.received;
-        self.pending = contents_json.pending;
+    pub fn remove_all(&self) {
+        self.remove_pending();
+        self.remove_recieved();
+    }
+
+    pub fn read_pending(&mut self) {
+        self.wait_for_file("P");
+
+        let pending_contents = read_to_string(&format!("{}P", self.path())).unwrap();
+        let parsed_pending: Vec<String> = serde_json::from_str(&pending_contents).unwrap();
+
+        self.pending = parsed_pending.clone();
+    }
+
+    pub fn read_recieved(&mut self) {
+        self.wait_for_file("R");
+
+        let recieved_contents = read_to_string(&format!("{}R", self.path())).unwrap();
+        let parsed_recieved: Vec<ReceivedMessage> = serde_json::from_str(&recieved_contents).unwrap();
+
+        self.received = parsed_recieved.clone();
     }
 
     pub fn write_pending(&self) {
-        self.wait_for_file();
-        let mut current_json = self.read_and_parse();
-        self.remove();
-        self.create();
-        current_json.pending = self.pending.clone();
+        self.remove_pending();
+        self.create_pending();
+        self.wait_for_file("P");
 
-        let mut file = File::options().write(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).unwrap();
+        let mut file = File::options().write(true).open(&format!("{}P", self.path())).unwrap();
 
-        file.write_fmt(format_args!("{}", serde_json::to_string_pretty(&current_json).unwrap())).unwrap();
+        file.write_fmt(format_args!("{}", serde_json::to_string_pretty(&self.pending).unwrap())).unwrap();
         file.flush().unwrap();
     }
 
     pub fn write_received(&self) {
-        self.wait_for_file();
-        let mut current_json = self.read_and_parse();
-        self.remove();
-        self.create();
-        current_json.received = self.received.clone();
+        self.remove_recieved();
+        self.create_recieved();
+        self.wait_for_file("R");
+        let mut file = File::options().write(true).open(&format!("{}R", self.path())).unwrap();
 
-        let mut file = File::options().write(true).open(&format!("/tmp/darklight/connections/_dl-{}-{}", self.id, self.port)).unwrap();
-
-        file.write_fmt(format_args!("{}", serde_json::to_string_pretty(&current_json).unwrap())).unwrap();
+        file.write_fmt(format_args!("{}", serde_json::to_string_pretty(&self.received).unwrap())).unwrap();
         file.flush().unwrap();
     }
 
