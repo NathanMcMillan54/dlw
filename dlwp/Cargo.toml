@@ -16,6 +16,16 @@ serde = { version = "1.0.188", features = ["serde_derive", "std"] }
 serde_json = { version = "1.0.100" }
 serialport = { version = "3.3.0", optional = true }
 
+[[example]]
+name = "client"
+path = "examples/client.rs"
+required-features = ["include_chrono"]
+
+[[example]]
+name = "server"
+path = "examples/server.rs"
+required-features = ["include_chrono"]
+
 [features]
 # Enable if testing a stream
 test_stream = []

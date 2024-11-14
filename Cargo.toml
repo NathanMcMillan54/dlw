@@ -43,8 +43,6 @@ members = [
     "dl_instance/",
     "dl_instance/distributor/distributor/",
     "dlwp/",
-    "test_streams/test_client",
-    "test_streams/test_server",
     "tools/client",
     "tools/dlcmd", 
     "tools/dlcns",
