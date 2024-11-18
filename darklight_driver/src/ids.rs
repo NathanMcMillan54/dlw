@@ -3,6 +3,8 @@ use std::{
     io::{Read, Write},
 };
 
+use dlwp::id::DId;
+
 pub(crate) fn first_key() -> String {
     read_to_string("/etc/dlw/first_key").expect("Failed to open \"/etc/dlw/first_key\'")
 }
@@ -31,6 +33,17 @@ pub(crate) fn write_local_id() {
     id_file
         .write_fmt(format_args!("{}", generate_local_id()))
         .expect("Failed to write to \"/etc/dlw/local_id\"");
+}
+
+pub(crate) fn write_local_did(did: DId) {
+    let mut did_file = File::options()
+        .write(true)
+        .create(true)
+        .open("/etc/dlw/local_did")
+        .expect("Failed to open \"/etc/dlw/local_did\"");
+    did_file
+        .write_fmt(format_args!("{}", did))
+        .expect("Failed to write to \"/etc/dlw/local_did\"");
 }
 
 pub(crate) fn verify_id() -> bool {

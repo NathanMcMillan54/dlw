@@ -1,4 +1,4 @@
-use crate::streams::{StreamInfo, StreamsHandler};
+use crate::{ids::write_local_did, streams::{StreamInfo, StreamsHandler}};
 use dlwp::{
     cerpton::{libcerpton_decode, libcerpton_encode},
     chrono::{Timelike, Utc},
@@ -13,7 +13,9 @@ use dlwp::{
 use std::{
     borrow::{Borrow, BorrowMut},
     io::{Read, Write},
-    net::TcpStream, thread::sleep, time::Duration,
+    net::TcpStream,
+    thread::sleep,
+    time::Duration,
 };
 
 pub struct DarkLightDriver {
@@ -54,6 +56,9 @@ impl DarkLightDriver {
         let id = id_response.parse::<DId>();
         if id.is_err() {
             println!("Failed to get Distirbutor ID: {}", id_response);
+            return false;
+        } else {
+            write_local_did(*id.as_ref().unwrap());
         }
 
         // Send user information
@@ -163,12 +168,16 @@ impl DarkLightDriver {
         while read_ret == [0; 4096] {
             read_ret = if self.config.serial == true {
                 read(self.serial_port.as_mut().unwrap())
-            } else {
+            } else if self.config.tcp == true {
                 read(self.tcp_stream.as_mut().unwrap())
+            } else {
+                [0; 4096]
             };
         }
 
-        String::from_utf8(read_ret.to_vec()).unwrap_or(String::new()).replace("\0", "")
+        String::from_utf8(read_ret.to_vec())
+            .unwrap_or(String::new())
+            .replace("\0", "")
     }
 
     pub fn send_to_distributor(&mut self) {

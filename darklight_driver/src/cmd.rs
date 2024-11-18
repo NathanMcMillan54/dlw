@@ -170,7 +170,7 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
                     id: id,
                     port: port.unwrap(),
                     did: did.unwrap(),
-                    local: id == local_user_id().unwrap()
+                    local: id == local_user_id().unwrap(),
                 };
 
                 if !driver.streams_handler.streams.contains_key(&streaminfo) {
@@ -178,8 +178,19 @@ pub fn check_cmd_input(driver: &mut DarkLightDriver) {
                 }
 
                 println!("cleared");
-                driver.streams_handler.streams.get_mut(&streaminfo).unwrap().received.clear();
-                driver.streams_handler.streams.get_mut(&streaminfo).unwrap().write_received();
+                driver
+                    .streams_handler
+                    .streams
+                    .get_mut(&streaminfo)
+                    .unwrap()
+                    .received
+                    .clear();
+                driver
+                    .streams_handler
+                    .streams
+                    .get_mut(&streaminfo)
+                    .unwrap()
+                    .write_received();
             }
             "REQUEST-ADD-NAME" => {
                 println!("Requested to add a name");

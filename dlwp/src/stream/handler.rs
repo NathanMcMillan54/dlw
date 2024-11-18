@@ -230,11 +230,9 @@ impl Stream {
     }
 
     pub fn _read(&mut self) -> Vec<ReceivedMessage> {
-        println!("waiting for stream file");
         if self.wait_for_stream_file("R") == STREAM_FILE_NOT_FOUND {
             return vec![];
         }
-        println!("done waiting");
 
         self.file.read_recieved();
         let received = self.file.received.clone();
@@ -257,7 +255,6 @@ impl Stream {
         for i in 0..received_messages.len() {
             let message = Message::decode(&received_messages[i].message, self.encryption);
             if message == Message::empty() {
-                println!("failed to decode");
                 continue;
             }
 
@@ -363,7 +360,6 @@ impl Stream {
     fn _client_start(&mut self) -> Code {
         let decode_info = self.encryption.info;
 
-        println!("sending");
         // Create a stream
         send_dlcmd(
             CONNECT,
