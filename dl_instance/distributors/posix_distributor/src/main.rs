@@ -4,13 +4,9 @@ use std::{
     time::Duration,
 };
 
-use distributor::{users, DarkLightDistributor};
-use dlwp::encryption::EncryptionInfo;
-use lib_dldistributor::encryption::DistributorEncryption;
-
 extern crate dlwp;
 #[macro_use]
-extern crate lib_dldistributor;
+extern crate libdistributor;
 #[macro_use]
 extern crate tokio;
 
@@ -32,7 +28,13 @@ const DISTRIBUTOR_UID: &str = env!("DIST_UID");
 // Path to config file
 const CONFIG_PATH: &str = "distributor_config.json";
 
-mod distributor;
+pub(crate) mod distributor;
+pub(crate) mod distributors;
+pub(crate) mod input;
+pub(crate) mod users;
+pub(crate) mod verify_server;
+
+pub(crate) use distributor::DarkLightDistributor;
 
 static mut DISTRIBUTOR: Option<DarkLightDistributor> = None;
 

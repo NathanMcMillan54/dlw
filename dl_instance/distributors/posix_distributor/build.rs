@@ -26,6 +26,5 @@ fn bin() {
 }
 
 fn main() {
-    #[cfg(feature = "bin")]
     bin()
 }

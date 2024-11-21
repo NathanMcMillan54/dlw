@@ -1,5 +1,5 @@
 use dlwp::{cerpton::{libcerpton_decode, libcerpton_encode}, codes::{INVALID_RR, READ_FAILED, STATUS_OK, WRITE_FAILED}, distributor::DIST_INIT};
-use lib_dldistributor::external::{ExternalDistributorInfo, ExternalDistributorRW};
+use libdistributor::external::{ExternalDistributorInfo, ExternalDistributorRW};
 use std::{borrow::Borrow, io::{Read, Write}, net::TcpStream, time::Duration};
 
 use crate::{distributor::{encrpytion::current_encryption, magicn::get_my_magic_num}, DISTRIBUTOR_ID, VS1, VS2, VS3};

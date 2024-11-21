@@ -11,7 +11,7 @@ use dlwp::{
     id::LId,
     message::{ReceiveInfo, MSG_END, MSG_INIT},
 };
-use lib_dldistributor::connections::PendingMessage;
+use libdistributor::connections::PendingMessage;
 
 use super::DarkLightDistributor;
 use crate::DISTRIBUTOR;
@@ -45,7 +45,7 @@ impl DarkLightDistributor {
                     return None;
                 }
 
-                sleep(Duration::from_micros(100));
+                sleep(Duration::from_micros(50));
             }
 
             let read_err = io_err_check!(stream.read(&mut buf));
@@ -81,16 +81,9 @@ impl DarkLightDistributor {
 
     pub fn tcp_user_handler(&mut self) {
         loop {
-            //sleep_condition!(self.user_connections.tcp_connections.len() <= 1); // Loop delays then continues if there <= 1 users
+            sleep_condition!(self.user_connections.tcp_connections.len() <= 1); // Loop delays then continues if there <= 1 users
 
             for (id, mut stream) in self.user_connections.tcp_connections.iter() {
-                /*if self.local_pending_messages.contains_key(id) {
-                    if self.local_pending_messages[id].can_send == true {
-                        println!("i have a message: {}", self.local_pending_messages[id].message_str);
-                        self.tcp_user_write(stream, self.local_pending_messages[id].message_str.clone());
-                    }
-                }*/
-
                 if self.local_pending_messages.contains_key(id) {
                     if self.local_pending_messages[id].message_str == String::new() {
                         self.local_pending_messages.remove(id);
@@ -152,10 +145,17 @@ impl DarkLightDistributor {
                 }
             }
             
+            let mut removed = vec![];
             for (id, msg) in self.local_pending_messages.iter() {
                 if msg.can_send == false && msg.message_str == String::from("rm") { // Remove users
+                    println!("removing user: {}", id);
                     self.user_connections.tcp_connections.remove(id);
+                    removed.push(id.clone());
                 }
+            }
+
+            for i in 0..removed.len() {
+                self.local_pending_messages.remove(&removed[i]);
             }
         }
     }

@@ -36,6 +36,7 @@ impl StreamFile {
         };
 
         file.create();
+        file.write();
         return file;
     }
 
@@ -51,7 +52,8 @@ impl StreamFile {
         while self.exists(pr) == false {
             sleep(Duration::from_micros(100));
         }
-        sleep(Duration::from_micros(200));
+
+        sleep(Duration::from_millis(150));
     }
 
     pub fn create(&self) {
@@ -60,11 +62,11 @@ impl StreamFile {
     }
 
     pub fn create_pending(&self) {
-        File::options().read(true).write(true).create(true).open(&format!("{}P", self.path())).expect("Failed to create file").write_fmt(format_args!("{}", serde_json::to_string(&self.pending).expect("Failed to parse"))).expect("Failed to write to stream file");
+        File::options().read(true).write(true).create(true).open(&format!("{}P", self.path())).expect("Failed to create file");
     }
 
     pub fn create_recieved(&self) {
-        File::options().read(true).write(true).create(true).open(&format!("{}R", self.path())).expect("Failed to create file").write_fmt(format_args!("{}", serde_json::to_string(&self.received).expect("Failed to parse"))).expect("Failed to write to stream file");
+        File::options().read(true).write(true).create(true).open(&format!("{}R", self.path())).expect("Failed to create file");
     }
 
     pub fn remove_pending(&self) {
@@ -83,8 +85,13 @@ impl StreamFile {
     pub fn read_pending(&mut self) {
         self.wait_for_file("P");
 
-        let pending_contents = read_to_string(&format!("{}P", self.path())).unwrap();
-        let parsed_pending: Vec<String> = serde_json::from_str(&pending_contents).unwrap();
+        let mut try_pending_contents = read_to_string(&format!("{}P", self.path()));
+
+        while try_pending_contents.is_err() {
+            try_pending_contents = read_to_string(&format!("{}P", self.path()));
+        }
+
+        let parsed_pending: Vec<String> = serde_json::from_str(&try_pending_contents.unwrap()).unwrap();
 
         self.pending = parsed_pending.clone();
     }
@@ -92,8 +99,13 @@ impl StreamFile {
     pub fn read_recieved(&mut self) {
         self.wait_for_file("R");
 
-        let recieved_contents = read_to_string(&format!("{}R", self.path())).unwrap();
-        let parsed_recieved: Vec<ReceivedMessage> = serde_json::from_str(&recieved_contents).unwrap();
+        let mut try_recieved_contents = read_to_string(&format!("{}R", self.path()));
+
+        while try_recieved_contents.is_err() {
+            try_recieved_contents = read_to_string(&format!("{}R", self.path()));
+        }
+
+        let parsed_recieved: Vec<ReceivedMessage> = serde_json::from_str(&try_recieved_contents.unwrap()).unwrap();
 
         self.received = parsed_recieved.clone();
     }
@@ -105,7 +117,7 @@ impl StreamFile {
 
         let mut file = File::options().write(true).open(&format!("{}P", self.path())).unwrap();
 
-        file.write_fmt(format_args!("{}", serde_json::to_string_pretty(&self.pending).unwrap())).unwrap();
+        file.write_fmt(format_args!("{}", serde_json::to_string(&self.pending).unwrap())).unwrap();
         file.flush().unwrap();
     }
 
@@ -115,7 +127,7 @@ impl StreamFile {
         self.wait_for_file("R");
         let mut file = File::options().write(true).open(&format!("{}R", self.path())).unwrap();
 
-        file.write_fmt(format_args!("{}", serde_json::to_string_pretty(&self.received).unwrap())).unwrap();
+        file.write_fmt(format_args!("{}", serde_json::to_string(&self.received).unwrap())).unwrap();
         file.flush().unwrap();
     }
 

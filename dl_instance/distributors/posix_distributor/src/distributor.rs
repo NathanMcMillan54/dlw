@@ -9,20 +9,15 @@ use std::{
     time::Duration,
 };
 
-use distributors::tcp::TcpDistributor;
+use crate::distributors::tcp::TcpDistributor;
 use dlwp::{config::DistributorConfig, encryption::EncryptionInfo};
 use dlwp::serde_json;
-use input::check_user_input;
-use lib_dldistributor::{
+use crate::input::check_user_input;
+use libdistributor::{
     connections::{LocalConnections, PendingMessage, PendingMessages}, encryption::DistributorEncryption, get_a_magic_num, info::DistributorInfo
 };
 
 use crate::{DISTRIBUTOR, DISTRIBUTOR_ID, DISTRIBUTOR_UID};
-
-pub(crate) mod distributors;
-pub(crate) mod input;
-pub(crate) mod users;
-pub(crate) mod verify_server;
 
 // "Magic number" information
 #[cfg(debug_assertions)]

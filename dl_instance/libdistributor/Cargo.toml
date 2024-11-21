@@ -1,0 +1,8 @@
+[package]
+name = "libdistributor"
+version = "0.1.0"
+edition = "2021"
+description = "A TCP and serial distributor intended to run on POSIX-like systems"
+
+[dependencies]
+dlwp = { path = "../../dlwp/", features = ["use_io", "include_chrono", "include_serde"] }

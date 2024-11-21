@@ -3,7 +3,7 @@
 use std::{io::Write, net::TcpStream, thread::{sleep, spawn}, time::Duration};
 
 use dlwp::{codes::{Code, READ_TIMEDOUT, STATUS_OK}, distributor::READ_AVAILABLE, message::{valid_message_string, ReceiveInfo, MSG_END, MSG_INIT}};
-use lib_dldistributor::{connections::PendingMessage, external::ExternalDistributorRW, IDLE_SLEEP};
+use libdistributor::{connections::PendingMessage, external::ExternalDistributorRW, IDLE_SLEEP};
 use tcp::TcpDistributor;
 
 use crate::DISTRIBUTOR;

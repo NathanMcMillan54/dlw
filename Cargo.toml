@@ -41,7 +41,8 @@ signal-hook = "0.3.17"
 members = [
     "darklight_driver/",
     "dl_instance/",
-    "dl_instance/distributor/distributor/",
+    "dl_instance/distributors/posix_distributor/",
+    "dl_instance/libdistributor/",
     "dlwp/",
     "tools/client",
     "tools/dlcmd", 

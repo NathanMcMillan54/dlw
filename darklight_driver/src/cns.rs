@@ -35,7 +35,6 @@ pub fn setup_cns() -> ([i32; 6], String, String) {
         s2 = rng.gen_range(0..ALPHABET_LEN);
         encoder.change_setting(s1, s2);
         encoder.set_alphabet();
-        println!("Running");
     }
 
     // In the future this value can (and should) be increased to i32::MAX
@@ -134,13 +133,6 @@ pub fn cns_add(input: Vec<&str>) {
         if recv_first == false {
             let read = stream.read();
             if read.is_empty() {
-                attempts += 1;
-
-                if attempts > 500 {
-                    attempts = 0;
-                    send_first = false;
-                }
-
                 continue;
             }
 
