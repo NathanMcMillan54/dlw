@@ -1,0 +1,3 @@
+# For testing Stream functions (requires sudo)
+# [target.x86_64-unknown-linux-gnu]
+# runner = 'sudo -E'

@@ -1,5 +1,7 @@
 use std::{fs::{read_to_string, remove_file, File}, io::Write, path::Path, thread::sleep, time::Duration};
 
+use serde_json::Error;
+
 use crate::{id::{DId, LId, Port}, message::Message};
 
 #[derive(Deserialize, Serialize, Default, Clone)]
@@ -82,32 +84,40 @@ impl StreamFile {
         self.remove_recieved();
     }
 
-    pub fn read_pending(&mut self) {
-        self.wait_for_file("P");
+    fn read(&self, pr: &str) -> String {
+        self.wait_for_file(pr);
 
-        let mut try_pending_contents = read_to_string(&format!("{}P", self.path()));
+        let mut file_contents = read_to_string(format!("{}{}", self.path(), pr));
 
-        while try_pending_contents.is_err() {
-            try_pending_contents = read_to_string(&format!("{}P", self.path()));
+        while file_contents.is_err() {
+            file_contents = read_to_string(format!("{}{}", self.path(), pr));
         }
 
-        let parsed_pending: Vec<String> = serde_json::from_str(&try_pending_contents.unwrap()).unwrap();
+        return file_contents.unwrap();
+    }
 
-        self.pending = parsed_pending.clone();
+    pub fn read_pending(&mut self) {
+        let mut read = self.read("P");
+        let mut parsed_pending: Result<Vec<String>, Error> = serde_json::from_str(&read);
+
+        while read.is_empty() || parsed_pending.is_err() {
+            read = self.read("P");
+            parsed_pending = serde_json::from_str(&read);
+        }
+
+        self.pending = parsed_pending.unwrap();
     }
 
     pub fn read_recieved(&mut self) {
-        self.wait_for_file("R");
+        let mut read = self.read("R");
+        let mut parsed_received: Result<Vec<ReceivedMessage>, Error> = serde_json::from_str(&read);
 
-        let mut try_recieved_contents = read_to_string(&format!("{}R", self.path()));
-
-        while try_recieved_contents.is_err() {
-            try_recieved_contents = read_to_string(&format!("{}R", self.path()));
+        while read.is_empty() || parsed_received.is_err() {
+            read = self.read("R");
+            parsed_received = serde_json::from_str(&read);
         }
 
-        let parsed_recieved: Vec<ReceivedMessage> = serde_json::from_str(&try_recieved_contents.unwrap()).unwrap();
-
-        self.received = parsed_recieved.clone();
+        self.received = parsed_received.unwrap();
     }
 
     pub fn write_pending(&self) {
