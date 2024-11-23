@@ -15,13 +15,15 @@ pub const MSG_INIT: &str = "\\z ";
 pub const SN_MSG_INIT: &str = "\\\\z ";
 /// The end of a message being sent
 pub const MSG_END: &str = " \\q";
+/// The real length of contents (contents length minus length of all other information in the message)
+pub const MAX_CONTENTS_LENGTH: usize = CONTENTS_LENGTH - 123;
 
 /// "contents" type, 4096 byte array
 pub type Contents = [u8; CONTENTS_LENGTH];
 
-/// If the original ``String`` was less than 4096 bytes there will be many null characters (``\0``) at the end
+/// If the original ``String`` was less than 4096 bytes there would be many null characters (``\0``) at the end, these are removed before returning
 pub fn contents_to_string(contents: Contents) -> String {
-    utf8_to_string(contents.to_vec())
+    utf8_to_string(contents.to_vec()).replace("\0", "")
 }
 
 /// Converts a ``String`` to ``Contents``, will panic if the input ``String`` is larger than 4096 bytes

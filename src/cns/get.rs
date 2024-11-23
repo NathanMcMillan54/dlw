@@ -1,3 +1,5 @@
+use dlwp::message::MAX_CONTENTS_LENGTH;
+
 use crate::NAMES_LIST;
 
 pub fn get_cns_info(inputs: Vec<&str>) -> String {
@@ -11,13 +13,26 @@ pub fn get_cns_info(inputs: Vec<&str>) -> String {
         }
 
         vec![did.unwrap() as u64, id.unwrap(), port.unwrap() as u64]
+    } else if inputs[0] == "GET_ALL_NAMES_ID" {
+        let did = inputs[1].parse::<u32>();
+        let id = inputs[2].parse::<u64>();
+
+        if did.is_err() || id.is_err() {
+            return format!("Parsing error");
+        }
+
+        vec![did.unwrap() as u64, id.unwrap()]
     } else {
         vec![]
     };
 
+    let mut ret = String::new();
     unsafe {
         for i in 0..NAMES_LIST.list.len() {
             match inputs[0] {
+                "GET_ALL_NAMES" => {
+                    ret.push_str(&format!("{} {} {} {} {},", NAMES_LIST.list[i].owner.id, NAMES_LIST.list[i].owner.did, NAMES_LIST.list[i].owner.port, NAMES_LIST.list[i].owner.name, NAMES_LIST.list[i].owner.name_type));
+                }
                 "GET_ID" => {
                     if &NAMES_LIST.list[i].owner.name == inputs[1] {
                         return format!(
@@ -30,8 +45,10 @@ pub fn get_cns_info(inputs: Vec<&str>) -> String {
                         );
                     }
                 }
-                "GET_ALL_NAMES" => {
-                    // TODO: Implement large file reading
+                "GET_ALL_NAMES_ID" => {
+                    if NAMES_LIST.list[i].owner.did == location[0] as u32 && NAMES_LIST.list[i].owner.id == location[1] {
+                        ret.push_str(&format!("{} {} {} {} {},", NAMES_LIST.list[i].owner.id, NAMES_LIST.list[i].owner.did, NAMES_LIST.list[i].owner.port, NAMES_LIST.list[i].owner.name, NAMES_LIST.list[i].owner.name_type));
+                    }
                 }
                 "GET_NAME" => {
                     if NAMES_LIST.list[i].owner.did == location[0] as u32
@@ -47,6 +64,13 @@ pub fn get_cns_info(inputs: Vec<&str>) -> String {
                 _ => {}
             }
         }
+    }
+    
+    if ret.len() <= MAX_CONTENTS_LENGTH {
+        let chunks = ret.len() / MAX_CONTENTS_LENGTH;
+        // TODO: 
+    } else {
+        return ret;
     }
 
     String::new()

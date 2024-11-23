@@ -230,10 +230,6 @@ impl Stream {
     }
 
     pub fn _read(&mut self) -> Vec<ReceivedMessage> {
-        if self.wait_for_stream_file("R") == STREAM_FILE_NOT_FOUND {
-            return vec![];
-        }
-
         self.file.read_recieved();
         let received = self.file.received.clone();
 

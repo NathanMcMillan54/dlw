@@ -19,9 +19,14 @@ pub fn format_name_request(name: &String) -> String {
     return format!("GET_ID {}", name);
 }
 
-/// Getting all names by location (owner)
-pub fn format_id_request(did: DId, id: LId) -> String {
-    return format!("GET_ALL_NAMES {} {}", did, id);
+/// Getting all names by location (owner), if the owner has multiple names the response might be sent in chunks
+pub fn format_all_id_request(did: DId, id: LId) -> String {
+    return format!("GET_ALL_NAMES_ID {} {}", did, id);
+}
+
+/// Gets all registered names, this will return multiple strings that makeup a list of all names and their owners
+pub fn format_all_request() -> String {
+    return format!("GET_ALL");
 }
 
 /// Getting a single name from a location
@@ -144,8 +149,14 @@ impl CNSGet {
     }
 
     /// Return a list of all owners and their names
-    pub fn get_all(&mut self) -> String {
+    pub fn get_all(&mut self) -> Option<Vec<Owner>> {
         unimplemented!();
+    }
+
+    /// Return a list of all names from an owner
+    pub fn get_all_names(&mut self) -> Option<Vec<Owner>> {
+
+        None
     }
 
     /// Returns the name of an onwer
