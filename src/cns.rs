@@ -6,7 +6,7 @@ use std::{fmt::format, fs::File, path::Path};
 use dlcns::name::{Name, NamesList, Owner};
 use dlcns::OWNERS_LIST;
 use dlwp::cerpton::{libcerpton_encode, Encoder};
-use dlwp::codes::REQUEST_CONNECTION;
+use dlwp::codes::{REMOVE_CLIENT, REQUEST_CONNECTION};
 use dlwp::encryption::EncryptionInfo;
 use dlwp::message::TransmitInfo;
 use dlwp::{
@@ -24,10 +24,14 @@ mod get;
 
 pub(crate) static mut NAMES_LIST: NamesList = NamesList::empty();
 
-pub fn handle_message(contents: String, ti: TransmitInfo) -> (String, Code) {
+pub fn handle_message(contents: String, mut stream: &mut Stream, ti: TransmitInfo) -> (String, Code) {
     let split = contents.split(" ").collect::<Vec<&str>>();
 
-    return if split[0].starts_with("GET_") {
+    return if split[0].starts_with("GET_") && split[0].contains("ALL") {
+        // Get large chunks of data
+        get::get_cns_all_info(split, stream, ti);
+        (String::new(), REMOVE_CLIENT)
+    } else if split[0].starts_with("GET_") && !split[0].contains("ALL") {
         (get::get_cns_info(split), REGULAR_RESPONSE)
     } else if split[0].contains("REQUEST_ADD") {
         unsafe { add::check_allowadd(contents, ti) }
@@ -92,7 +96,7 @@ fn main() {
             }
 
             let contents = contents_to_string(r.contents);
-            let response = handle_message(contents, r.ti);
+            let response = handle_message(contents, &mut stream, r.ti);
 
             stream.server_write(r.ti, response.0, response.1);
         }

@@ -149,14 +149,89 @@ impl CNSGet {
     }
 
     /// Return a list of all owners and their names
-    pub fn get_all(&mut self) -> Option<Vec<Owner>> {
-        unimplemented!();
+    pub fn get_all_from_id(&mut self, did: DId, id: LId) -> Option<Vec<Owner>> {
+        if self.stream.running() == false {
+            return None;
+        }
+        sleep(Duration::from_millis(100));
+
+        let response = self.write_read(format_all_id_request(did, id));
+        if response.is_empty() {
+            return None;
+        }
+
+        let split_response = response.split(",").collect::<Vec<&str>>();
+        let mut ret = vec![];
+
+        for i in 0..split_response.len() {
+            let split_owner = split_response[i].split(" ").collect::<Vec<&str>>();
+
+            if split_response.len() < 5 {
+                return None;
+            }
+    
+            let id = split_owner[0].parse::<u64>();
+            let did = split_owner[1].parse::<u32>();
+            let port = split_owner[2].parse::<u16>();
+            let name = split_owner[3];
+            let name_type = split_owner[4].parse::<usize>();
+    
+            if id.is_err() || did.is_err() || port.is_err() || name_type.is_err() || name.is_empty() {
+                return None;
+            }
+            ret.push(Owner {
+                id: id.unwrap(),
+                did: did.unwrap(),
+                port: port.unwrap(),
+                name: name.to_string(),
+                name_type: name_type.unwrap()
+            });
+        }
+        
+        return Some(ret);
     }
 
     /// Return a list of all names from an owner
     pub fn get_all_names(&mut self) -> Option<Vec<Owner>> {
+        if self.stream.running() == false {
+            return None;
+        }
+        sleep(Duration::from_millis(100));
 
-        None
+        let response = self.write_read(format_all_request());
+        if response.is_empty() {
+            return None;
+        }
+
+        let split_response = response.split(",").collect::<Vec<&str>>();
+        let mut ret = vec![];
+
+        for i in 0..split_response.len() {
+            let split_owner = split_response[i].split(" ").collect::<Vec<&str>>();
+
+            if split_response.len() < 5 {
+                return None;
+            }
+    
+            let id = split_owner[0].parse::<u64>();
+            let did = split_owner[1].parse::<u32>();
+            let port = split_owner[2].parse::<u16>();
+            let name = split_owner[3];
+            let name_type = split_owner[4].parse::<usize>();
+    
+            if id.is_err() || did.is_err() || port.is_err() || name_type.is_err() || name.is_empty() {
+                return None;
+            }
+            ret.push(Owner {
+                id: id.unwrap(),
+                did: did.unwrap(),
+                port: port.unwrap(),
+                name: name.to_string(),
+                name_type: name_type.unwrap()
+            });
+        }
+        
+        return Some(ret);
     }
 
     /// Returns the name of an onwer
