@@ -26,7 +26,7 @@ pub fn format_all_id_request(did: DId, id: LId) -> String {
 
 /// Gets all registered names, this will return multiple strings that makeup a list of all names and their owners
 pub fn format_all_request() -> String {
-    return format!("GET_ALL");
+    return format!("GET_ALL_NAMES");
 }
 
 /// Getting a single name from a location
@@ -37,6 +37,7 @@ pub fn format_specific_id_request(did: DId, id: LId, port: Port) -> String {
 pub struct CNSGet {
     stream: Stream,
     pub received: Vec<Owner>,
+    /// Default timeout is 1 minute
     pub timeout: Duration,
 }
 
@@ -60,7 +61,7 @@ impl CNSGet {
         return CNSGet {
             stream,
             received: vec![],
-            timeout: Duration::from_millis(5000),
+            timeout: Duration::from_millis(60000),
         };
     }
 
@@ -209,8 +210,10 @@ impl CNSGet {
         for i in 0..split_response.len() {
             let split_owner = split_response[i].split(" ").collect::<Vec<&str>>();
 
-            if split_response.len() < 5 {
+            if split_owner.len() > 5 { // There is extra or incorrect information that should not be here
                 return None;
+            } else if split_owner.len() < 5 { // An extra space might have been created
+                continue;
             }
     
             let id = split_owner[0].parse::<u64>();

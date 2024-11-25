@@ -9,5 +9,5 @@ readme = "README.md"
 repository = "https://github.com/NathanMcMillan54/dlw/"
 
 [dependencies]
-dlwp = { version = "0.1.0-alpha", features = ["include_serde"] }
+dlwp = { path = "../../dlwp/", features = ["include_serde"] }
 serde = { version = "1.0.188", features = ["serde_derive", "std"] }
